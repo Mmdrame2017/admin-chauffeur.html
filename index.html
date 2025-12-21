@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Al Bourakh - Administration Chauffeurs</title>
+    <title>Al Bourakh - Administration Complète</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -200,6 +200,8 @@
         .status-en_attente { background: #fff3cd; color: #856404; }
         .status-acceptee { background: #d4edda; color: #155724; }
         .status-refusee { background: #f8d7da; color: #721c24; }
+        .status-active { background: #cce5ff; color: #004085; }
+        .status-completed { background: #d4edda; color: #155724; }
         .type-badge {
             padding: 4px 8px;
             border-radius: 15px;
@@ -438,12 +440,372 @@
         .alert-box.info { background: #d1ecf1; border-left-color: #17a2b8; }
         .alert-box i { font-size: 1.5em; color: #856404; }
         .alert-box.info i { color: #0c5460; }
+
+        /* GPS TRACKING STYLES */
+        .gps-container {
+            display: flex;
+            gap: 20px;
+            height: 700px;
+        }
+        
+        .gps-sidebar {
+            width: 350px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .gps-sidebar-header {
+            background: linear-gradient(135deg, #00A854, #FECB00);
+            color: white;
+            padding: 20px;
+        }
+        
+        .gps-sidebar-header h2 { font-size: 1.3em; margin-bottom: 5px; }
+        
+        .status-bar {
+            padding: 10px 15px;
+            background: #f8f9fa;
+            font-size: 0.85em;
+        }
+        
+        .status-bar.connected { background: #d4edda; color: #155724; }
+        .status-bar.error { background: #f8d7da; color: #721c24; }
+        
+        .gps-filters {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .filter-group-gps {
+            margin-bottom: 15px;
+        }
+        
+        .filter-group-gps label {
+            display: block;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .filter-group-gps select {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+        
+        .stats-mini {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .stat-mini {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-mini-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #00A854;
+        }
+        
+        .stat-mini-label {
+            font-size: 0.75em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .sessions-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .session-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .session-card:hover {
+            border-color: #00A854;
+            box-shadow: 0 4px 12px rgba(0,168,84,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .session-card.active {
+            border-color: #00A854;
+            background: #f0fff4;
+        }
+        
+        .session-driver {
+            font-weight: bold;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+            color: #00A854;
+        }
+        
+        .session-info {
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .session-info div {
+            margin-bottom: 3px;
+        }
+        
+        .map-wrapper {
+            flex: 1;
+            position: relative;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .debug-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #333;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+            font-size: 14px;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            padding: 15px;
+            z-index: 1000;
+            min-width: 220px;
+        }
+
+        .map-controls h3 {
+            margin: 0 0 15px 0;
+            font-size: 1em;
+            color: #333;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .control-group {
+            margin-bottom: 12px;
+        }
+
+        .control-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            cursor: pointer;
+            color: #555;
+            padding: 5px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .control-group label:hover {
+            background: #f8f9fa;
+        }
+
+        .control-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #00A854;
+        }
+
+        .btn-map {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-map.primary {
+            background: linear-gradient(135deg, #00A854, #00C65E);
+            color: white;
+        }
+
+        .btn-map.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,168,84,0.3);
+        }
+
+        .btn-map.secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-map.secondary:hover {
+            background: #5a6268;
+        }
+
+        .trajectory-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            padding: 15px;
+            z-index: 1000;
+            min-width: 300px;
+            display: none;
+        }
+
+        .trajectory-info.visible {
+            display: block;
+        }
+
+        .trajectory-info h3 {
+            color: #00A854;
+            margin: 0 0 15px 0;
+            font-size: 1em;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .trajectory-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .trajectory-stat {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .trajectory-stat-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #00A854;
+            margin-bottom: 5px;
+        }
+
+        .trajectory-stat-label {
+            font-size: 0.75em;
+            color: #666;
+        }
+        
+        .debug-console {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.95);
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75em;
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 600px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+        }
+        
+        .debug-console.visible {
+            display: block;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .empty-state i {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        .gps-loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            border-radius: 15px;
+        }
+
+        .gps-loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #f0f0f0;
+            border-top-color: #00A854;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .gps-loading-text {
+            margin-top: 20px;
+            font-size: 1.1em;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .gps-loading-progress {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
         @media (max-width: 768px) {
             .header h1 { font-size: 1.5em; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
             .action-bar { flex-direction: column; align-items: stretch; }
             .search-box { max-width: 100%; }
             .tabs { justify-content: center; }
+            .gps-container { flex-direction: column; height: auto; }
+            .gps-sidebar { width: 100%; height: 400px; }
+            .map-wrapper { height: 500px; }
         }
     </style>
 </head>
@@ -453,7 +815,7 @@
             <div class="login-header">
                 <div class="login-logo">🔐</div>
                 <h1 class="login-title">Administration</h1>
-                <p style="color: #666;">Al Bourakh - Gestion des Chauffeurs</p>
+                <p style="color: #666;">Al Bourakh - Gestion Complète</p>
             </div>
             <div class="form-group">
                 <label>📧 Email Administrateur</label>
@@ -467,7 +829,7 @@
                 <i class="fas fa-sign-in-alt"></i> Se connecter
             </button>
             <p style="text-align: center; margin-top: 20px; color: #999; font-size: 0.9em;">
-                Version 3.0 - Al Bourakh © 2025
+                Version 4.1 OPTIMISÉ - Al Bourakh © 2025
             </p>
         </div>
     </div>
@@ -475,8 +837,8 @@
     <div id="adminDashboard" style="display: none;">
         <div class="container">
             <div class="header">
-                <h1><i class="fas fa-shield-alt"></i> Administration - Chauffeurs</h1>
-                <p>Gérez les chauffeurs et les candidatures Al Bourakh</p>
+                <h1><i class="fas fa-shield-alt"></i> Administration Complète</h1>
+                <p>Gestion des chauffeurs, candidatures et suivi GPS</p>
                 <button class="logout-btn" onclick="logoutAdmin()">
                     <i class="fas fa-sign-out-alt"></i> Déconnexion
                 </button>
@@ -488,6 +850,9 @@
                 </button>
                 <button class="tab-btn" onclick="switchTab('chauffeurs')">
                     <i class="fas fa-users"></i> Chauffeurs Actifs
+                </button>
+                <button class="tab-btn" onclick="switchTab('gps')">
+                    <i class="fas fa-map-marked-alt"></i> GPS Tracking
                 </button>
             </div>
 
@@ -652,6 +1017,135 @@
                     </div>
                 </div>
             </div>
+
+            <!-- TAB GPS TRACKING -->
+            <div id="tab-gps" class="tab-content">
+                <div class="gps-container">
+                    <div class="gps-sidebar">
+                        <div class="gps-sidebar-header">
+                            <h2>🛰️ GPS Tracking</h2>
+                            <p style="font-size:0.9em;opacity:0.9;">Suivi en temps réel</p>
+                        </div>
+
+                        <div class="status-bar" id="statusBar">
+                            <i class="fas fa-circle-notch fa-spin"></i> Initialisation...
+                        </div>
+
+                        <div class="gps-filters">
+                            <div class="filter-group-gps">
+                                <label>Chauffeur</label>
+                                <select id="filterDriver">
+                                    <option value="">Tous les chauffeurs</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group-gps">
+                                <label>Statut</label>
+                                <select id="filterStatus">
+                                    <option value="">Tous</option>
+                                    <option value="active">Actives</option>
+                                    <option value="completed">Terminées</option>
+                                </select>
+                            </div>
+
+                            <button class="btn-primary" id="btnRefresh" style="width:100%;margin-top:10px;">
+                                <i class="fas fa-sync-alt"></i> Actualiser
+                            </button>
+                        </div>
+
+                        <div class="stats-mini">
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="totalSessions">0</div>
+                                <div class="stat-mini-label">Sessions</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="activeSessions">0</div>
+                                <div class="stat-mini-label">Actives</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="totalDistance">0</div>
+                                <div class="stat-mini-label">km Total</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="totalPositions">0</div>
+                                <div class="stat-mini-label">Positions</div>
+                            </div>
+                        </div>
+
+                        <div class="sessions-list" id="sessionsList">
+                            <div class="empty-state">
+                                <i class="fas fa-route"></i>
+                                <p>Chargement...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="map-wrapper" style="position:relative;">
+                        <!-- GPS Loading Overlay -->
+                        <div class="gps-loading-overlay" id="gpsLoadingOverlay" style="display:none;">
+                            <div class="gps-loading-spinner"></div>
+                            <div class="gps-loading-text">Chargement du GPS Tracking...</div>
+                            <div class="gps-loading-progress" id="gpsLoadingProgress">Initialisation...</div>
+                        </div>
+
+                        <button class="debug-toggle" id="debugBtn">
+                            <i class="fas fa-terminal"></i> Debug
+                        </button>
+
+                        <div id="map"></div>
+                        
+                        <div class="map-controls">
+                            <h3>🎛️ Options</h3>
+                            
+                            <div class="control-group">
+                                <label>
+                                    <input type="checkbox" id="showMarkers" checked onchange="toggleMarkers()">
+                                    <span>📍 Marqueurs</span>
+                                </label>
+                            </div>
+
+                            <div class="control-group">
+                                <label>
+                                    <input type="checkbox" id="showTrajectory" checked onchange="toggleTrajectory()">
+                                    <span>📈 Trajet</span>
+                                </label>
+                            </div>
+
+                            <button class="btn-map primary" onclick="centerOnTrajectory()">
+                                <i class="fas fa-crosshairs"></i> Centrer
+                            </button>
+
+                            <button class="btn-map secondary" onclick="clearMapDisplay()">
+                                <i class="fas fa-eraser"></i> Effacer
+                            </button>
+                        </div>
+
+                        <div class="trajectory-info" id="trajectoryInfo">
+                            <h3>📊 Informations du trajet</h3>
+                            <div class="trajectory-stats">
+                                <div class="trajectory-stat">
+                                    <div class="trajectory-stat-value" id="trajDistance">0 km</div>
+                                    <div class="trajectory-stat-label">Distance</div>
+                                </div>
+                                <div class="trajectory-stat">
+                                    <div class="trajectory-stat-value" id="trajDuration">0 min</div>
+                                    <div class="trajectory-stat-label">Durée</div>
+                                </div>
+                                <div class="trajectory-stat">
+                                    <div class="trajectory-stat-value" id="trajSpeed">0 km/h</div>
+                                    <div class="trajectory-stat-label">Vitesse moy.</div>
+                                </div>
+                                <div class="trajectory-stat">
+                                    <div class="trajectory-stat-value" id="trajPoints">0</div>
+                                    <div class="trajectory-stat-label">Points GPS</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="debug-console" id="debugConsole"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -696,9 +1190,19 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
+        // Variables globales
         let allCandidatures = [];
         let allDrivers = [];
         let currentFilter = 'all';
+        let map;
+        let markers = [];
+        let polylines = [];
+        let allSessions = [];
+        let allDriversGPS = {};
+        let currentPositions = [];
+        let isAuth = false;
+        let currentSessionId = null;
+        let mapInitialized = false;
 
         const CANDIDATURES_COLLECTION = 'candidatures';
 
@@ -728,8 +1232,34 @@
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             event.target.classList.add('active');
             document.getElementById(`tab-${tab}`).classList.add('active');
+            
             if (tab === 'candidatures') loadCandidatures();
-            else loadDrivers();
+            else if (tab === 'chauffeurs') loadDrivers();
+            else if (tab === 'gps') {
+                if (!mapInitialized) {
+                    // La carte n'est pas encore chargée, afficher le loader
+                    showGPSLoader();
+                    initGoogleMaps();
+                } else {
+                    // La carte est déjà prête (préchargée)!
+                    console.log('✅ Carte déjà préchargée, chargement immédiat');
+                    
+                    // Charger uniquement les sessions si les drivers sont déjà chargés
+                    if (Object.keys(allDriversGPS).length === 0) {
+                        updateStatus('🔄 Chargement des chauffeurs...');
+                        loadGPSDrivers().then(() => {
+                            return loadSessions();
+                        }).catch(err => {
+                            console.error('Erreur:', err);
+                            updateStatus('❌ Erreur de chargement', true);
+                        });
+                    } else {
+                        // Tout est déjà prêt, juste charger les sessions
+                        console.log('✅ Chauffeurs déjà en cache, chargement des sessions uniquement');
+                        loadSessions();
+                    }
+                }
+            }
         }
 
         // === AUTHENTIFICATION ===
@@ -740,20 +1270,61 @@
             showLoading('Connexion...');
             try {
                 await auth.signInWithEmailAndPassword(email, password);
+                isAuth = true;
                 hideLoading();
                 showToast('✅ Connexion réussie!', 'success');
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('adminDashboard').style.display = 'block';
                 loadCandidatures();
+                
+                // Préchargement de Google Maps en arrière-plan pour l'onglet GPS
+                if (!mapInitialized) {
+                    setTimeout(() => {
+                        console.log('🚀 Préchargement de Google Maps en arrière-plan...');
+                        const script = document.createElement('script');
+                        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBI1svukv3Ts7fN97ke5OGfwo2V-vRUGHI&callback=initMapSilent';
+                        script.async = true;
+                        script.defer = true;
+                        document.head.appendChild(script);
+                    }, 2000); // 2 secondes après la connexion
+                }
             } catch (error) {
                 hideLoading();
                 showToast('Email ou mot de passe incorrect', 'error');
             }
         }
 
+        // Fonction d'initialisation silencieuse de la carte (préchargement)
+        window.initMapSilent = function() {
+            if (mapInitialized) return;
+            
+            console.log('🗺️ Préchargement silencieux de Google Maps...');
+            try {
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: { lat: 14.6937, lng: -17.4441 },
+                    zoom: 12,
+                    mapTypeControl: true,
+                    streetViewControl: false
+                });
+                
+                mapInitialized = true;
+                console.log('✅ Carte préchargée en arrière-plan');
+                
+                // Charger les chauffeurs GPS en arrière-plan aussi
+                if (isAuth && Object.keys(allDriversGPS).length === 0) {
+                    loadGPSDrivers().then(() => {
+                        console.log('✅ Chauffeurs GPS préchargés');
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Erreur préchargement carte:', error);
+            }
+        };
+
         async function logoutAdmin() {
             if (confirm('Voulez-vous vous déconnecter ?')) {
                 await auth.signOut();
+                isAuth = false;
                 document.getElementById('loginScreen').style.display = 'block';
                 document.getElementById('adminDashboard').style.display = 'none';
                 showToast('Déconnexion réussie', 'info');
@@ -919,7 +1490,9 @@
                 'refusee': '❌ Refusée',
                 'disponible': '🟢 Disponible',
                 'en_course': '🔵 En Course',
-                'hors_ligne': '⚫ Hors Ligne'
+                'hors_ligne': '⚫ Hors Ligne',
+                'active': '🔵 Active',
+                'completed': '✅ Terminée'
             };
             return labels[statut] || statut;
         }
@@ -942,7 +1515,6 @@
             displayCandidatures(filtered);
         }
 
-        // === VOIR DÉTAILS CANDIDATURE ===
         function viewCandidature(id) {
             const c = allCandidatures.find(x => x.id === id);
             if (!c) return showToast('Candidature non trouvée', 'error');
@@ -1182,7 +1754,6 @@
             document.getElementById('detailsModal').classList.remove('active');
         }
 
-        // === ACCEPTER CANDIDATURE ===
         async function acceptCandidature(id) {
             const c = allCandidatures.find(x => x.id === id);
             if (!c) return;
@@ -1253,7 +1824,6 @@
             }
         }
 
-        // === REFUSER CANDIDATURE ===
         async function rejectCandidature(id) {
             const c = allCandidatures.find(x => x.id === id);
             if (!c) return;
@@ -1277,7 +1847,6 @@
             }
         }
 
-        // === SUPPRIMER CANDIDATURE ===
         async function deleteCandidature(id) {
             if (!confirm('Supprimer définitivement cette candidature ?')) return;
             showLoading('Suppression...');
@@ -1292,7 +1861,7 @@
             }
         }
 
-        // === CHAUFFEURS (code existant conservé) ===
+        // === CHAUFFEURS ===
         async function loadDrivers() {
             if (!auth.currentUser) return;
             showLoading('Chargement des chauffeurs...');
@@ -1521,13 +2090,537 @@
             }
         }
 
+        // === GPS TRACKING ===
+        function log(msg, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const colors = { error: '#f00', success: '#0f0', warning: '#ff0', info: '#0ff' };
+            const color = colors[type] || '#0ff';
+            
+            const debugDiv = document.getElementById('debugConsole');
+            const line = document.createElement('div');
+            line.style.color = color;
+            line.textContent = `[${time}] ${msg}`;
+            debugDiv.appendChild(line);
+            debugDiv.scrollTop = debugDiv.scrollHeight;
+            
+            console.log(`[${time}] ${msg}`);
+        }
+
+        function showGPSLoader() {
+            const overlay = document.getElementById('gpsLoadingOverlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+                updateGPSProgress('Chargement de Google Maps...');
+            }
+        }
+
+        function hideGPSLoader() {
+            const overlay = document.getElementById('gpsLoadingOverlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+        }
+
+        function updateGPSProgress(message) {
+            const progress = document.getElementById('gpsLoadingProgress');
+            if (progress) {
+                progress.textContent = message;
+            }
+        }
+
+        document.getElementById('debugBtn').addEventListener('click', function() {
+            document.getElementById('debugConsole').classList.toggle('visible');
+        });
+
+        function updateStatus(msg, error = false) {
+            const bar = document.getElementById('statusBar');
+            bar.innerHTML = msg;
+            bar.className = 'status-bar ' + (error ? 'error' : 'connected');
+        }
+
+        function initGoogleMaps() {
+            log('🗺️ Initialisation Google Maps...', 'info');
+            updateGPSProgress('Chargement de Google Maps...');
+            const script = document.createElement('script');
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBI1svukv3Ts7fN97ke5OGfwo2V-vRUGHI&callback=initMap';
+            script.async = true;
+            script.defer = true;
+            script.onerror = function() {
+                log('❌ Échec du chargement de Google Maps', 'error');
+                updateGPSProgress('Erreur de chargement de la carte');
+                hideGPSLoader();
+            };
+            document.head.appendChild(script);
+        }
+
+        function initMap() {
+            if (mapInitialized) {
+                console.log('ℹ️ Carte déjà initialisée, chargement des données...');
+                hideGPSLoader();
+                if (isAuth) {
+                    updateGPSProgress('Chargement des données...');
+                    Promise.all([
+                        Object.keys(allDriversGPS).length === 0 ? loadGPSDrivers() : Promise.resolve(),
+                        loadSessions()
+                    ]).then(() => {
+                        console.log('✅ Données GPS chargées');
+                    }).catch(error => {
+                        console.error('❌ Erreur chargement données GPS:', error);
+                    });
+                }
+                return;
+            }
+            
+            log('🗺️ Callback initMap appelé', 'info');
+            updateGPSProgress('Création de la carte...');
+            
+            try {
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: { lat: 14.6937, lng: -17.4441 },
+                    zoom: 12,
+                    mapTypeControl: true,
+                    streetViewControl: false
+                });
+                
+                mapInitialized = true;
+                log('✅ Carte initialisée avec succès', 'success');
+                updateStatus('✅ Carte chargée');
+                
+                if (isAuth) {
+                    updateGPSProgress('Chargement des chauffeurs...');
+                    loadGPSDrivers().then(() => {
+                        updateGPSProgress('Chargement des sessions...');
+                        return loadSessions();
+                    }).then(() => {
+                        hideGPSLoader();
+                        log('✅ GPS Tracking complètement chargé', 'success');
+                    }).catch(error => {
+                        log('❌ Erreur lors du chargement initial: ' + error.message, 'error');
+                        hideGPSLoader();
+                    });
+                } else {
+                    hideGPSLoader();
+                }
+            } catch (error) {
+                log('❌ Erreur init carte: ' + error.message, 'error');
+                updateGPSProgress('Erreur d\'initialisation');
+                hideGPSLoader();
+            }
+        }
+
+        async function loadGPSDrivers() {
+            try {
+                log('📥 Chargement de la liste des chauffeurs GPS...', 'info');
+                const snapshot = await db.collection('drivers').get();
+                
+                const select = document.getElementById('filterDriver');
+                select.innerHTML = '<option value="">Tous les chauffeurs</option>';
+                
+                let count = 0;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const name = `${data.prenom || ''} ${data.nom || ''}`.trim() || data.telephone;
+                    allDriversGPS[doc.id] = name;
+                    
+                    const opt = document.createElement('option');
+                    opt.value = doc.id;
+                    opt.textContent = name;
+                    select.appendChild(opt);
+                    count++;
+                });
+                
+                log(`✅ ${count} chauffeur(s) chargé(s) pour GPS`, 'success');
+                return Promise.resolve(count);
+            } catch (error) {
+                log('❌ Erreur chargement chauffeurs GPS: ' + error.message, 'error');
+                return Promise.reject(error);
+            }
+        }
+
+        async function loadSessions() {
+            if (!isAuth) {
+                log('⚠️ Impossible de charger : non authentifié', 'warning');
+                return Promise.reject(new Error('Non authentifié'));
+            }
+
+            log('📥 Chargement des sessions de tracking...', 'info');
+
+            try {
+                const driverFilter = document.getElementById('filterDriver').value;
+                const statusFilter = document.getElementById('filterStatus').value;
+
+                let query = db.collection('tracking_sessions');
+
+                if (driverFilter) {
+                    query = query.where('driverId', '==', driverFilter);
+                    log(`🔍 Filtre actif: chauffeur ${allDriversGPS[driverFilter]}`, 'info');
+                }
+
+                if (statusFilter) {
+                    query = query.where('status', '==', statusFilter);
+                    log(`🔍 Filtre actif: statut ${statusFilter}`, 'info');
+                }
+
+                query = query.limit(100);
+
+                const snapshot = await query.get();
+                allSessions = [];
+
+                let totalDist = 0;
+                let totalPos = 0;
+                let activeCount = 0;
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    allSessions.push({ id: doc.id, ...data });
+                    
+                    if (data.status === 'active') activeCount++;
+                    if (data.totalDistance) totalDist += data.totalDistance;
+                    if (data.totalPositions) totalPos += data.totalPositions;
+                });
+
+                allSessions.sort((a, b) => {
+                    const timeA = a.startTime?.toDate() || new Date(0);
+                    const timeB = b.startTime?.toDate() || new Date(0);
+                    return timeB - timeA;
+                });
+
+                log('🔄 Tri chronologique appliqué côté client', 'info');
+
+                document.getElementById('totalSessions').textContent = allSessions.length;
+                document.getElementById('activeSessions').textContent = activeCount;
+                document.getElementById('totalDistance').textContent = totalDist.toFixed(1);
+                document.getElementById('totalPositions').textContent = totalPos;
+
+                displaySessions();
+
+                log(`✅ ${allSessions.length} session(s) chargée(s)`, 'success');
+                log(`📊 Stats: ${activeCount} active(s), ${totalDist.toFixed(1)} km total, ${totalPos} positions`, 'info');
+                updateStatus(`✅ ${allSessions.length} session(s) trouvée(s)`);
+
+                return Promise.resolve(allSessions.length);
+            } catch (error) {
+                log('❌ Erreur chargement sessions: ' + error.message, 'error');
+                updateStatus('❌ Erreur chargement', true);
+                return Promise.reject(error);
+            }
+        }
+
+        function displaySessions() {
+            const container = document.getElementById('sessionsList');
+
+            if (allSessions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-route"></i>
+                        <p>Aucune session de tracking</p>
+                        <p style="font-size: 0.8em; margin-top: 10px;">Les sessions apparaîtront ici</p>
+                    </div>
+                `;
+                log('ℹ️ Aucune session à afficher', 'info');
+                return;
+            }
+
+            container.innerHTML = '';
+
+            allSessions.forEach((session, idx) => {
+                const card = document.createElement('div');
+                card.className = 'session-card';
+                if (currentSessionId === session.id) {
+                    card.classList.add('active');
+                }
+
+                const driverName = allDriversGPS[session.driverId] || session.driverId;
+                const startTime = session.startTime?.toDate();
+                const endTime = session.endTime?.toDate();
+                
+                let duration = 'En cours';
+                if (startTime && endTime) {
+                    const diff = (endTime - startTime) / 60000;
+                    duration = `${Math.round(diff)} min`;
+                }
+
+                card.innerHTML = `
+                    <div class="session-driver">${driverName}</div>
+                    <div class="session-info">
+                        <div><i class="fas fa-clock"></i> ${startTime ? startTime.toLocaleString('fr-FR') : 'N/A'}</div>
+                        <div><i class="fas fa-hourglass"></i> ${duration}</div>
+                        <div><i class="fas fa-route"></i> ${(session.totalDistance || 0).toFixed(1)} km • ${session.totalPositions || 0} points GPS</div>
+                    </div>
+                `;
+
+                card.addEventListener('click', function() {
+                    log(`🖱️ CLIC sur session #${idx + 1} (${session.id})`, 'info');
+                    selectSession(session);
+                });
+
+                container.appendChild(card);
+            });
+
+            log(`📋 ${allSessions.length} carte(s) de session affichée(s)`, 'success');
+        }
+
+        async function selectSession(session) {
+            log('═══════════════════════════════════════', 'info');
+            log(`🎯 SELECTION SESSION: ${session.id}`, 'info');
+            log(`👤 Chauffeur: ${allDriversGPS[session.driverId]}`, 'info');
+            log(`📊 Stats session: ${session.totalPositions || 0} positions, ${(session.totalDistance || 0).toFixed(1)} km`, 'info');
+            
+            currentSessionId = session.id;
+            displaySessions();
+            showLoading('Chargement des positions GPS...');
+
+            try {
+                log('📍 Requête Firebase pour les positions GPS...', 'info');
+                
+                const snapshot = await db.collection('position_history')
+                    .where('sessionId', '==', session.id)
+                    .get();
+
+                log(`📦 ${snapshot.size} document(s) reçu(s) de Firestore`, 'info');
+
+                currentPositions = [];
+                const tempPositions = [];
+                let validCount = 0;
+                let invalidCount = 0;
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.position?.latitude && data.position?.longitude) {
+                        tempPositions.push({
+                            lat: data.position.latitude,
+                            lng: data.position.longitude,
+                            timestamp: data.timestamp?.toDate() || new Date(0)
+                        });
+                        validCount++;
+                    } else {
+                        invalidCount++;
+                    }
+                });
+
+                log(`✅ ${validCount} position(s) valide(s)`, 'success');
+                if (invalidCount > 0) {
+                    log(`⚠️ ${invalidCount} position(s) ignorée(s) (données manquantes)`, 'warning');
+                }
+
+                tempPositions.sort((a, b) => a.timestamp - b.timestamp);
+                currentPositions = tempPositions.map(p => ({ lat: p.lat, lng: p.lng }));
+
+                log('🔄 Positions triées par ordre chronologique', 'info');
+                if (currentPositions.length > 0) {
+                    log(`📍 Première position: ${currentPositions[0]?.lat}, ${currentPositions[0]?.lng}`, 'info');
+                    log(`📍 Dernière position: ${currentPositions[currentPositions.length-1]?.lat}, ${currentPositions[currentPositions.length-1]?.lng}`, 'info');
+                }
+
+                if (currentPositions.length > 0) {
+                    log('🎨 Début du dessin du trajet...', 'info');
+                    drawTrajectory();
+                } else {
+                    log('❌ AUCUNE position GPS valide trouvée', 'error');
+                    hideLoading();
+                    showToast('⚠️ Aucune position GPS trouvée pour cette session', 'warning');
+                }
+
+            } catch (error) {
+                log('❌ ERREUR CRITIQUE: ' + error.message, 'error');
+                log('Stack: ' + error.stack, 'error');
+                hideLoading();
+                showToast('Erreur: ' + error.message, 'error');
+            } finally {
+                log('═══════════════════════════════════════', 'info');
+            }
+        }
+
+        function drawTrajectory() {
+            log('🧹 Nettoyage des éléments précédents sur la carte...', 'info');
+            
+            markers.forEach(m => m.setMap(null));
+            polylines.forEach(p => p.setMap(null));
+            markers = [];
+            polylines = [];
+
+            log(`🖌️ Dessin de la polyline avec ${currentPositions.length} points`, 'info');
+
+            const line = new google.maps.Polyline({
+                path: currentPositions,
+                geodesic: true,
+                strokeColor: '#00A854',
+                strokeOpacity: 1,
+                strokeWeight: 5,
+                map: map
+            });
+            polylines.push(line);
+            log('✅ Polyline créée', 'success');
+
+            log('📍 Ajout du marqueur DEPART...', 'info');
+            const start = new google.maps.Marker({
+                position: currentPositions[0],
+                map: map,
+                label: {
+                    text: 'D',
+                    color: 'white',
+                    fontWeight: 'bold'
+                },
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 15,
+                    fillColor: '#4CAF50',
+                    fillOpacity: 1,
+                    strokeColor: 'white',
+                    strokeWeight: 3
+                },
+                title: 'Départ'
+            });
+            markers.push(start);
+            log('✅ Marqueur DEPART ajouté', 'success');
+
+            log('📍 Ajout du marqueur ARRIVEE...', 'info');
+            const end = new google.maps.Marker({
+                position: currentPositions[currentPositions.length - 1],
+                map: map,
+                label: {
+                    text: 'A',
+                    color: 'white',
+                    fontWeight: 'bold'
+                },
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 15,
+                    fillColor: '#E30613',
+                    fillOpacity: 1,
+                    strokeColor: 'white',
+                    strokeWeight: 3
+                },
+                title: 'Arrivée'
+            });
+            markers.push(end);
+            log('✅ Marqueur ARRIVEE ajouté', 'success');
+
+            log('🎯 Centrage de la carte sur le trajet...', 'info');
+            const bounds = new google.maps.LatLngBounds();
+            currentPositions.forEach(pos => bounds.extend(pos));
+            map.fitBounds(bounds, { padding: 50 });
+            
+            showTrajectoryInfo();
+            hideLoading();
+            
+            log('✅✅✅ TRAJET COMPLETEMENT AFFICHE! ✅✅✅', 'success');
+            log(`📊 Résumé: ${currentPositions.length} points, 2 marqueurs, 1 ligne`, 'success');
+        }
+
+        function showTrajectoryInfo() {
+            const info = document.getElementById('trajectoryInfo');
+            info.classList.add('visible');
+
+            if (currentPositions.length === 0) return;
+
+            let totalDistance = 0;
+            for (let i = 1; i < currentPositions.length; i++) {
+                totalDistance += calculateDistance(
+                    currentPositions[i-1].lat,
+                    currentPositions[i-1].lng,
+                    currentPositions[i].lat,
+                    currentPositions[i].lng
+                );
+            }
+
+            const durationMinutes = Math.round((currentPositions.length * 10) / 60);
+            const avgSpeed = durationMinutes > 0 ? (totalDistance / (durationMinutes / 60)) : 0;
+
+            document.getElementById('trajDistance').textContent = totalDistance.toFixed(2) + ' km';
+            document.getElementById('trajDuration').textContent = durationMinutes + ' min';
+            document.getElementById('trajSpeed').textContent = Math.round(avgSpeed) + ' km/h';
+            document.getElementById('trajPoints').textContent = currentPositions.length;
+        }
+
+        function calculateDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                     Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function toggleMarkers() {
+            const show = document.getElementById('showMarkers').checked;
+            markers.forEach(m => m.setVisible(show));
+            log(`📍 Marqueurs: ${show ? 'VISIBLES' : 'CACHÉS'}`, 'info');
+        }
+
+        function toggleTrajectory() {
+            const show = document.getElementById('showTrajectory').checked;
+            polylines.forEach(p => p.setVisible(show));
+            log(`📈 Trajet: ${show ? 'VISIBLE' : 'CACHÉ'}`, 'info');
+        }
+
+        function centerOnTrajectory() {
+            if (currentPositions.length === 0) {
+                log('⚠️ Aucun trajet à centrer', 'warning');
+                return;
+            }
+
+            const bounds = new google.maps.LatLngBounds();
+            currentPositions.forEach(pos => bounds.extend(pos));
+            map.fitBounds(bounds, { padding: 50 });
+            log('✅ Carte centrée sur le trajet', 'success');
+        }
+
+        function clearMapDisplay() {
+            log('🧹 Effacement de la carte...', 'info');
+            
+            markers.forEach(m => m.setMap(null));
+            polylines.forEach(p => p.setMap(null));
+            markers = [];
+            polylines = [];
+            currentPositions = [];
+            currentSessionId = null;
+            
+            document.getElementById('trajectoryInfo').classList.remove('visible');
+            displaySessions();
+            
+            log('✅ Carte effacée', 'success');
+        }
+
+        document.getElementById('btnRefresh').addEventListener('click', function() {
+            log('🔄 Actualisation manuelle demandée', 'info');
+            const btn = this;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Chargement...';
+            btn.disabled = true;
+            
+            loadSessions().finally(() => {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            });
+        });
+        
+        document.getElementById('filterDriver').addEventListener('change', function() {
+            log('🔄 Filtre chauffeur modifié', 'info');
+            loadSessions();
+        });
+        
+        document.getElementById('filterStatus').addEventListener('change', function() {
+            log('🔄 Filtre statut modifié', 'info');
+            loadSessions();
+        });
+
         auth.onAuthStateChanged(user => {
             if (user && document.getElementById('adminDashboard').style.display !== 'none') {
                 loadCandidatures();
             }
         });
 
-        console.log('🚕 Al Bourakh Admin v3.0 - Prêt avec gestion avec/sans véhicule!');
+        console.log('%c🚕 Al Bourakh Admin v4.1 - OPTIMISÉ', 'color: #00A854; font-size: 16px; font-weight: bold');
+        console.log('%c✨ Nouvelles fonctionnalités:', 'color: #FECB00; font-size: 14px; font-weight: bold');
+        console.log('  📊 Dashboard unifié avec 3 onglets');
+        console.log('  🚀 Préchargement intelligent de Google Maps');
+        console.log('  💾 Mise en cache des données GPS');
+        console.log('  ⚡ Chargement ultra-rapide de l\'onglet GPS');
+        console.log('  🎯 Indicateurs de progression détaillés');
+        console.log('%cSystème prêt!', 'color: #00A854; font-size: 12px');
     </script>
 </body>
 </html>
