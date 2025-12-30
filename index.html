@@ -3,91 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Al Bourakh - Administration Complète</title>
+    <title>Al Bourakh - Administration Unifiée v6.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 20px; }
         .container { max-width: 1400px; margin: 0 auto; }
-        .header {
-            background: linear-gradient(135deg, #00A854, #FECB00);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            position: relative;
-        }
+        .header { background: linear-gradient(135deg, #00A854, #FECB00); color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); position: relative; }
         .header h1 { font-size: 2.2em; display: flex; align-items: center; gap: 15px; }
         .header p { margin-top: 10px; opacity: 0.9; }
-        .logout-btn {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: all 0.3s;
-        }
+        .logout-btn { position: absolute; top: 30px; right: 30px; background: rgba(255,255,255,0.2); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1em; transition: all 0.3s; }
         .logout-btn:hover { background: rgba(255,255,255,0.3); }
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .tab-btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: white;
-            color: #333;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .tab-btn.active {
-            background: linear-gradient(135deg, #00A854, #FECB00);
-            color: white;
-        }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { padding: 12px 25px; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s; background: white; color: #333; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 8px; }
+        .tab-btn.active { background: linear-gradient(135deg, #00A854, #FECB00); color: white; }
         .tab-btn:hover { transform: translateY(-2px); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5em;
-        }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 15px; }
+        .stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5em; }
         .stat-icon.green { background: #d4edda; color: #00A854; }
         .stat-icon.blue { background: #cce5ff; color: #004085; }
         .stat-icon.orange { background: #fff3cd; color: #856404; }
@@ -96,706 +33,173 @@
         .stat-icon.teal { background: #d1ecf1; color: #0c5460; }
         .stat-info h3 { font-size: 1.8em; color: #333; margin-bottom: 3px; }
         .stat-info p { color: #666; font-size: 0.9em; }
-        .main-content {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .action-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .search-box {
-            flex: 1;
-            max-width: 350px;
-            position: relative;
-        }
-        .search-box input {
-            width: 100%;
-            padding: 12px 45px 12px 20px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 1em;
-        }
-        .search-box i {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-        }
-        .filters {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .filter-btn {
-            padding: 8px 16px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .stat-count { background: #e8f5e9; color: #00A854; padding: 4px 12px; border-radius: 15px; font-size: 0.85em; font-weight: bold; margin-top: 5px; }
+        
+        .section, .main-content { background: white; border-radius: 15px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .section-header, .action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; flex-wrap: wrap; gap: 15px; }
+        .section-title { font-size: 1.3em; font-weight: bold; color: #333; display: flex; align-items: center; gap: 10px; }
+        
+        .search-box { flex: 1; max-width: 350px; position: relative; }
+        .search-box input { width: 100%; padding: 12px 45px 12px 20px; border: 2px solid #ddd; border-radius: 10px; font-size: 1em; }
+        .search-box i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #999; }
+        
+        .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .filter-btn { padding: 8px 16px; border: 2px solid #ddd; border-radius: 8px; background: white; cursor: pointer; font-size: 0.9em; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
         .filter-btn:hover { border-color: #00A854; }
-        .filter-btn.active {
-            background: #00A854;
-            color: white;
-            border-color: #00A854;
-        }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #00A854, #FECB00);
-            color: white;
-        }
+        .filter-btn.active { background: #00A854; color: white; border-color: #00A854; }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-size: 0.95em; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: linear-gradient(135deg, #00A854, #FECB00); color: white; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,168,84,0.3); }
-        .btn-success { background: #28a745; color: white; }
-        .btn-success:hover { background: #218838; }
-        .btn-danger { background: #E30613; color: white; }
-        .btn-danger:hover { background: #c50510; }
-        .btn-secondary { background: #6c757d; color: white; }
-        .btn-secondary:hover { background: #5a6268; }
-        .btn-info { background: #17a2b8; color: white; }
-        .btn-info:hover { background: #138496; }
-        .btn-warning { background: #ffc107; color: #333; }
-        .btn-warning:hover { background: #e0a800; }
+        .btn-success, .btn-validate { background: #28a745; color: white; }
+        .btn-danger, .btn-reject { background: #E30613; color: white; }
+        .btn-secondary, .btn-refresh { background: #6c757d; color: white; }
+        .btn-info, .btn-view { background: #17a2b8; color: white; }
+        .btn-warning, .btn-edit { background: #ffc107; color: #333; }
+        .btn-icon { width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.85em; }
+        .btn-delete { background: #E30613; color: white; }
+        .btn-accept { background: #28a745; color: white; }
+        
         .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         thead { background: #f8f9fa; }
         th { padding: 12px; text-align: left; font-weight: 600; color: #333; border-bottom: 2px solid #dee2e6; font-size: 0.9em; }
         td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 0.9em; }
-        tbody tr { transition: all 0.3s; }
         tbody tr:hover { background: #f8f9fa; }
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 600;
-            display: inline-block;
-        }
-        .status-disponible { background: #d4edda; color: #155724; }
-        .status-en_course, .status-en-course { background: #cce5ff; color: #004085; }
-        .status-hors_ligne, .status-hors-ligne { background: #f8d7da; color: #721c24; }
-        .status-en_attente { background: #fff3cd; color: #856404; }
-        .status-acceptee { background: #d4edda; color: #155724; }
-        .status-refusee { background: #f8d7da; color: #721c24; }
-        .status-active { background: #cce5ff; color: #004085; }
-        .status-completed { background: #d4edda; color: #155724; }
-        .type-badge {
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 0.75em;
-            font-weight: 600;
-            display: inline-block;
-        }
+        
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8em; font-weight: 600; display: inline-block; }
+        .status-pending, .status-en_attente { background: #fff3cd; color: #856404; }
+        .status-validated, .status-completed, .status-acceptee, .status-disponible { background: #d4edda; color: #155724; }
+        .status-rejected, .status-refusee, .status-hors_ligne, .status-hors-ligne { background: #f8d7da; color: #721c24; }
+        .status-en_course, .status-en-course, .status-active { background: #cce5ff; color: #004085; }
+        
+        .type-badge { padding: 4px 8px; border-radius: 15px; font-size: 0.75em; font-weight: 600; display: inline-block; }
         .type-with-vehicle { background: #d1ecf1; color: #0c5460; }
         .type-without-vehicle { background: #fff3cd; color: #856404; }
+        
+        .amount-highlight { font-size: 1.2em; font-weight: bold; }
+        .amount-credit { color: #00A854; }
+        .amount-debit { color: #E30613; }
         .action-buttons { display: flex; gap: 5px; flex-wrap: wrap; }
-        .btn-icon {
-            width: 32px;
-            height: 32px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 6px;
-            font-size: 0.85em;
-        }
-        .btn-view { background: #17a2b8; color: white; }
-        .btn-edit { background: #ffc107; color: #333; }
-        .btn-delete { background: #E30613; color: white; }
-        .btn-accept { background: #28a745; color: white; }
-        .btn-reject { background: #dc3545; color: white; }
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            z-index: 9999;
-            animation: slideInRight 0.3s;
-            max-width: 350px;
-        }
-        @keyframes slideInRight {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        .toast.success { border-left: 4px solid #00A854; }
-        .toast.error { border-left: 4px solid #E30613; }
-        .toast.info { border-left: 4px solid #2196F3; }
-        .loading {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-        .loading.active { display: flex; }
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 6px solid rgba(255,255,255,0.3);
-            border-top-color: #FECB00;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .loading-text { color: white; font-size: 1.2em; margin-top: 20px; }
-        .login-container {
-            max-width: 450px;
-            margin: 80px auto;
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        }
-        .login-header { text-align: center; margin-bottom: 30px; }
-        .login-logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, #00A854, #FECB00);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5em;
-        }
-        .login-title { color: #00A854; font-size: 1.8em; margin-bottom: 10px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1em;
-        }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: #00A854; }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+        
+        .albourakh-main-account { background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white; padding: 25px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+        .albourakh-main-account h2 { font-size: 1.4em; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .albourakh-account-number { font-size: 2em; font-weight: bold; margin-bottom: 15px; letter-spacing: 2px; }
+        .albourakh-instructions { background: rgba(255,255,255,0.15); padding: 15px; border-radius: 10px; }
+        .albourakh-instructions h3 { font-size: 1em; margin-bottom: 10px; }
+        .albourakh-instructions ul { margin-left: 20px; }
+        .albourakh-instructions li { margin-bottom: 8px; line-height: 1.5; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
         .modal.active { display: flex; }
-        .modal-content {
-            background: white;
-            max-width: 900px;
-            width: 100%;
-            border-radius: 15px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .modal-header {
-            background: linear-gradient(135deg, #00A854, #FECB00);
-            color: white;
-            padding: 20px;
-            border-radius: 15px 15px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .modal-content { background: white; max-width: 900px; width: 100%; border-radius: 15px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { background: linear-gradient(135deg, #00A854, #FECB00); color: white; padding: 20px; border-radius: 15px 15px 0 0; display: flex; justify-content: space-between; align-items: center; }
         .modal-header h2 { font-size: 1.4em; }
-        .modal-close {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2em;
-        }
+        .modal-close { background: rgba(255,255,255,0.2); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2em; }
         .modal-body { padding: 25px; }
-        .docs-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .doc-card {
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-        .doc-card:hover { border-color: #00A854; transform: translateY(-3px); }
-        .doc-card img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            cursor: pointer;
-        }
-        .doc-card .doc-label {
-            padding: 10px;
-            background: #f8f9fa;
-            text-align: center;
-            font-weight: 600;
-            font-size: 0.85em;
-        }
-        .doc-card a {
-            display: block;
-            padding: 10px;
-            background: #00A854;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            font-size: 0.85em;
-        }
-        .doc-card a:hover { background: #008844; }
-        .info-section {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
-        .info-section h4 {
-            color: #00A854;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-        }
+        
+        .info-section { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .info-section h4 { color: #00A854; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
         .info-item { padding: 8px 0; }
         .info-item label { color: #666; font-size: 0.85em; display: block; }
         .info-item span { font-weight: 600; color: #333; }
-        .image-viewer {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 10001;
-            align-items: center;
-            justify-content: center;
-        }
-        .image-viewer.active { display: flex; }
-        .image-viewer img { max-width: 90%; max-height: 90%; object-fit: contain; }
-        .image-viewer .close-viewer {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: white;
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.5em;
-        }
-        .alert-box {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: start;
-            gap: 10px;
-        }
+        
+        .validation-instructions { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .validation-instructions h4 { color: #92400e; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .validation-instructions ol { margin-left: 20px; color: #78350f; }
+        .validation-instructions li { margin-bottom: 10px; line-height: 1.6; }
+        .validation-instructions strong { color: #b45309; }
+        
+        .docs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .doc-card { border: 2px solid #e0e0e0; border-radius: 10px; overflow: hidden; transition: all 0.3s; }
+        .doc-card:hover { border-color: #00A854; transform: translateY(-3px); }
+        .doc-card img { width: 100%; height: 150px; object-fit: cover; cursor: pointer; }
+        .doc-card .doc-label { padding: 10px; background: #f8f9fa; text-align: center; font-weight: 600; font-size: 0.85em; }
+        .doc-card a { display: block; padding: 10px; background: #00A854; color: white; text-align: center; text-decoration: none; font-size: 0.85em; }
+        
+        .alert-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: start; gap: 10px; }
         .alert-box.info { background: #d1ecf1; border-left-color: #17a2b8; }
         .alert-box i { font-size: 1.5em; color: #856404; }
         .alert-box.info i { color: #0c5460; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #00A854; }
+        
+        .toast { position: fixed; top: 20px; right: 20px; background: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); z-index: 9999; animation: slideIn 0.3s; max-width: 350px; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast.success { border-left: 4px solid #00A854; }
+        .toast.error { border-left: 4px solid #E30613; }
+        .toast.info { border-left: 4px solid #2196F3; }
+        
+        .loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center; flex-direction: column; }
+        .loading.active { display: flex; }
+        .spinner { width: 60px; height: 60px; border: 6px solid rgba(255,255,255,0.3); border-top-color: #FECB00; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { color: white; font-size: 1.2em; margin-top: 20px; }
+        
+        .login-container { max-width: 450px; margin: 80px auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+        .login-header { text-align: center; margin-bottom: 30px; }
+        .login-logo { width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #00A854, #FECB00); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5em; }
+        .login-title { color: #00A854; font-size: 1.8em; margin-bottom: 10px; }
+        
+        .image-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; align-items: center; justify-content: center; }
+        .image-viewer.active { display: flex; }
+        .image-viewer img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .image-viewer .close-viewer { position: absolute; top: 20px; right: 20px; background: white; border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 1.5em; }
 
-        /* GPS TRACKING STYLES */
-        .gps-container {
-            display: flex;
-            gap: 20px;
-            height: 700px;
-        }
-        
-        .gps-sidebar {
-            width: 350px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        
-        .gps-sidebar-header {
-            background: linear-gradient(135deg, #00A854, #FECB00);
-            color: white;
-            padding: 20px;
-        }
-        
+        /* GPS STYLES */
+        .gps-container { display: flex; gap: 20px; height: 700px; }
+        .gps-sidebar { width: 350px; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
+        .gps-sidebar-header { background: linear-gradient(135deg, #00A854, #FECB00); color: white; padding: 20px; }
         .gps-sidebar-header h2 { font-size: 1.3em; margin-bottom: 5px; }
-        
-        .status-bar {
-            padding: 10px 15px;
-            background: #f8f9fa;
-            font-size: 0.85em;
-        }
-        
+        .status-bar { padding: 10px 15px; background: #f8f9fa; font-size: 0.85em; }
         .status-bar.connected { background: #d4edda; color: #155724; }
         .status-bar.error { background: #f8d7da; color: #721c24; }
-        
-        .gps-filters {
-            padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .filter-group-gps {
-            margin-bottom: 15px;
-        }
-        
-        .filter-group-gps label {
-            display: block;
-            font-size: 0.85em;
-            font-weight: 600;
-            color: #666;
-            margin-bottom: 5px;
-        }
-        
-        .filter-group-gps select {
-            width: 100%;
-            padding: 8px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 0.9em;
-        }
-        
-        .stats-mini {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .stat-mini {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .stat-mini-value {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #00A854;
-        }
-        
-        .stat-mini-label {
-            font-size: 0.75em;
-            color: #666;
-            margin-top: 5px;
-        }
-        
-        .sessions-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-        }
-        
-        .session-card {
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .session-card:hover {
-            border-color: #00A854;
-            box-shadow: 0 4px 12px rgba(0,168,84,0.2);
-            transform: translateY(-2px);
-        }
-        
-        .session-card.active {
-            border-color: #00A854;
-            background: #f0fff4;
-        }
-        
-        .session-driver {
-            font-weight: bold;
-            font-size: 0.95em;
-            margin-bottom: 8px;
-            color: #00A854;
-        }
-        
-        .session-info {
-            font-size: 0.85em;
-            color: #666;
-        }
-        
-        .session-info div {
-            margin-bottom: 3px;
-        }
-        
-        .map-wrapper {
-            flex: 1;
-            position: relative;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        
-        #map {
-            width: 100%;
-            height: 100%;
-        }
-        
-        .debug-toggle {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: #333;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            z-index: 1001;
-            font-size: 14px;
-        }
-
-        .map-controls {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            padding: 15px;
-            z-index: 1000;
-            min-width: 220px;
-        }
-
-        .map-controls h3 {
-            margin: 0 0 15px 0;
-            font-size: 1em;
-            color: #333;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .control-group {
-            margin-bottom: 12px;
-        }
-
-        .control-group label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9em;
-            cursor: pointer;
-            color: #555;
-            padding: 5px;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-
-        .control-group label:hover {
-            background: #f8f9fa;
-        }
-
-        .control-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: #00A854;
-        }
-
-        .btn-map {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.2s;
-            margin-top: 8px;
-        }
-
-        .btn-map.primary {
-            background: linear-gradient(135deg, #00A854, #00C65E);
-            color: white;
-        }
-
-        .btn-map.primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,168,84,0.3);
-        }
-
-        .btn-map.secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-map.secondary:hover {
-            background: #5a6268;
-        }
-
-        .trajectory-info {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            padding: 15px;
-            z-index: 1000;
-            min-width: 300px;
-            display: none;
-        }
-
-        .trajectory-info.visible {
-            display: block;
-        }
-
-        .trajectory-info h3 {
-            color: #00A854;
-            margin: 0 0 15px 0;
-            font-size: 1em;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .trajectory-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .trajectory-stat {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .trajectory-stat-value {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #00A854;
-            margin-bottom: 5px;
-        }
-
-        .trajectory-stat-label {
-            font-size: 0.75em;
-            color: #666;
-        }
-        
-        .debug-console {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.95);
-            color: #0f0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.75em;
-            padding: 15px;
-            border-radius: 10px;
-            max-width: 600px;
-            max-height: 400px;
-            overflow-y: auto;
-            z-index: 2000;
-            display: none;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-        }
-        
-        .debug-console.visible {
-            display: block;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #999;
-        }
-        
-        .empty-state i {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            opacity: 0.5;
-        }
-
-        .gps-loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.95);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            border-radius: 15px;
-        }
-
-        .gps-loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 6px solid #f0f0f0;
-            border-top-color: #00A854;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        .gps-loading-text {
-            margin-top: 20px;
-            font-size: 1.1em;
-            color: #333;
-            font-weight: 600;
-        }
-
-        .gps-loading-progress {
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #666;
-        }
+        .gps-filters { padding: 15px; border-bottom: 1px solid #e0e0e0; }
+        .filter-group-gps { margin-bottom: 15px; }
+        .filter-group-gps label { display: block; font-size: 0.85em; font-weight: 600; color: #666; margin-bottom: 5px; }
+        .filter-group-gps select { width: 100%; padding: 8px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 0.9em; }
+        .stats-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; border-bottom: 1px solid #e0e0e0; }
+        .stat-mini { background: #f8f9fa; padding: 10px; border-radius: 8px; text-align: center; }
+        .stat-mini-value { font-size: 1.5em; font-weight: bold; color: #00A854; }
+        .stat-mini-label { font-size: 0.75em; color: #666; margin-top: 5px; }
+        .sessions-list { flex: 1; overflow-y: auto; padding: 10px; }
+        .session-card { background: white; border: 2px solid #e0e0e0; border-radius: 10px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.3s; }
+        .session-card:hover { border-color: #00A854; box-shadow: 0 4px 12px rgba(0,168,84,0.2); transform: translateY(-2px); }
+        .session-card.active { border-color: #00A854; background: #f0fff4; }
+        .session-driver { font-weight: bold; font-size: 0.95em; margin-bottom: 8px; color: #00A854; }
+        .session-info { font-size: 0.85em; color: #666; }
+        .session-info div { margin-bottom: 3px; }
+        .map-wrapper { flex: 1; position: relative; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; }
+        #map { width: 100%; height: 100%; }
+        .debug-toggle { position: absolute; top: 20px; left: 20px; background: #333; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; z-index: 1001; font-size: 14px; }
+        .map-controls { position: absolute; top: 20px; right: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); padding: 15px; z-index: 1000; min-width: 220px; }
+        .map-controls h3 { margin: 0 0 15px 0; font-size: 1em; color: #333; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; }
+        .control-group { margin-bottom: 12px; }
+        .control-group label { display: flex; align-items: center; gap: 8px; font-size: 0.9em; cursor: pointer; color: #555; padding: 5px; border-radius: 6px; transition: all 0.2s; }
+        .control-group label:hover { background: #f8f9fa; }
+        .control-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #00A854; }
+        .btn-map { width: 100%; padding: 10px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9em; transition: all 0.2s; margin-top: 8px; }
+        .btn-map.primary { background: linear-gradient(135deg, #00A854, #00C65E); color: white; }
+        .btn-map.secondary { background: #6c757d; color: white; }
+        .trajectory-info { position: absolute; bottom: 20px; left: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); padding: 15px; z-index: 1000; min-width: 300px; display: none; }
+        .trajectory-info.visible { display: block; }
+        .trajectory-info h3 { color: #00A854; margin: 0 0 15px 0; font-size: 1em; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; }
+        .trajectory-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .trajectory-stat { background: #f8f9fa; padding: 10px; border-radius: 8px; text-align: center; }
+        .trajectory-stat-value { font-size: 1.3em; font-weight: bold; color: #00A854; margin-bottom: 5px; }
+        .trajectory-stat-label { font-size: 0.75em; color: #666; }
+        .debug-console { position: absolute; bottom: 20px; right: 20px; background: rgba(0,0,0,0.95); color: #0f0; font-family: 'Courier New', monospace; font-size: 0.75em; padding: 15px; border-radius: 10px; max-width: 600px; max-height: 400px; overflow-y: auto; z-index: 2000; display: none; }
+        .debug-console.visible { display: block; }
+        .empty-state { text-align: center; padding: 40px 20px; color: #999; }
+        .empty-state i { font-size: 2.5em; margin-bottom: 10px; opacity: 0.5; }
+        .gps-loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; border-radius: 15px; }
+        .gps-loading-spinner { width: 60px; height: 60px; border: 6px solid #f0f0f0; border-top-color: #00A854; border-radius: 50%; animation: spin 1s linear infinite; }
+        .gps-loading-text { margin-top: 20px; font-size: 1.1em; color: #333; font-weight: 600; }
+        .gps-loading-progress { margin-top: 10px; font-size: 0.9em; color: #666; }
 
         @media (max-width: 768px) {
             .header h1 { font-size: 1.5em; }
@@ -806,16 +210,18 @@
             .gps-container { flex-direction: column; height: auto; }
             .gps-sidebar { width: 100%; height: 400px; }
             .map-wrapper { height: 500px; }
+            .albourakh-account-number { font-size: 1.5em; }
         }
     </style>
 </head>
 <body>
+    <!-- LOGIN SCREEN -->
     <div id="loginScreen">
         <div class="login-container">
             <div class="login-header">
                 <div class="login-logo">🔐</div>
                 <h1 class="login-title">Administration</h1>
-                <p style="color: #666;">Al Bourakh - Gestion Complète</p>
+                <p style="color: #666;">Al Bourakh - Gestion Unifiée</p>
             </div>
             <div class="form-group">
                 <label>📧 Email Administrateur</label>
@@ -829,16 +235,17 @@
                 <i class="fas fa-sign-in-alt"></i> Se connecter
             </button>
             <p style="text-align: center; margin-top: 20px; color: #999; font-size: 0.9em;">
-                Version 4.1 OPTIMISÉ - Al Bourakh © 2025
+                Version 6.0 UNIFIÉE - Al Bourakh © 2025
             </p>
         </div>
     </div>
 
+    <!-- ADMIN DASHBOARD -->
     <div id="adminDashboard" style="display: none;">
         <div class="container">
             <div class="header">
-                <h1><i class="fas fa-shield-alt"></i> Administration Complète</h1>
-                <p>Gestion des chauffeurs, candidatures et suivi GPS</p>
+                <h1><i class="fas fa-shield-alt"></i> Administration Unifiée</h1>
+                <p>Candidatures • Chauffeurs • Portefeuille • GPS Tracking</p>
                 <button class="logout-btn" onclick="logoutAdmin()">
                     <i class="fas fa-sign-out-alt"></i> Déconnexion
                 </button>
@@ -849,10 +256,13 @@
                     <i class="fas fa-file-alt"></i> Candidatures
                 </button>
                 <button class="tab-btn" onclick="switchTab('chauffeurs')">
-                    <i class="fas fa-users"></i> Chauffeurs Actifs
+                    <i class="fas fa-users"></i> Chauffeurs
+                </button>
+                <button class="tab-btn" onclick="switchTab('portefeuille')">
+                    <i class="fas fa-wallet"></i> Portefeuille
                 </button>
                 <button class="tab-btn" onclick="switchTab('gps')">
-                    <i class="fas fa-map-marked-alt"></i> GPS Tracking
+                    <i class="fas fa-map-marked-alt"></i> GPS
                 </button>
             </div>
 
@@ -861,87 +271,38 @@
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon purple"><i class="fas fa-inbox"></i></div>
-                        <div class="stat-info">
-                            <h3 id="totalCandidatures">0</h3>
-                            <p>Total Candidatures</p>
-                        </div>
+                        <div class="stat-info"><h3 id="totalCandidatures">0</h3><p>Total</p></div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
-                        <div class="stat-info">
-                            <h3 id="pendingCandidatures">0</h3>
-                            <p>En Attente</p>
-                        </div>
+                        <div class="stat-info"><h3 id="pendingCandidatures">0</h3><p>En Attente</p></div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon teal"><i class="fas fa-car"></i></div>
-                        <div class="stat-info">
-                            <h3 id="withVehicleCandidatures">0</h3>
-                            <p>Avec Véhicule</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon blue"><i class="fas fa-user-tie"></i></div>
-                        <div class="stat-info">
-                            <h3 id="withoutVehicleCandidatures">0</h3>
-                            <p>Sans Véhicule</p>
-                        </div>
+                        <div class="stat-info"><h3 id="withVehicleCandidatures">0</h3><p>Avec Véhicule</p></div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon green"><i class="fas fa-check"></i></div>
-                        <div class="stat-info">
-                            <h3 id="acceptedCandidatures">0</h3>
-                            <p>Acceptées</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon red"><i class="fas fa-times"></i></div>
-                        <div class="stat-info">
-                            <h3 id="rejectedCandidatures">0</h3>
-                            <p>Refusées</p>
-                        </div>
+                        <div class="stat-info"><h3 id="acceptedCandidatures">0</h3><p>Acceptées</p></div>
                     </div>
                 </div>
-
                 <div class="main-content">
                     <div class="action-bar">
                         <div class="search-box">
-                            <input type="text" id="searchCandidatures" placeholder="Rechercher une candidature..." onkeyup="searchCandidatures()">
+                            <input type="text" id="searchCandidatures" placeholder="Rechercher..." onkeyup="searchCandidatures()">
                             <i class="fas fa-search"></i>
                         </div>
                         <div class="filters">
-                            <button class="filter-btn active" onclick="filterCandidatures('all')">
-                                <i class="fas fa-list"></i> Tous
-                            </button>
-                            <button class="filter-btn" onclick="filterCandidatures('with-vehicle')">
-                                <i class="fas fa-car"></i> Avec véhicule
-                            </button>
-                            <button class="filter-btn" onclick="filterCandidatures('without-vehicle')">
-                                <i class="fas fa-user-tie"></i> Sans véhicule
-                            </button>
-                            <button class="btn btn-secondary" onclick="loadCandidatures()">
-                                <i class="fas fa-sync-alt"></i> Actualiser
-                            </button>
+                            <button class="filter-btn active" onclick="filterCandidatures('all', this)">Tous</button>
+                            <button class="filter-btn" onclick="filterCandidatures('with-vehicle', this)">Avec véhicule</button>
+                            <button class="filter-btn" onclick="filterCandidatures('without-vehicle', this)">Sans véhicule</button>
+                            <button class="btn btn-secondary" onclick="loadCandidatures()"><i class="fas fa-sync-alt"></i></button>
                         </div>
                     </div>
                     <div class="table-container">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>Candidat</th>
-                                    <th>Téléphone</th>
-                                    <th>Type</th>
-                                    <th>Véhicule</th>
-                                    <th>Date</th>
-                                    <th>Statut</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="candidaturesTableBody">
-                                <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">
-                                    <i class="fas fa-spinner fa-spin"></i> Chargement...
-                                </td></tr>
-                            </tbody>
+                            <thead><tr><th>Candidat</th><th>Téléphone</th><th>Type</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
+                            <tbody id="candidaturesTableBody"><tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">Chargement...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -952,196 +313,179 @@
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon green"><i class="fas fa-users"></i></div>
-                        <div class="stat-info">
-                            <h3 id="totalDrivers">0</h3>
-                            <p>Total Chauffeurs</p>
-                        </div>
+                        <div class="stat-info"><h3 id="totalDrivers">0</h3><p>Total</p></div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon blue"><i class="fas fa-check-circle"></i></div>
-                        <div class="stat-info">
-                            <h3 id="availableDrivers">0</h3>
-                            <p>Disponibles</p>
-                        </div>
+                        <div class="stat-info"><h3 id="availableDrivers">0</h3><p>Disponibles</p></div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon orange"><i class="fas fa-car"></i></div>
-                        <div class="stat-info">
-                            <h3 id="busyDrivers">0</h3>
-                            <p>En Course</p>
-                        </div>
+                        <div class="stat-info"><h3 id="busyDrivers">0</h3><p>En Course</p></div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon red"><i class="fas fa-power-off"></i></div>
-                        <div class="stat-info">
-                            <h3 id="offlineDrivers">0</h3>
-                            <p>Hors Ligne</p>
-                        </div>
+                        <div class="stat-info"><h3 id="offlineDrivers">0</h3><p>Hors Ligne</p></div>
                     </div>
                 </div>
-
                 <div class="main-content">
                     <div class="action-bar">
                         <div class="search-box">
-                            <input type="text" id="searchDrivers" placeholder="Rechercher un chauffeur..." onkeyup="searchDrivers()">
+                            <input type="text" id="searchDrivers" placeholder="Rechercher..." onkeyup="searchDrivers()">
                             <i class="fas fa-search"></i>
                         </div>
                         <div style="display:flex;gap:10px;">
-                            <button class="btn btn-primary" onclick="newDriver()">
-                                <i class="fas fa-plus"></i> Nouveau
-                            </button>
-                            <button class="btn btn-secondary" onclick="loadDrivers()">
-                                <i class="fas fa-sync-alt"></i> Actualiser
-                            </button>
+                            <button class="btn btn-primary" onclick="newDriver()"><i class="fas fa-plus"></i> Nouveau</button>
+                            <button class="btn btn-secondary" onclick="loadDrivers()"><i class="fas fa-sync-alt"></i></button>
                         </div>
                     </div>
                     <div class="table-container">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>Chauffeur</th>
-                                    <th>Téléphone</th>
-                                    <th>Véhicule</th>
-                                    <th>Note</th>
-                                    <th>Courses</th>
-                                    <th>Statut</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="driversTableBody">
-                                <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">
-                                    <i class="fas fa-spinner fa-spin"></i> Chargement...
-                                </td></tr>
-                            </tbody>
+                            <thead><tr><th>Chauffeur</th><th>Téléphone</th><th>Véhicule</th><th>Note</th><th>Statut</th><th>Actions</th></tr></thead>
+                            <tbody id="driversTableBody"><tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">Chargement...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB GPS TRACKING -->
+            <!-- TAB PORTEFEUILLE -->
+            <div id="tab-portefeuille" class="tab-content">
+                <div class="albourakh-main-account">
+                    <h2><i class="fas fa-building"></i> Compte Principal Al Bourakh</h2>
+                    <div class="albourakh-account-number">+221 78 785 01 01</div>
+                    <div class="albourakh-instructions">
+                        <h3>📋 Instructions de Validation</h3>
+                        <ul>
+                            <li><strong>Recharge Client/Chauffeur :</strong> Vérifier réception → Valider → Crédit portefeuille</li>
+                            <li><strong>Paiement Course :</strong> Vérifier réception → Valider → Crédit chauffeur (70%)</li>
+                            <li><strong>Retrait Chauffeur :</strong> Effectuer transfert → Valider → Débit solde</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fas fa-arrow-down"></i></div>
+                        <div class="stat-info"><h3 id="pendingRecharges">0</h3><p>Recharges Clients</p></div>
+                        <div class="stat-count"><span id="totalRechargesAmount">0</span> FCFA</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fas fa-plus-square"></i></div>
+                        <div class="stat-info"><h3 id="pendingDriverRecharges">0</h3><p>Recharges Chauffeurs</p></div>
+                        <div class="stat-count"><span id="totalDriverRechargesAmount">0</span> FCFA</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange"><i class="fas fa-credit-card"></i></div>
+                        <div class="stat-info"><h3 id="pendingPayments">0</h3><p>Paiements Courses</p></div>
+                        <div class="stat-count"><span id="totalPaymentsAmount">0</span> FCFA</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red"><i class="fas fa-arrow-up"></i></div>
+                        <div class="stat-info"><h3 id="pendingWithdrawals">0</h3><p>Retraits</p></div>
+                        <div class="stat-count"><span id="totalWithdrawalsAmount">0</span> FCFA</div>
+                    </div>
+                </div>
+                <!-- Recharges Clients -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="fas fa-plus-circle"></i> Recharges Clients</h2>
+                        <div class="filters">
+                            <button class="filter-btn active" onclick="filterRecharges('pending', this)">En attente</button>
+                            <button class="filter-btn" onclick="filterRecharges('validated', this)">Validées</button>
+                            <button class="filter-btn" onclick="filterRecharges('all', this)">Toutes</button>
+                            <button class="btn btn-refresh" onclick="loadPortefeuilleData()"><i class="fas fa-sync"></i></button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table><thead><tr><th>Client</th><th>Téléphone</th><th>Montant</th><th>Source</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
+                        <tbody id="rechargesTable"><tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Chargement...</td></tr></tbody></table>
+                    </div>
+                </div>
+                <!-- Recharges Chauffeurs -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="fas fa-plus-square"></i> Recharges Chauffeurs</h2>
+                        <div class="filters">
+                            <button class="filter-btn active" onclick="filterDriverRecharges('pending', this)">En attente</button>
+                            <button class="filter-btn" onclick="filterDriverRecharges('validated', this)">Validées</button>
+                            <button class="filter-btn" onclick="filterDriverRecharges('all', this)">Toutes</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table><thead><tr><th>Chauffeur</th><th>Téléphone</th><th>Montant</th><th>Source</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
+                        <tbody id="driverRechargesTable"><tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Chargement...</td></tr></tbody></table>
+                    </div>
+                </div>
+                <!-- Paiements Courses -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="fas fa-car"></i> Paiements Courses</h2>
+                        <div class="filters">
+                            <button class="filter-btn active" onclick="filterPayments('pending', this)">En attente</button>
+                            <button class="filter-btn" onclick="filterPayments('validated', this)">Validés</button>
+                            <button class="filter-btn" onclick="filterPayments('all', this)">Tous</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table><thead><tr><th>Client</th><th>Course</th><th>Chauffeur</th><th>Montant</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
+                        <tbody id="paymentsTable"><tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Chargement...</td></tr></tbody></table>
+                    </div>
+                </div>
+                <!-- Retraits Chauffeurs -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="fas fa-money-bill-wave"></i> Retraits Chauffeurs</h2>
+                        <div class="filters">
+                            <button class="filter-btn active" onclick="filterWithdrawals('pending', this)">En attente</button>
+                            <button class="filter-btn" onclick="filterWithdrawals('completed', this)">Effectués</button>
+                            <button class="filter-btn" onclick="filterWithdrawals('all', this)">Tous</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table><thead><tr><th>Chauffeur</th><th>Téléphone</th><th>Montant</th><th>Destination</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
+                        <tbody id="withdrawalsTable"><tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Chargement...</td></tr></tbody></table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB GPS -->
             <div id="tab-gps" class="tab-content">
                 <div class="gps-container">
                     <div class="gps-sidebar">
-                        <div class="gps-sidebar-header">
-                            <h2>🛰️ GPS Tracking</h2>
-                            <p style="font-size:0.9em;opacity:0.9;">Suivi en temps réel</p>
-                        </div>
-
-                        <div class="status-bar" id="statusBar">
-                            <i class="fas fa-circle-notch fa-spin"></i> Initialisation...
-                        </div>
-
+                        <div class="gps-sidebar-header"><h2>🛰️ GPS Tracking</h2><p style="font-size:0.9em;opacity:0.9;">Suivi en temps réel</p></div>
+                        <div class="status-bar" id="statusBar"><i class="fas fa-circle-notch fa-spin"></i> Initialisation...</div>
                         <div class="gps-filters">
-                            <div class="filter-group-gps">
-                                <label>Chauffeur</label>
-                                <select id="filterDriver">
-                                    <option value="">Tous les chauffeurs</option>
-                                </select>
-                            </div>
-
-                            <div class="filter-group-gps">
-                                <label>Statut</label>
-                                <select id="filterStatus">
-                                    <option value="">Tous</option>
-                                    <option value="active">Actives</option>
-                                    <option value="completed">Terminées</option>
-                                </select>
-                            </div>
-
-                            <button class="btn-primary" id="btnRefresh" style="width:100%;margin-top:10px;">
-                                <i class="fas fa-sync-alt"></i> Actualiser
-                            </button>
+                            <div class="filter-group-gps"><label>Chauffeur</label><select id="filterDriver"><option value="">Tous</option></select></div>
+                            <div class="filter-group-gps"><label>Statut</label><select id="filterStatus"><option value="">Tous</option><option value="active">Actives</option><option value="completed">Terminées</option></select></div>
+                            <button class="btn btn-primary" id="btnRefresh" style="width:100%;"><i class="fas fa-sync-alt"></i> Actualiser</button>
                         </div>
-
                         <div class="stats-mini">
-                            <div class="stat-mini">
-                                <div class="stat-mini-value" id="totalSessions">0</div>
-                                <div class="stat-mini-label">Sessions</div>
-                            </div>
-                            <div class="stat-mini">
-                                <div class="stat-mini-value" id="activeSessions">0</div>
-                                <div class="stat-mini-label">Actives</div>
-                            </div>
-                            <div class="stat-mini">
-                                <div class="stat-mini-value" id="totalDistance">0</div>
-                                <div class="stat-mini-label">km Total</div>
-                            </div>
-                            <div class="stat-mini">
-                                <div class="stat-mini-value" id="totalPositions">0</div>
-                                <div class="stat-mini-label">Positions</div>
-                            </div>
+                            <div class="stat-mini"><div class="stat-mini-value" id="totalSessions">0</div><div class="stat-mini-label">Sessions</div></div>
+                            <div class="stat-mini"><div class="stat-mini-value" id="activeSessions">0</div><div class="stat-mini-label">Actives</div></div>
+                            <div class="stat-mini"><div class="stat-mini-value" id="totalDistance">0</div><div class="stat-mini-label">km Total</div></div>
+                            <div class="stat-mini"><div class="stat-mini-value" id="totalPositions">0</div><div class="stat-mini-label">Positions</div></div>
                         </div>
-
-                        <div class="sessions-list" id="sessionsList">
-                            <div class="empty-state">
-                                <i class="fas fa-route"></i>
-                                <p>Chargement...</p>
-                            </div>
-                        </div>
+                        <div class="sessions-list" id="sessionsList"><div class="empty-state"><i class="fas fa-route"></i><p>Chargement...</p></div></div>
                     </div>
-
-                    <div class="map-wrapper" style="position:relative;">
-                        <!-- GPS Loading Overlay -->
-                        <div class="gps-loading-overlay" id="gpsLoadingOverlay" style="display:none;">
-                            <div class="gps-loading-spinner"></div>
-                            <div class="gps-loading-text">Chargement du GPS Tracking...</div>
-                            <div class="gps-loading-progress" id="gpsLoadingProgress">Initialisation...</div>
-                        </div>
-
-                        <button class="debug-toggle" id="debugBtn">
-                            <i class="fas fa-terminal"></i> Debug
-                        </button>
-
+                    <div class="map-wrapper">
+                        <div class="gps-loading-overlay" id="gpsLoadingOverlay" style="display:none;"><div class="gps-loading-spinner"></div><div class="gps-loading-text">Chargement GPS...</div><div class="gps-loading-progress" id="gpsLoadingProgress">Initialisation...</div></div>
+                        <button class="debug-toggle" id="debugBtn"><i class="fas fa-terminal"></i> Debug</button>
                         <div id="map"></div>
-                        
                         <div class="map-controls">
                             <h3>🎛️ Options</h3>
-                            
-                            <div class="control-group">
-                                <label>
-                                    <input type="checkbox" id="showMarkers" checked onchange="toggleMarkers()">
-                                    <span>📍 Marqueurs</span>
-                                </label>
-                            </div>
-
-                            <div class="control-group">
-                                <label>
-                                    <input type="checkbox" id="showTrajectory" checked onchange="toggleTrajectory()">
-                                    <span>📈 Trajet</span>
-                                </label>
-                            </div>
-
-                            <button class="btn-map primary" onclick="centerOnTrajectory()">
-                                <i class="fas fa-crosshairs"></i> Centrer
-                            </button>
-
-                            <button class="btn-map secondary" onclick="clearMapDisplay()">
-                                <i class="fas fa-eraser"></i> Effacer
-                            </button>
+                            <div class="control-group"><label><input type="checkbox" id="showMarkers" checked onchange="toggleMarkers()"><span>📍 Marqueurs</span></label></div>
+                            <div class="control-group"><label><input type="checkbox" id="showTrajectory" checked onchange="toggleTrajectory()"><span>📈 Trajet</span></label></div>
+                            <button class="btn-map primary" onclick="centerOnTrajectory()"><i class="fas fa-crosshairs"></i> Centrer</button>
+                            <button class="btn-map secondary" onclick="clearMapDisplay()"><i class="fas fa-eraser"></i> Effacer</button>
                         </div>
-
                         <div class="trajectory-info" id="trajectoryInfo">
                             <h3>📊 Informations du trajet</h3>
                             <div class="trajectory-stats">
-                                <div class="trajectory-stat">
-                                    <div class="trajectory-stat-value" id="trajDistance">0 km</div>
-                                    <div class="trajectory-stat-label">Distance</div>
-                                </div>
-                                <div class="trajectory-stat">
-                                    <div class="trajectory-stat-value" id="trajDuration">0 min</div>
-                                    <div class="trajectory-stat-label">Durée</div>
-                                </div>
-                                <div class="trajectory-stat">
-                                    <div class="trajectory-stat-value" id="trajSpeed">0 km/h</div>
-                                    <div class="trajectory-stat-label">Vitesse moy.</div>
-                                </div>
-                                <div class="trajectory-stat">
-                                    <div class="trajectory-stat-value" id="trajPoints">0</div>
-                                    <div class="trajectory-stat-label">Points GPS</div>
-                                </div>
+                                <div class="trajectory-stat"><div class="trajectory-stat-value" id="trajDistance">0 km</div><div class="trajectory-stat-label">Distance</div></div>
+                                <div class="trajectory-stat"><div class="trajectory-stat-value" id="trajDuration">0 min</div><div class="trajectory-stat-label">Durée</div></div>
+                                <div class="trajectory-stat"><div class="trajectory-stat-value" id="trajSpeed">0 km/h</div><div class="trajectory-stat-label">Vitesse moy.</div></div>
+                                <div class="trajectory-stat"><div class="trajectory-stat-value" id="trajPoints">0</div><div class="trajectory-stat-label">Points GPS</div></div>
                             </div>
                         </div>
-                        
                         <div class="debug-console" id="debugConsole"></div>
                     </div>
                 </div>
@@ -1149,33 +493,18 @@
         </div>
     </div>
 
-    <!-- MODAL DÉTAILS -->
-    <div class="modal" id="detailsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Détails</h2>
-                <button class="modal-close" onclick="closeModal()">×</button>
-            </div>
-            <div class="modal-body" id="modalBody"></div>
-        </div>
-    </div>
-
-    <!-- VISIONNEUSE D'IMAGE -->
-    <div class="image-viewer" id="imageViewer" onclick="closeImageViewer()">
-        <button class="close-viewer" onclick="closeImageViewer()">×</button>
-        <img id="viewerImage" src="" alt="Document">
-    </div>
-
-    <!-- LOADING -->
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <div class="loading-text">Chargement...</div>
-    </div>
+    <!-- MODALS -->
+    <div class="modal" id="detailsModal"><div class="modal-content"><div class="modal-header"><h2 id="modalTitle">Détails</h2><button class="modal-close" onclick="closeModal('detailsModal')">×</button></div><div class="modal-body" id="modalBody"></div></div></div>
+    <div class="modal" id="rechargeModal"><div class="modal-content"><div class="modal-header"><h2><i class="fas fa-plus-circle"></i> Validation Recharge Client</h2><button class="modal-close" onclick="closeModal('rechargeModal')">×</button></div><div class="modal-body" id="rechargeModalBody"></div></div></div>
+    <div class="modal" id="driverRechargeModal"><div class="modal-content"><div class="modal-header"><h2><i class="fas fa-plus-square"></i> Validation Recharge Chauffeur</h2><button class="modal-close" onclick="closeModal('driverRechargeModal')">×</button></div><div class="modal-body" id="driverRechargeModalBody"></div></div></div>
+    <div class="modal" id="paymentModal"><div class="modal-content"><div class="modal-header"><h2><i class="fas fa-credit-card"></i> Validation Paiement Course</h2><button class="modal-close" onclick="closeModal('paymentModal')">×</button></div><div class="modal-body" id="paymentModalBody"></div></div></div>
+    <div class="modal" id="withdrawalModal"><div class="modal-content"><div class="modal-header"><h2><i class="fas fa-money-bill-wave"></i> Validation Retrait</h2><button class="modal-close" onclick="closeModal('withdrawalModal')">×</button></div><div class="modal-body" id="withdrawalModalBody"></div></div></div>
+    <div class="image-viewer" id="imageViewer" onclick="closeImageViewer()"><button class="close-viewer" onclick="closeImageViewer()">×</button><img id="viewerImage" src="" alt="Document"></div>
+    <div class="loading" id="loading"><div class="spinner"></div><div class="loading-text">Chargement...</div></div>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyANcdvMz2yMbRD4V82EGLm95Jh2NdaR2o0",
@@ -1185,1442 +514,240 @@
             messagingSenderId: "297875396274",
             appId: "1:297875396274:web:82a466c4fce6fbb79b1bab"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // Variables globales
-        let allCandidatures = [];
-        let allDrivers = [];
-        let currentFilter = 'all';
-        let map;
-        let markers = [];
-        let polylines = [];
-        let allSessions = [];
-        let allDriversGPS = {};
-        let currentPositions = [];
-        let isAuth = false;
-        let currentSessionId = null;
-        let mapInitialized = false;
+        const ALBOURAKH_ACCOUNT = '+221 78 785 01 01';
+        const COMMISSION_RATE = 0.30;
+        const DRIVER_RATE = 0.70;
 
-        const CANDIDATURES_COLLECTION = 'candidatures';
+        let allCandidatures = [], allDrivers = [], allRecharges = [], allDriverRecharges = [], allPayments = [], allWithdrawals = [], allSessions = [], allDriversGPS = {};
+        let currentCandFilter = 'all', currentRechargeFilter = 'pending', currentDriverRechargeFilter = 'pending', currentPaymentFilter = 'pending', currentWithdrawalFilter = 'pending';
+        let map, markers = [], polylines = [], currentPositions = [], isAuth = false, currentSessionId = null, mapInitialized = false;
 
-        // === UTILITAIRES ===
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `<strong>${message}</strong>`;
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+        function showToast(msg, type = 'info') {
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerHTML = `<strong>${msg}</strong>`;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
         }
-
-        function showLoading(text = 'Chargement...') {
-            document.getElementById('loading').querySelector('.loading-text').textContent = text;
-            document.getElementById('loading').classList.add('active');
-        }
-
-        function hideLoading() {
-            document.getElementById('loading').classList.remove('active');
-        }
+        function showLoading(txt = 'Chargement...') { document.querySelector('.loading-text').textContent = txt; document.getElementById('loading').classList.add('active'); }
+        function hideLoading() { document.getElementById('loading').classList.remove('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function formatDate(ts) { if (!ts) return 'N/A'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleString('fr-FR'); }
+        function getStatusLabel(s) { const l = { 'en_attente': '⏳ En Attente', 'acceptee': '✅ Acceptée', 'refusee': '❌ Refusée', 'disponible': '🟢 Disponible', 'en_course': '🔵 En Course', 'hors_ligne': '⚫ Hors Ligne', 'pending': '⏳ En attente', 'validated': '✅ Validé', 'completed': '✅ Effectué', 'active': '🔵 Active' }; return l[s] || s; }
 
         function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.closest('.tab-btn').classList.add('active');
             document.getElementById(`tab-${tab}`).classList.add('active');
-            
             if (tab === 'candidatures') loadCandidatures();
             else if (tab === 'chauffeurs') loadDrivers();
-            else if (tab === 'gps') {
-                if (!mapInitialized) {
-                    // La carte n'est pas encore chargée, afficher le loader
-                    showGPSLoader();
-                    initGoogleMaps();
-                } else {
-                    // La carte est déjà prête (préchargée)!
-                    console.log('✅ Carte déjà préchargée, chargement immédiat');
-                    
-                    // Charger uniquement les sessions si les drivers sont déjà chargés
-                    if (Object.keys(allDriversGPS).length === 0) {
-                        updateStatus('🔄 Chargement des chauffeurs...');
-                        loadGPSDrivers().then(() => {
-                            return loadSessions();
-                        }).catch(err => {
-                            console.error('Erreur:', err);
-                            updateStatus('❌ Erreur de chargement', true);
-                        });
-                    } else {
-                        // Tout est déjà prêt, juste charger les sessions
-                        console.log('✅ Chauffeurs déjà en cache, chargement des sessions uniquement');
-                        loadSessions();
-                    }
-                }
-            }
+            else if (tab === 'portefeuille') loadPortefeuilleData();
+            else if (tab === 'gps') { if (!mapInitialized) { showGPSLoader(); initGoogleMaps(); } else { loadSessions(); } }
         }
 
-        // === AUTHENTIFICATION ===
         async function loginAdmin() {
             const email = document.getElementById('adminEmail').value.trim();
-            const password = document.getElementById('adminPassword').value.trim();
-            if (!email || !password) { showToast('Remplissez tous les champs', 'error'); return; }
+            const pwd = document.getElementById('adminPassword').value.trim();
+            if (!email || !pwd) { showToast('Remplissez tous les champs', 'error'); return; }
             showLoading('Connexion...');
             try {
-                await auth.signInWithEmailAndPassword(email, password);
+                await auth.signInWithEmailAndPassword(email, pwd);
                 isAuth = true;
                 hideLoading();
                 showToast('✅ Connexion réussie!', 'success');
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('adminDashboard').style.display = 'block';
                 loadCandidatures();
-                
-                // Préchargement de Google Maps en arrière-plan pour l'onglet GPS
-                if (!mapInitialized) {
-                    setTimeout(() => {
-                        console.log('🚀 Préchargement de Google Maps en arrière-plan...');
-                        const script = document.createElement('script');
-                        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBI1svukv3Ts7fN97ke5OGfwo2V-vRUGHI&callback=initMapSilent';
-                        script.async = true;
-                        script.defer = true;
-                        document.head.appendChild(script);
-                    }, 2000); // 2 secondes après la connexion
-                }
-            } catch (error) {
-                hideLoading();
-                showToast('Email ou mot de passe incorrect', 'error');
-            }
+                setTimeout(() => { if (!mapInitialized) { const s = document.createElement('script'); s.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBI1svukv3Ts7fN97ke5OGfwo2V-vRUGHI&callback=initMapSilent'; s.async = true; document.head.appendChild(s); } }, 2000);
+            } catch (e) { hideLoading(); showToast('Email ou mot de passe incorrect', 'error'); }
         }
-
-        // Fonction d'initialisation silencieuse de la carte (préchargement)
-        window.initMapSilent = function() {
-            if (mapInitialized) return;
-            
-            console.log('🗺️ Préchargement silencieux de Google Maps...');
-            try {
-                map = new google.maps.Map(document.getElementById('map'), {
-                    center: { lat: 14.6937, lng: -17.4441 },
-                    zoom: 12,
-                    mapTypeControl: true,
-                    streetViewControl: false
-                });
-                
-                mapInitialized = true;
-                console.log('✅ Carte préchargée en arrière-plan');
-                
-                // Charger les chauffeurs GPS en arrière-plan aussi
-                if (isAuth && Object.keys(allDriversGPS).length === 0) {
-                    loadGPSDrivers().then(() => {
-                        console.log('✅ Chauffeurs GPS préchargés');
-                    });
-                }
-            } catch (error) {
-                console.error('❌ Erreur préchargement carte:', error);
-            }
-        };
-
-        async function logoutAdmin() {
-            if (confirm('Voulez-vous vous déconnecter ?')) {
-                await auth.signOut();
-                isAuth = false;
-                document.getElementById('loginScreen').style.display = 'block';
-                document.getElementById('adminDashboard').style.display = 'none';
-                showToast('Déconnexion réussie', 'info');
-            }
-        }
-
-        document.getElementById('adminPassword').addEventListener('keypress', e => {
-            if (e.key === 'Enter') loginAdmin();
-        });
+        async function logoutAdmin() { if (confirm('Déconnexion ?')) { await auth.signOut(); isAuth = false; document.getElementById('loginScreen').style.display = 'block'; document.getElementById('adminDashboard').style.display = 'none'; } }
+        document.getElementById('adminPassword').addEventListener('keypress', e => { if (e.key === 'Enter') loginAdmin(); });
 
         // === CANDIDATURES ===
         async function loadCandidatures() {
-            if (!auth.currentUser) {
-                showToast('Veuillez vous reconnecter', 'error');
-                return;
-            }
-            
-            showLoading('Chargement des candidatures...');
-            
+            if (!auth.currentUser) return;
+            showLoading('Chargement candidatures...');
             try {
+                const snap = await db.collection('candidatures').get();
                 allCandidatures = [];
-                const snapshot = await db.collection(CANDIDATURES_COLLECTION).get();
-                
-                if (!snapshot.empty) {
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        allCandidatures.push({ 
-                            id: doc.id,
-                            prenom: data.prenom || '',
-                            nom: data.nom || '',
-                            telephone: data.telephone || '',
-                            email: data.email || '',
-                            adresse: data.adresse || '',
-                            hasVehicle: data.hasVehicle !== undefined ? data.hasVehicle : true,
-                            vehicule: data.vehicule || {},
-                            documents: data.documents || {},
-                            photos: data.photos || {},
-                            statut: data.statut || 'en_attente',
-                            dateCreation: data.dateCreation || data.dateCandidate || null,
-                            ...data
-                        });
-                    });
-                }
-                
-                allCandidatures.sort((a, b) => {
-                    const dateA = a.dateCreation?.toDate ? a.dateCreation.toDate() : new Date(0);
-                    const dateB = b.dateCreation?.toDate ? b.dateCreation.toDate() : new Date(0);
-                    return dateB - dateA;
-                });
-                
+                snap.forEach(doc => allCandidatures.push({ id: doc.id, ...doc.data() }));
+                allCandidatures.sort((a, b) => { const dA = a.dateCreation?.toDate?.() || new Date(0); const dB = b.dateCreation?.toDate?.() || new Date(0); return dB - dA; });
                 updateCandidaturesStats();
                 displayCandidatures(allCandidatures);
                 hideLoading();
-                
-                if (allCandidatures.length === 0) {
-                    showToast('Aucune candidature trouvée', 'info');
-                } else {
-                    showToast(`✅ ${allCandidatures.length} candidature(s) chargée(s)`, 'success');
-                }
-                
-            } catch (error) {
-                console.error('❌ Erreur:', error);
-                hideLoading();
-                showToast('Erreur: ' + error.message, 'error');
-            }
+            } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); }
         }
-
         function updateCandidaturesStats() {
-            const total = allCandidatures.length;
-            const pending = allCandidatures.filter(c => 
-                c.statut === 'en_attente' || c.statut === 'nouvelle' || !c.statut
-            ).length;
-            const withVehicle = allCandidatures.filter(c => c.hasVehicle === true).length;
-            const withoutVehicle = allCandidatures.filter(c => c.hasVehicle === false).length;
-            const accepted = allCandidatures.filter(c => 
-                c.statut === 'acceptee' || c.statut === 'accepte' || c.statut === 'validee'
-            ).length;
-            const rejected = allCandidatures.filter(c => 
-                c.statut === 'refusee' || c.statut === 'refuse' || c.statut === 'rejetee'
-            ).length;
-            
-            document.getElementById('totalCandidatures').textContent = total;
-            document.getElementById('pendingCandidatures').textContent = pending;
-            document.getElementById('withVehicleCandidatures').textContent = withVehicle;
-            document.getElementById('withoutVehicleCandidatures').textContent = withoutVehicle;
-            document.getElementById('acceptedCandidatures').textContent = accepted;
-            document.getElementById('rejectedCandidatures').textContent = rejected;
+            document.getElementById('totalCandidatures').textContent = allCandidatures.length;
+            document.getElementById('pendingCandidatures').textContent = allCandidatures.filter(c => !c.statut || c.statut === 'en_attente' || c.statut === 'nouvelle').length;
+            document.getElementById('withVehicleCandidatures').textContent = allCandidatures.filter(c => c.hasVehicle === true).length;
+            document.getElementById('acceptedCandidatures').textContent = allCandidatures.filter(c => c.statut === 'acceptee' || c.statut === 'validee').length;
         }
-
-        function filterCandidatures(filter) {
-            currentFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
+        function filterCandidatures(filter, btn) {
+            currentCandFilter = filter;
+            btn.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             let filtered = allCandidatures;
-            if (filter === 'with-vehicle') {
-                filtered = allCandidatures.filter(c => c.hasVehicle === true);
-            } else if (filter === 'without-vehicle') {
-                filtered = allCandidatures.filter(c => c.hasVehicle === false);
-            }
-            
+            if (filter === 'with-vehicle') filtered = allCandidatures.filter(c => c.hasVehicle === true);
+            else if (filter === 'without-vehicle') filtered = allCandidatures.filter(c => c.hasVehicle === false);
             displayCandidatures(filtered);
         }
-
-        function displayCandidatures(candidatures) {
+        function displayCandidatures(list) {
             const tbody = document.getElementById('candidaturesTableBody');
-            if (candidatures.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">
-                    <i class="fas fa-inbox" style="font-size:3em;opacity:0.3;display:block;margin-bottom:15px;"></i>
-                    Aucune candidature trouvée
-                </td></tr>`;
-                return;
-            }
-            
-            tbody.innerHTML = candidatures.map(c => {
+            if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">Aucune candidature</td></tr>'; return; }
+            tbody.innerHTML = list.map(c => {
                 let statut = c.statut || 'en_attente';
-                if (statut === 'nouvelle') statut = 'en_attente';
-                if (statut === 'accepte' || statut === 'validee') statut = 'acceptee';
-                if (statut === 'refuse' || statut === 'rejetee') statut = 'refusee';
-                
-                const date = c.dateCreation?.toDate ? c.dateCreation.toDate().toLocaleDateString('fr-FR') : 'N/A';
-                const isPending = statut === 'en_attente';
+                const isPending = statut === 'en_attente' || statut === 'nouvelle' || !c.statut;
                 const hasVehicle = c.hasVehicle === true;
-                
-                return `
-                <tr>
-                    <td>
-                        <strong>${c.prenom || ''} ${c.nom || ''}</strong>
-                        <br><small style="color:#666;">${c.email || ''}</small>
-                    </td>
-                    <td>${c.telephone || 'N/A'}</td>
-                    <td>
-                        <span class="type-badge ${hasVehicle ? 'type-with-vehicle' : 'type-without-vehicle'}">
-                            ${hasVehicle ? '🚗 Avec véhicule' : '👤 Sans véhicule'}
-                        </span>
-                    </td>
-                    <td>
-                        ${hasVehicle ? `
-                            ${c.vehicule?.marque || ''} ${c.vehicule?.modele || ''}
-                            <br><small style="color:#666;">${c.vehicule?.immatriculation || ''}</small>
-                        ` : '<small style="color:#999;">N/A</small>'}
-                    </td>
-                    <td>${date}</td>
-                    <td><span class="status-badge status-${statut}">${getStatusLabel(statut)}</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn btn-icon btn-view" onclick="viewCandidature('${c.id}')" title="Détails"><i class="fas fa-eye"></i></button>
-                            ${isPending ? `
-                                <button class="btn btn-icon btn-accept" onclick="acceptCandidature('${c.id}')" title="Accepter"><i class="fas fa-check"></i></button>
-                                <button class="btn btn-icon btn-reject" onclick="rejectCandidature('${c.id}')" title="Refuser"><i class="fas fa-times"></i></button>
-                            ` : ''}
-                            <button class="btn btn-icon btn-delete" onclick="deleteCandidature('${c.id}')" title="Supprimer"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>`;
+                const date = c.dateCreation?.toDate ? c.dateCreation.toDate().toLocaleDateString('fr-FR') : 'N/A';
+                return `<tr><td><strong>${c.prenom || ''} ${c.nom || ''}</strong><br><small style="color:#666;">${c.email || ''}</small></td><td>${c.telephone || 'N/A'}</td><td><span class="type-badge ${hasVehicle ? 'type-with-vehicle' : 'type-without-vehicle'}">${hasVehicle ? '🚗 Véhicule' : '👤 Sans'}</span></td><td>${date}</td><td><span class="status-badge status-${statut}">${getStatusLabel(statut)}</span></td><td><div class="action-buttons"><button class="btn btn-icon btn-view" onclick="viewCandidature('${c.id}')"><i class="fas fa-eye"></i></button>${isPending ? `<button class="btn btn-icon btn-accept" onclick="acceptCandidature('${c.id}')"><i class="fas fa-check"></i></button><button class="btn btn-icon btn-reject" onclick="rejectCandidature('${c.id}')"><i class="fas fa-times"></i></button>` : ''}<button class="btn btn-icon btn-delete" onclick="deleteCandidature('${c.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`;
             }).join('');
         }
-
-        function getStatusLabel(statut) {
-            const labels = {
-                'en_attente': '⏳ En Attente',
-                'acceptee': '✅ Acceptée',
-                'refusee': '❌ Refusée',
-                'disponible': '🟢 Disponible',
-                'en_course': '🔵 En Course',
-                'hors_ligne': '⚫ Hors Ligne',
-                'active': '🔵 Active',
-                'completed': '✅ Terminée'
-            };
-            return labels[statut] || statut;
-        }
-
         function searchCandidatures() {
             const term = document.getElementById('searchCandidatures').value.toLowerCase();
-            let filtered = allCandidatures.filter(c =>
-                (c.prenom?.toLowerCase().includes(term)) ||
-                (c.nom?.toLowerCase().includes(term)) ||
-                (c.telephone?.includes(term)) ||
-                (c.email?.toLowerCase().includes(term))
-            );
-            
-            if (currentFilter === 'with-vehicle') {
-                filtered = filtered.filter(c => c.hasVehicle === true);
-            } else if (currentFilter === 'without-vehicle') {
-                filtered = filtered.filter(c => c.hasVehicle === false);
-            }
-            
+            let filtered = allCandidatures.filter(c => (c.prenom?.toLowerCase().includes(term)) || (c.nom?.toLowerCase().includes(term)) || (c.telephone?.includes(term)));
             displayCandidatures(filtered);
         }
-
         function viewCandidature(id) {
             const c = allCandidatures.find(x => x.id === id);
-            if (!c) return showToast('Candidature non trouvée', 'error');
-            
+            if (!c) return;
             const hasVehicle = c.hasVehicle === true;
-            
-            let vehicleSection = '';
-            if (hasVehicle) {
-                vehicleSection = `
-                <div class="info-section">
-                    <h4><i class="fas fa-car"></i> Véhicule Personnel</h4>
-                    <div class="info-grid">
-                        <div class="info-item"><label>Marque</label><span>${c.vehicule?.marque || 'N/A'}</span></div>
-                        <div class="info-item"><label>Modèle</label><span>${c.vehicule?.modele || 'N/A'}</span></div>
-                        <div class="info-item"><label>Année</label><span>${c.vehicule?.annee || 'N/A'}</span></div>
-                        <div class="info-item"><label>Couleur</label><span>${c.vehicule?.couleur || 'N/A'}</span></div>
-                        <div class="info-item"><label>Immatriculation</label><span>${c.vehicule?.immatriculation || 'N/A'}</span></div>
-                        <div class="info-item"><label>Places</label><span>${c.vehicule?.places || 'N/A'}</span></div>
-                    </div>
-                </div>`;
-            } else {
-                vehicleSection = `
-                <div class="alert-box info">
-                    <i class="fas fa-info-circle"></i>
-                    <div>
-                        <strong>Candidat sans véhicule personnel</strong>
-                        <p style="margin-top:5px;font-size:0.9em;">Ce candidat devra se voir attribuer un véhicule Al Bourakh après acceptation.</p>
-                    </div>
-                </div>`;
-            }
-
-            const html = `
-                <div class="info-section">
-                    <h4><i class="fas fa-user"></i> Informations Personnelles</h4>
-                    <div class="info-grid">
-                        <div class="info-item"><label>Nom complet</label><span>${c.prenom || ''} ${c.nom || ''}</span></div>
-                        <div class="info-item"><label>Téléphone</label><span>${c.telephone || 'N/A'}</span></div>
-                        <div class="info-item"><label>Email</label><span>${c.email || 'N/A'}</span></div>
-                        <div class="info-item"><label>Adresse</label><span>${c.adresse || 'N/A'}</span></div>
-                        <div class="info-item"><label>Date de naissance</label><span>${c.dateNaissance || 'N/A'}</span></div>
-                        <div class="info-item"><label>Expérience</label><span>${c.experience || 'N/A'}</span></div>
-                        <div class="info-item">
-                            <label>Type de candidature</label>
-                            <span class="type-badge ${hasVehicle ? 'type-with-vehicle' : 'type-without-vehicle'}">
-                                ${hasVehicle ? '🚗 Avec véhicule' : '👤 Sans véhicule'}
-                            </span>
-                        </div>
-                        <div class="info-item"><label>Statut</label><span class="status-badge status-${c.statut || 'en_attente'}">${getStatusLabel(c.statut || 'en_attente')}</span></div>
-                    </div>
-                </div>
-
-                ${vehicleSection}
-
-                <div class="info-section">
-                    <h4><i class="fas fa-folder-open"></i> Documents Uploadés</h4>
-                    <div class="docs-grid">
-                        ${renderDocuments(c.documents, c, hasVehicle)}
-                    </div>
-                </div>
-
-                <div class="info-section">
-                    <h4><i class="fas fa-camera"></i> Photos</h4>
-                    <div class="docs-grid">
-                        ${renderPhotos(c.photos, c, hasVehicle)}
-                    </div>
-                </div>
-
-                ${c.statut === 'en_attente' || !c.statut ? `
-                <div style="display:flex;gap:15px;margin-top:20px;">
-                    <button class="btn btn-success" onclick="acceptCandidature('${c.id}')" style="flex:1;">
-                        <i class="fas fa-check"></i> ${hasVehicle ? 'Accepter la candidature' : 'Accepter et attribuer un véhicule'}
-                    </button>
-                    <button class="btn btn-danger" onclick="rejectCandidature('${c.id}')" style="flex:1;">
-                        <i class="fas fa-times"></i> Refuser la candidature
-                    </button>
-                </div>` : ''}
-            `;
-
-            document.getElementById('modalTitle').textContent = `👤 ${c.prenom || ''} ${c.nom || ''} - ${hasVehicle ? '🚗 Avec véhicule' : '👤 Sans véhicule'}`;
-            document.getElementById('modalBody').innerHTML = html;
+            document.getElementById('modalTitle').textContent = `👤 ${c.prenom || ''} ${c.nom || ''}`;
+            document.getElementById('modalBody').innerHTML = `<div class="info-section"><h4><i class="fas fa-user"></i> Informations</h4><div class="info-grid"><div class="info-item"><label>Nom</label><span>${c.prenom || ''} ${c.nom || ''}</span></div><div class="info-item"><label>Téléphone</label><span>${c.telephone || 'N/A'}</span></div><div class="info-item"><label>Email</label><span>${c.email || 'N/A'}</span></div><div class="info-item"><label>Type</label><span class="type-badge ${hasVehicle ? 'type-with-vehicle' : 'type-without-vehicle'}">${hasVehicle ? '🚗 Avec véhicule' : '👤 Sans véhicule'}</span></div></div></div>${hasVehicle ? `<div class="info-section"><h4><i class="fas fa-car"></i> Véhicule</h4><div class="info-grid"><div class="info-item"><label>Marque</label><span>${c.vehicule?.marque || 'N/A'}</span></div><div class="info-item"><label>Modèle</label><span>${c.vehicule?.modele || 'N/A'}</span></div><div class="info-item"><label>Immatriculation</label><span>${c.vehicule?.immatriculation || 'N/A'}</span></div></div></div>` : '<div class="alert-box info"><i class="fas fa-info-circle"></i><div><strong>Sans véhicule</strong><p>Un véhicule Al Bourakh sera attribué.</p></div></div>'}`;
             document.getElementById('detailsModal').classList.add('active');
         }
-
-        function renderDocuments(documents, candidature = null, hasVehicle = true) {
-            let allDocs = {};
-            
-            if (documents && typeof documents === 'object') {
-                Object.entries(documents).forEach(([key, value]) => {
-                    if (value && typeof value === 'string' && value.startsWith('http')) {
-                        allDocs[key] = value;
-                    } else if (Array.isArray(value)) {
-                        allDocs[key] = value;
-                    }
-                });
-            }
-            
-            if (candidature) {
-                const docFields = ['permis', 'carteGrise', 'assurance', 'cni', 'casierJudiciaire', 
-                                   'pieceIdentite', 'certificatMedical', 'carteIdentite'];
-                Object.keys(candidature).forEach(key => {
-                    const value = candidature[key];
-                    if (value && typeof value === 'string' && value.startsWith('http') && 
-                        (docFields.some(f => key.toLowerCase().includes(f.toLowerCase())) || 
-                         key.toLowerCase().includes('document') || key.toLowerCase().includes('permis') ||
-                         key.toLowerCase().includes('carte') || key.toLowerCase().includes('assurance'))) {
-                        if (!allDocs[key]) allDocs[key] = value;
-                    }
-                });
-            }
-            
-            if (Object.keys(allDocs).length === 0) {
-                return '<p style="color:#999;grid-column:1/-1;">Aucun document uploadé</p>';
-            }
-            
-            const docLabels = {
-                'permis': '🪪 Permis de conduire',
-                'carteGrise': '📄 Carte grise',
-                'assurance': '🛡️ Assurance',
-                'cni': '🆔 Carte d\'identité',
-                'pieceIdentite': '🆔 Pièce d\'identité',
-                'carteIdentite': '🆔 Carte d\'identité',
-                'casierJudiciaire': '📋 Casier judiciaire',
-                'certificatMedical': '🏥 Certificat médical'
-            };
-            
-            let html = '';
-            Object.entries(allDocs).forEach(([key, value]) => {
-                if (!value) return;
-                const label = docLabels[key] || key.replace(/([A-Z])/g, ' $1').trim();
-                
-                if (Array.isArray(value)) {
-                    value.forEach((url, i) => {
-                        if (url && typeof url === 'string' && url.startsWith('http')) {
-                            html += createDocCard(url, `${label} ${i+1}`);
-                        }
-                    });
-                } else if (typeof value === 'string' && value.startsWith('http')) {
-                    html += createDocCard(value, label);
-                }
-            });
-            
-            return html || '<p style="color:#999;grid-column:1/-1;">Aucun document uploadé</p>';
-        }
-
-        function renderPhotos(photos, candidature = null, hasVehicle = true) {
-            let allPhotos = {};
-            
-            if (photos && typeof photos === 'object') {
-                Object.entries(photos).forEach(([key, value]) => {
-                    if (value && typeof value === 'string' && value.startsWith('http')) {
-                        allPhotos[key] = value;
-                    } else if (Array.isArray(value)) {
-                        allPhotos[key] = value;
-                    }
-                });
-            }
-            
-            if (candidature) {
-                Object.keys(candidature).forEach(key => {
-                    const value = candidature[key];
-                    const keyLower = key.toLowerCase();
-                    
-                    if (keyLower.includes('photo')) {
-                        if (value && typeof value === 'string' && value.startsWith('http')) {
-                            if (!allPhotos[key]) allPhotos[key] = value;
-                        } else if (Array.isArray(value)) {
-                            if (!allPhotos[key]) allPhotos[key] = value;
-                        }
-                    }
-                });
-            }
-            
-            if (Object.keys(allPhotos).length === 0) {
-                return '<p style="color:#999;grid-column:1/-1;">Aucune photo uploadée</p>';
-            }
-            
-            const photoLabels = {
-                'photoProfil': '👤 Photo de profil',
-                'photo': '👤 Photo',
-                'photoVehicule': '🚗 Photo du véhicule',
-                'photosVehicule': '🚗 Photos du véhicule',
-                'photoVehiculeAvant': '🚗 Véhicule (avant)',
-                'photoVehiculeArriere': '🚗 Véhicule (arrière)',
-                'photoVehiculeCote': '🚗 Véhicule (côté)',
-                'photoInterieur': '🚗 Intérieur véhicule'
-            };
-            
-            let html = '';
-            Object.entries(allPhotos).forEach(([key, value]) => {
-                if (!value) return;
-                const label = photoLabels[key] || key.replace(/([A-Z])/g, ' $1').trim();
-                
-                if (Array.isArray(value)) {
-                    value.forEach((url, i) => {
-                        if (url && typeof url === 'string' && url.startsWith('http')) {
-                            html += createPhotoCard(url, `${label} ${i+1}`);
-                        }
-                    });
-                } else if (typeof value === 'string' && value.startsWith('http')) {
-                    html += createPhotoCard(value, label);
-                }
-            });
-            
-            return html || '<p style="color:#999;grid-column:1/-1;">Aucune photo uploadée</p>';
-        }
-
-        function createDocCard(url, label) {
-            const isImage = url.match(/\.(jpg|jpeg|png|gif|webp)/i) || url.includes('firebasestorage');
-            return `
-            <div class="doc-card">
-                ${isImage ? `<img src="${url}" alt="${label}" onclick="openImageViewer('${url}')" onerror="this.onerror=null;this.parentElement.innerHTML='<div style=\\'height:150px;display:flex;align-items:center;justify-content:center;background:#f8d7da;color:#721c24;\\'>Erreur de chargement</div><div class=\\'doc-label\\'>${label}</div><a href=\\'${url}\\' target=\\'_blank\\'><i class=\\'fas fa-external-link-alt\\'></i> Ouvrir</a>';">` : 
-                `<div style="height:150px;display:flex;align-items:center;justify-content:center;background:#f0f0f0;"><i class="fas fa-file-pdf" style="font-size:3em;color:#E30613;"></i></div>`}
-                <div class="doc-label">${label}</div>
-                <a href="${url}" target="_blank"><i class="fas fa-external-link-alt"></i> Ouvrir</a>
-            </div>`;
-        }
-
-        function createPhotoCard(url, label) {
-            return `
-            <div class="doc-card">
-                <img src="${url}" alt="${label}" onclick="openImageViewer('${url}')" onerror="this.onerror=null;this.parentElement.innerHTML='<div style=\\'height:150px;display:flex;align-items:center;justify-content:center;background:#f8d7da;color:#721c24;padding:10px;text-align:center;\\'>Erreur de chargement</div><div class=\\'doc-label\\'>${label}</div><a href=\\'${url}\\' target=\\'_blank\\'><i class=\\'fas fa-external-link-alt\\'></i> Ouvrir</a>';">
-                <div class="doc-label">${label}</div>
-                <a href="${url}" target="_blank"><i class="fas fa-external-link-alt"></i> Ouvrir</a>
-            </div>`;
-        }
-
-        function openImageViewer(url) {
-            document.getElementById('viewerImage').src = url;
-            document.getElementById('imageViewer').classList.add('active');
-        }
-
-        function closeImageViewer() {
-            document.getElementById('imageViewer').classList.remove('active');
-        }
-
-        function closeModal() {
-            document.getElementById('detailsModal').classList.remove('active');
-        }
-
         async function acceptCandidature(id) {
             const c = allCandidatures.find(x => x.id === id);
-            if (!c) return;
-            
-            const hasVehicle = c.hasVehicle === true;
-            let confirmMsg = `Accepter la candidature de ${c.prenom} ${c.nom} ?\n\nUn compte chauffeur sera créé.`;
-            
-            if (!hasVehicle) {
-                confirmMsg = `Accepter la candidature de ${c.prenom} ${c.nom} ?\n\n⚠️ ATTENTION: Ce candidat n'a pas de véhicule personnel.\nVous devrez lui attribuer un véhicule Al Bourakh.\n\nUn compte chauffeur sera créé.`;
-            }
-            
-            if (!confirm(confirmMsg)) return;
-
-            showLoading('Création du compte chauffeur...');
+            if (!confirm(`Accepter ${c.prenom} ${c.nom} ?`)) return;
+            showLoading('Création compte...');
             try {
-                const driverData = {
-                    prenom: c.prenom || '',
-                    nom: c.nom || '',
-                    nomComplet: `${c.prenom || ''} ${c.nom || ''}`.trim(),
-                    email: c.email || '',
-                    telephone: c.telephone || '',
-                    adresse: c.adresse || '',
-                    dateNaissance: c.dateNaissance || '',
-                    experience: c.experience || '',
-                    hasVehicle: hasVehicle,
-                    vehicule: hasVehicle ? (c.vehicule || {}) : {},
-                    documents: c.documents || {},
-                    photos: c.photos || {},
-                    statut: 'hors_ligne',
-                    actif: true,
-                    disponible: true,
-                    rating: 5.0,
-                    coursesCompletees: 0,
-                    coursesEnCours: 0,
-                    revenusTotal: 0,
-                    candidatureId: id,
-                    dateCreation: firebase.firestore.FieldValue.serverTimestamp(),
-                    derniereActivite: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                if (!hasVehicle) {
-                    driverData.vehiculeAttribue = false;
-                    driverData.remarques = 'En attente d\'attribution de véhicule Al Bourakh';
-                }
-
-                const driverRef = await db.collection('drivers').add(driverData);
-                
-                await db.collection(CANDIDATURES_COLLECTION).doc(id).update({
-                    statut: 'acceptee',
-                    driverId: driverRef.id,
-                    dateTraitement: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                hideLoading();
-                closeModal();
-                
-                if (hasVehicle) {
-                    showToast(`✅ ${c.prenom} ${c.nom} accepté! Compte chauffeur créé.`, 'success');
-                } else {
-                    showToast(`✅ ${c.prenom} ${c.nom} accepté! N'oubliez pas d'attribuer un véhicule.`, 'success');
-                }
-                
-                loadCandidatures();
-            } catch (error) {
-                hideLoading();
-                console.error('Erreur acceptation:', error);
-                showToast('Erreur: ' + error.message, 'error');
-            }
+                const driverData = { prenom: c.prenom || '', nom: c.nom || '', nomComplet: `${c.prenom || ''} ${c.nom || ''}`.trim(), email: c.email || '', telephone: c.telephone || '', hasVehicle: c.hasVehicle, vehicule: c.vehicule || {}, statut: 'hors_ligne', actif: true, rating: 5.0, coursesCompletees: 0, dateCreation: firebase.firestore.FieldValue.serverTimestamp() };
+                const ref = await db.collection('drivers').add(driverData);
+                await db.collection('candidatures').doc(id).update({ statut: 'acceptee', driverId: ref.id, dateTraitement: firebase.firestore.FieldValue.serverTimestamp() });
+                hideLoading(); closeModal('detailsModal'); showToast('✅ Chauffeur créé!', 'success'); loadCandidatures();
+            } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); }
         }
-
         async function rejectCandidature(id) {
             const c = allCandidatures.find(x => x.id === id);
-            if (!c) return;
-            const motif = prompt(`Refuser la candidature de ${c.prenom} ${c.nom} ?\n\nMotif (optionnel):`);
-            if (motif === null) return;
-
-            showLoading('Mise à jour...');
-            try {
-                await db.collection(CANDIDATURES_COLLECTION).doc(id).update({
-                    statut: 'refusee',
-                    motifRefus: motif || '',
-                    dateTraitement: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                hideLoading();
-                closeModal();
-                showToast(`❌ Candidature de ${c.prenom} ${c.nom} refusée.`, 'info');
-                loadCandidatures();
-            } catch (error) {
-                hideLoading();
-                showToast('Erreur: ' + error.message, 'error');
-            }
+            if (!confirm(`Refuser ${c.prenom} ${c.nom} ?`)) return;
+            showLoading(); try { await db.collection('candidatures').doc(id).update({ statut: 'refusee', dateTraitement: firebase.firestore.FieldValue.serverTimestamp() }); hideLoading(); showToast('Candidature refusée', 'info'); loadCandidatures(); } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); }
         }
-
-        async function deleteCandidature(id) {
-            if (!confirm('Supprimer définitivement cette candidature ?')) return;
-            showLoading('Suppression...');
-            try {
-                await db.collection(CANDIDATURES_COLLECTION).doc(id).delete();
-                hideLoading();
-                showToast('✅ Candidature supprimée', 'success');
-                loadCandidatures();
-            } catch (error) {
-                hideLoading();
-                showToast('Erreur: ' + error.message, 'error');
-            }
-        }
+        async function deleteCandidature(id) { if (!confirm('Supprimer ?')) return; showLoading(); try { await db.collection('candidatures').doc(id).delete(); hideLoading(); showToast('Supprimé', 'success'); loadCandidatures(); } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); } }
 
         // === CHAUFFEURS ===
         async function loadDrivers() {
             if (!auth.currentUser) return;
-            showLoading('Chargement des chauffeurs...');
+            showLoading('Chargement chauffeurs...');
             try {
-                const snapshot = await db.collection('drivers').get();
-                allDrivers = [];
-                snapshot.forEach(doc => allDrivers.push({ id: doc.id, ...doc.data() }));
-                updateDriversStats();
-                displayDrivers(allDrivers);
-                hideLoading();
-            } catch (error) {
-                hideLoading();
-                showToast('Erreur: ' + error.message, 'error');
-            }
+                const snap = await db.collection('drivers').get();
+                allDrivers = []; snap.forEach(doc => allDrivers.push({ id: doc.id, ...doc.data() }));
+                updateDriversStats(); displayDrivers(allDrivers); hideLoading();
+            } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); }
         }
-
         function updateDriversStats() {
             document.getElementById('totalDrivers').textContent = allDrivers.length;
             document.getElementById('availableDrivers').textContent = allDrivers.filter(d => d.statut === 'disponible').length;
             document.getElementById('busyDrivers').textContent = allDrivers.filter(d => d.statut === 'en_course').length;
             document.getElementById('offlineDrivers').textContent = allDrivers.filter(d => d.statut === 'hors_ligne' || !d.statut).length;
         }
-
-        function displayDrivers(drivers) {
+        function displayDrivers(list) {
             const tbody = document.getElementById('driversTableBody');
-            if (drivers.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Aucun chauffeur</td></tr>`;
-                return;
-            }
-            tbody.innerHTML = drivers.map(d => {
-                const statut = d.statut || 'hors_ligne';
-                const hasVehicle = d.hasVehicle !== false;
-                return `
-                <tr>
-                    <td>
-                        <strong>${d.prenom || ''} ${d.nom || ''}</strong>
-                        <br><small style="color:#666;">${d.email || ''}</small>
-                        ${!hasVehicle ? '<br><span class="type-badge type-without-vehicle" style="font-size:0.7em;">Sans véhicule</span>' : ''}
-                    </td>
-                    <td>${d.telephone || 'N/A'}</td>
-                    <td>${hasVehicle ? `${d.vehicule?.marque || ''} ${d.vehicule?.modele || ''}<br><small style="color:#666;">${d.vehicule?.immatriculation || ''}</small>` : '<small style="color:#999;">À attribuer</small>'}</td>
-                    <td><strong style="color:#FECB00;">⭐ ${(d.rating || 0).toFixed(1)}</strong></td>
-                    <td>${d.coursesCompletees || 0}</td>
-                    <td><span class="status-badge status-${statut}">${getStatusLabel(statut)}</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn btn-icon btn-view" onclick="viewDriver('${d.id}')" title="Détails"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-icon btn-edit" onclick="editDriver('${d.id}')" title="Modifier"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-icon btn-delete" onclick="deleteDriver('${d.id}')" title="Supprimer"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>`;
-            }).join('');
+            if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">Aucun chauffeur</td></tr>'; return; }
+            tbody.innerHTML = list.map(d => `<tr><td><strong>${d.prenom || ''} ${d.nom || ''}</strong></td><td>${d.telephone || 'N/A'}</td><td>${d.vehicule?.marque || ''} ${d.vehicule?.modele || ''}<br><small>${d.vehicule?.immatriculation || ''}</small></td><td>⭐ ${(d.rating || 0).toFixed(1)}</td><td><span class="status-badge status-${d.statut || 'hors_ligne'}">${getStatusLabel(d.statut || 'hors_ligne')}</span></td><td><div class="action-buttons"><button class="btn btn-icon btn-view" onclick="viewDriver('${d.id}')"><i class="fas fa-eye"></i></button><button class="btn btn-icon btn-edit" onclick="editDriver('${d.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-icon btn-delete" onclick="deleteDriver('${d.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('');
         }
+        function searchDrivers() { const term = document.getElementById('searchDrivers').value.toLowerCase(); displayDrivers(allDrivers.filter(d => (d.prenom?.toLowerCase().includes(term)) || (d.nom?.toLowerCase().includes(term)) || (d.telephone?.includes(term)))); }
+        function viewDriver(id) { const d = allDrivers.find(x => x.id === id); if (!d) return; document.getElementById('modalTitle').textContent = `👤 ${d.prenom || ''} ${d.nom || ''}`; document.getElementById('modalBody').innerHTML = `<div class="info-section"><h4><i class="fas fa-user"></i> Informations</h4><div class="info-grid"><div class="info-item"><label>Nom</label><span>${d.prenom || ''} ${d.nom || ''}</span></div><div class="info-item"><label>Téléphone</label><span>${d.telephone || 'N/A'}</span></div><div class="info-item"><label>Note</label><span>⭐ ${(d.rating || 0).toFixed(1)}</span></div><div class="info-item"><label>Courses</label><span>${d.coursesCompletees || 0}</span></div></div></div>`; document.getElementById('detailsModal').classList.add('active'); }
+        function editDriver(id) { const d = allDrivers.find(x => x.id === id); if (!d) return; document.getElementById('modalTitle').textContent = `✏️ Modifier`; document.getElementById('modalBody').innerHTML = `<div class="form-group"><label>Prénom</label><input type="text" id="editPrenom" value="${d.prenom || ''}"></div><div class="form-group"><label>Nom</label><input type="text" id="editNom" value="${d.nom || ''}"></div><div class="form-group"><label>Téléphone</label><input type="text" id="editTel" value="${d.telephone || ''}"></div><div class="form-group"><label>Statut</label><select id="editStatut"><option value="disponible" ${d.statut === 'disponible' ? 'selected' : ''}>Disponible</option><option value="en_course" ${d.statut === 'en_course' ? 'selected' : ''}>En Course</option><option value="hors_ligne" ${d.statut === 'hors_ligne' ? 'selected' : ''}>Hors Ligne</option></select></div><button class="btn btn-primary" onclick="saveDriver('${id}')" style="width:100%;"><i class="fas fa-save"></i> Enregistrer</button>`; document.getElementById('detailsModal').classList.add('active'); }
+        async function saveDriver(id) { showLoading(); try { await db.collection('drivers').doc(id).update({ prenom: document.getElementById('editPrenom').value, nom: document.getElementById('editNom').value, telephone: document.getElementById('editTel').value, statut: document.getElementById('editStatut').value }); hideLoading(); closeModal('detailsModal'); showToast('✅ Modifié', 'success'); loadDrivers(); } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); } }
+        async function deleteDriver(id) { if (!confirm('Supprimer ?')) return; showLoading(); try { await db.collection('drivers').doc(id).delete(); hideLoading(); showToast('Supprimé', 'success'); loadDrivers(); } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); } }
+        function newDriver() { document.getElementById('modalTitle').textContent = '➕ Nouveau Chauffeur'; document.getElementById('modalBody').innerHTML = `<div class="form-group"><label>Prénom *</label><input type="text" id="newPrenom"></div><div class="form-group"><label>Nom *</label><input type="text" id="newNom"></div><div class="form-group"><label>Téléphone *</label><input type="text" id="newTel"></div><div class="form-group"><label>Email</label><input type="email" id="newEmail"></div><button class="btn btn-primary" onclick="createDriver()" style="width:100%;"><i class="fas fa-plus"></i> Créer</button>`; document.getElementById('detailsModal').classList.add('active'); }
+        async function createDriver() { const p = document.getElementById('newPrenom').value.trim(), n = document.getElementById('newNom').value.trim(), t = document.getElementById('newTel').value.trim(); if (!p || !n || !t) { showToast('Champs requis', 'error'); return; } showLoading(); try { await db.collection('drivers').add({ prenom: p, nom: n, telephone: t, email: document.getElementById('newEmail').value.trim(), statut: 'hors_ligne', actif: true, rating: 5.0, coursesCompletees: 0, dateCreation: firebase.firestore.FieldValue.serverTimestamp() }); hideLoading(); closeModal('detailsModal'); showToast('✅ Créé', 'success'); loadDrivers(); } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); } }
 
-        function searchDrivers() {
-            const term = document.getElementById('searchDrivers').value.toLowerCase();
-            const filtered = allDrivers.filter(d =>
-                (d.prenom?.toLowerCase().includes(term)) ||
-                (d.nom?.toLowerCase().includes(term)) ||
-                (d.telephone?.includes(term))
-            );
-            displayDrivers(filtered);
-        }
-
-        function viewDriver(id) {
-            const d = allDrivers.find(x => x.id === id);
-            if (!d) return;
-            const hasVehicle = d.hasVehicle !== false;
-            const html = `
-                <div class="info-section">
-                    <h4><i class="fas fa-user"></i> Informations</h4>
-                    <div class="info-grid">
-                        <div class="info-item"><label>Nom</label><span>${d.prenom || ''} ${d.nom || ''}</span></div>
-                        <div class="info-item"><label>Téléphone</label><span>${d.telephone || 'N/A'}</span></div>
-                        <div class="info-item"><label>Email</label><span>${d.email || 'N/A'}</span></div>
-                        <div class="info-item"><label>Statut</label><span class="status-badge status-${d.statut || 'hors_ligne'}">${getStatusLabel(d.statut || 'hors_ligne')}</span></div>
-                    </div>
-                </div>
-                ${hasVehicle ? `
-                <div class="info-section">
-                    <h4><i class="fas fa-car"></i> Véhicule</h4>
-                    <div class="info-grid">
-                        <div class="info-item"><label>Marque</label><span>${d.vehicule?.marque || 'N/A'}</span></div>
-                        <div class="info-item"><label>Modèle</label><span>${d.vehicule?.modele || 'N/A'}</span></div>
-                        <div class="info-item"><label>Immatriculation</label><span>${d.vehicule?.immatriculation || 'N/A'}</span></div>
-                    </div>
-                </div>` : `
-                <div class="alert-box info">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <div>
-                        <strong>Chauffeur sans véhicule personnel</strong>
-                        <p style="margin-top:5px;font-size:0.9em;">Ce chauffeur doit se voir attribuer un véhicule Al Bourakh.</p>
-                    </div>
-                </div>`}
-                <div class="info-section">
-                    <h4><i class="fas fa-chart-bar"></i> Statistiques</h4>
-                    <div class="info-grid">
-                        <div class="info-item"><label>Note</label><span>⭐ ${(d.rating || 0).toFixed(1)}</span></div>
-                        <div class="info-item"><label>Courses</label><span>${d.coursesCompletees || 0}</span></div>
-                        <div class="info-item"><label>Revenus</label><span>${(d.revenusTotal || 0).toLocaleString()} FCFA</span></div>
-                    </div>
-                </div>
-                <div class="info-section">
-                    <h4><i class="fas fa-folder-open"></i> Documents</h4>
-                    <div class="docs-grid">${renderDocuments(d.documents, d, hasVehicle)}</div>
-                </div>
-                <div class="info-section">
-                    <h4><i class="fas fa-camera"></i> Photos</h4>
-                    <div class="docs-grid">${renderPhotos(d.photos, d, hasVehicle)}</div>
-                </div>
-            `;
-            document.getElementById('modalTitle').textContent = `👤 ${d.prenom || ''} ${d.nom || ''}`;
-            document.getElementById('modalBody').innerHTML = html;
-            document.getElementById('detailsModal').classList.add('active');
-        }
-
-        function editDriver(id) {
-            const d = allDrivers.find(x => x.id === id);
-            if (!d) return;
-            const html = `
-                <div class="form-group"><label>Prénom</label><input type="text" id="editPrenom" value="${d.prenom || ''}"></div>
-                <div class="form-group"><label>Nom</label><input type="text" id="editNom" value="${d.nom || ''}"></div>
-                <div class="form-group"><label>Téléphone</label><input type="text" id="editTel" value="${d.telephone || ''}"></div>
-                <div class="form-group"><label>Immatriculation</label><input type="text" id="editPlate" value="${d.vehicule?.immatriculation || ''}"></div>
-                <div class="form-group">
-                    <label>Statut</label>
-                    <select id="editStatut">
-                        <option value="disponible" ${d.statut === 'disponible' ? 'selected' : ''}>Disponible</option>
-                        <option value="en_course" ${d.statut === 'en_course' ? 'selected' : ''}>En Course</option>
-                        <option value="hors_ligne" ${d.statut === 'hors_ligne' ? 'selected' : ''}>Hors Ligne</option>
-                    </select>
-                </div>
-                <button class="btn btn-primary" onclick="saveDriver('${id}')" style="width:100%;margin-top:15px;">
-                    <i class="fas fa-save"></i> Enregistrer
-                </button>
-            `;
-            document.getElementById('modalTitle').textContent = `✏️ Modifier ${d.prenom || ''} ${d.nom || ''}`;
-            document.getElementById('modalBody').innerHTML = html;
-            document.getElementById('detailsModal').classList.add('active');
-        }
-
-        async function saveDriver(id) {
-            showLoading('Enregistrement...');
+        // === PORTEFEUILLE ===
+        async function loadPortefeuilleData() {
+            showLoading('Chargement portefeuille...');
             try {
-                await db.collection('drivers').doc(id).update({
-                    prenom: document.getElementById('editPrenom').value,
-                    nom: document.getElementById('editNom').value,
-                    telephone: document.getElementById('editTel').value,
-                    'vehicule.immatriculation': document.getElementById('editPlate').value,
-                    statut: document.getElementById('editStatut').value
-                });
+                const [rSnap, drSnap, pSnap, wSnap] = await Promise.all([
+                    db.collection('recharges').orderBy('createdAt', 'desc').get(),
+                    db.collection('driver_recharges').orderBy('createdAt', 'desc').get(),
+                    db.collection('course_payments').orderBy('createdAt', 'desc').get(),
+                    db.collection('withdrawals').orderBy('createdAt', 'desc').get()
+                ]);
+                allRecharges = []; rSnap.forEach(d => allRecharges.push({ id: d.id, ...d.data() }));
+                allDriverRecharges = []; drSnap.forEach(d => allDriverRecharges.push({ id: d.id, ...d.data() }));
+                allPayments = []; pSnap.forEach(d => allPayments.push({ id: d.id, ...d.data() }));
+                allWithdrawals = []; wSnap.forEach(d => allWithdrawals.push({ id: d.id, ...d.data() }));
+                updatePortefeuilleStats();
+                filterRecharges(currentRechargeFilter); filterDriverRecharges(currentDriverRechargeFilter); filterPayments(currentPaymentFilter); filterWithdrawals(currentWithdrawalFilter);
                 hideLoading();
-                closeModal();
-                showToast('✅ Chauffeur modifié', 'success');
-                loadDrivers();
-            } catch (error) {
-                hideLoading();
-                showToast('Erreur: ' + error.message, 'error');
-            }
+            } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); }
         }
-
-        async function deleteDriver(id) {
-            if (!confirm('Supprimer définitivement ce chauffeur ?')) return;
-            showLoading('Suppression...');
-            try {
-                await db.collection('drivers').doc(id).delete();
-                hideLoading();
-                showToast('✅ Chauffeur supprimé', 'success');
-                loadDrivers();
-            } catch (error) {
-                hideLoading();
-                showToast('Erreur: ' + error.message, 'error');
-            }
+        function updatePortefeuilleStats() {
+            const pR = allRecharges.filter(r => r.status === 'pending'), pDR = allDriverRecharges.filter(r => r.status === 'pending'), pP = allPayments.filter(p => p.status === 'pending'), pW = allWithdrawals.filter(w => w.status === 'pending');
+            document.getElementById('pendingRecharges').textContent = pR.length;
+            document.getElementById('totalRechargesAmount').textContent = pR.reduce((s, r) => s + (r.amount || 0), 0).toLocaleString();
+            document.getElementById('pendingDriverRecharges').textContent = pDR.length;
+            document.getElementById('totalDriverRechargesAmount').textContent = pDR.reduce((s, r) => s + (r.amount || 0), 0).toLocaleString();
+            document.getElementById('pendingPayments').textContent = pP.length;
+            document.getElementById('totalPaymentsAmount').textContent = pP.reduce((s, p) => s + (p.amount || 0), 0).toLocaleString();
+            document.getElementById('pendingWithdrawals').textContent = pW.length;
+            document.getElementById('totalWithdrawalsAmount').textContent = pW.reduce((s, w) => s + (w.amount || 0), 0).toLocaleString();
         }
-
-        function newDriver() {
-            const html = `
-                <div class="form-group"><label>Prénom *</label><input type="text" id="newPrenom" placeholder="Mamadou"></div>
-                <div class="form-group"><label>Nom *</label><input type="text" id="newNom" placeholder="Diop"></div>
-                <div class="form-group"><label>Téléphone *</label><input type="text" id="newTel" placeholder="+221771234567"></div>
-                <div class="form-group"><label>Email</label><input type="email" id="newEmail" placeholder="email@exemple.com"></div>
-                <div class="form-group"><label>Marque véhicule</label><input type="text" id="newMarque" placeholder="Toyota"></div>
-                <div class="form-group"><label>Modèle</label><input type="text" id="newModele" placeholder="Corolla"></div>
-                <div class="form-group"><label>Immatriculation</label><input type="text" id="newPlate" placeholder="DK-1234-AB"></div>
-                <button class="btn btn-primary" onclick="createDriver()" style="width:100%;margin-top:15px;">
-                    <i class="fas fa-plus"></i> Créer le chauffeur
-                </button>
-            `;
-            document.getElementById('modalTitle').textContent = '➕ Nouveau Chauffeur';
-            document.getElementById('modalBody').innerHTML = html;
-            document.getElementById('detailsModal').classList.add('active');
-        }
-
-        async function createDriver() {
-            const prenom = document.getElementById('newPrenom').value.trim();
-            const nom = document.getElementById('newNom').value.trim();
-            const tel = document.getElementById('newTel').value.trim();
-            if (!prenom || !nom || !tel) { showToast('Prénom, nom et téléphone requis', 'error'); return; }
-
-            showLoading('Création...');
-            try {
-                await db.collection('drivers').add({
-                    prenom, nom,
-                    telephone: tel,
-                    email: document.getElementById('newEmail').value.trim(),
-                    vehicule: {
-                        marque: document.getElementById('newMarque').value.trim(),
-                        modele: document.getElementById('newModele').value.trim(),
-                        immatriculation: document.getElementById('newPlate').value.trim()
-                    },
-                    statut: 'hors_ligne',
-                    actif: true,
-                    rating: 5.0,
-                    coursesCompletees: 0,
-                    revenusTotal: 0,
-                    dateCreation: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                hideLoading();
-                closeModal();
-                showToast('✅ Chauffeur créé', 'success');
-                loadDrivers();
-            } catch (error) {
-                hideLoading();
-                showToast('Erreur: ' + error.message, 'error');
-            }
-        }
-
-        // === GPS TRACKING ===
-        function log(msg, type = 'info') {
-            const time = new Date().toLocaleTimeString();
-            const colors = { error: '#f00', success: '#0f0', warning: '#ff0', info: '#0ff' };
-            const color = colors[type] || '#0ff';
-            
-            const debugDiv = document.getElementById('debugConsole');
-            const line = document.createElement('div');
-            line.style.color = color;
-            line.textContent = `[${time}] ${msg}`;
-            debugDiv.appendChild(line);
-            debugDiv.scrollTop = debugDiv.scrollHeight;
-            
-            console.log(`[${time}] ${msg}`);
-        }
-
-        function showGPSLoader() {
-            const overlay = document.getElementById('gpsLoadingOverlay');
-            if (overlay) {
-                overlay.style.display = 'flex';
-                updateGPSProgress('Chargement de Google Maps...');
-            }
-        }
-
-        function hideGPSLoader() {
-            const overlay = document.getElementById('gpsLoadingOverlay');
-            if (overlay) {
-                overlay.style.display = 'none';
-            }
-        }
-
-        function updateGPSProgress(message) {
-            const progress = document.getElementById('gpsLoadingProgress');
-            if (progress) {
-                progress.textContent = message;
-            }
-        }
-
-        document.getElementById('debugBtn').addEventListener('click', function() {
-            document.getElementById('debugConsole').classList.toggle('visible');
-        });
-
-        function updateStatus(msg, error = false) {
-            const bar = document.getElementById('statusBar');
-            bar.innerHTML = msg;
-            bar.className = 'status-bar ' + (error ? 'error' : 'connected');
-        }
-
-        function initGoogleMaps() {
-            log('🗺️ Initialisation Google Maps...', 'info');
-            updateGPSProgress('Chargement de Google Maps...');
-            const script = document.createElement('script');
-            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBI1svukv3Ts7fN97ke5OGfwo2V-vRUGHI&callback=initMap';
-            script.async = true;
-            script.defer = true;
-            script.onerror = function() {
-                log('❌ Échec du chargement de Google Maps', 'error');
-                updateGPSProgress('Erreur de chargement de la carte');
-                hideGPSLoader();
-            };
-            document.head.appendChild(script);
-        }
-
-        function initMap() {
-            if (mapInitialized) {
-                console.log('ℹ️ Carte déjà initialisée, chargement des données...');
-                hideGPSLoader();
-                if (isAuth) {
-                    updateGPSProgress('Chargement des données...');
-                    Promise.all([
-                        Object.keys(allDriversGPS).length === 0 ? loadGPSDrivers() : Promise.resolve(),
-                        loadSessions()
-                    ]).then(() => {
-                        console.log('✅ Données GPS chargées');
-                    }).catch(error => {
-                        console.error('❌ Erreur chargement données GPS:', error);
-                    });
-                }
-                return;
-            }
-            
-            log('🗺️ Callback initMap appelé', 'info');
-            updateGPSProgress('Création de la carte...');
-            
-            try {
-                map = new google.maps.Map(document.getElementById('map'), {
-                    center: { lat: 14.6937, lng: -17.4441 },
-                    zoom: 12,
-                    mapTypeControl: true,
-                    streetViewControl: false
-                });
-                
-                mapInitialized = true;
-                log('✅ Carte initialisée avec succès', 'success');
-                updateStatus('✅ Carte chargée');
-                
-                if (isAuth) {
-                    updateGPSProgress('Chargement des chauffeurs...');
-                    loadGPSDrivers().then(() => {
-                        updateGPSProgress('Chargement des sessions...');
-                        return loadSessions();
-                    }).then(() => {
-                        hideGPSLoader();
-                        log('✅ GPS Tracking complètement chargé', 'success');
-                    }).catch(error => {
-                        log('❌ Erreur lors du chargement initial: ' + error.message, 'error');
-                        hideGPSLoader();
-                    });
-                } else {
-                    hideGPSLoader();
-                }
-            } catch (error) {
-                log('❌ Erreur init carte: ' + error.message, 'error');
-                updateGPSProgress('Erreur d\'initialisation');
-                hideGPSLoader();
-            }
-        }
-
-        async function loadGPSDrivers() {
-            try {
-                log('📥 Chargement de la liste des chauffeurs GPS...', 'info');
-                const snapshot = await db.collection('drivers').get();
-                
-                const select = document.getElementById('filterDriver');
-                select.innerHTML = '<option value="">Tous les chauffeurs</option>';
-                
-                let count = 0;
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const name = `${data.prenom || ''} ${data.nom || ''}`.trim() || data.telephone;
-                    allDriversGPS[doc.id] = name;
-                    
-                    const opt = document.createElement('option');
-                    opt.value = doc.id;
-                    opt.textContent = name;
-                    select.appendChild(opt);
-                    count++;
-                });
-                
-                log(`✅ ${count} chauffeur(s) chargé(s) pour GPS`, 'success');
-                return Promise.resolve(count);
-            } catch (error) {
-                log('❌ Erreur chargement chauffeurs GPS: ' + error.message, 'error');
-                return Promise.reject(error);
-            }
-        }
-
-        async function loadSessions() {
-            if (!isAuth) {
-                log('⚠️ Impossible de charger : non authentifié', 'warning');
-                return Promise.reject(new Error('Non authentifié'));
-            }
-
-            log('📥 Chargement des sessions de tracking...', 'info');
-
-            try {
-                const driverFilter = document.getElementById('filterDriver').value;
-                const statusFilter = document.getElementById('filterStatus').value;
-
-                let query = db.collection('tracking_sessions');
-
-                if (driverFilter) {
-                    query = query.where('driverId', '==', driverFilter);
-                    log(`🔍 Filtre actif: chauffeur ${allDriversGPS[driverFilter]}`, 'info');
-                }
-
-                if (statusFilter) {
-                    query = query.where('status', '==', statusFilter);
-                    log(`🔍 Filtre actif: statut ${statusFilter}`, 'info');
-                }
-
-                query = query.limit(100);
-
-                const snapshot = await query.get();
-                allSessions = [];
-
-                let totalDist = 0;
-                let totalPos = 0;
-                let activeCount = 0;
-
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    allSessions.push({ id: doc.id, ...data });
-                    
-                    if (data.status === 'active') activeCount++;
-                    if (data.totalDistance) totalDist += data.totalDistance;
-                    if (data.totalPositions) totalPos += data.totalPositions;
-                });
-
-                allSessions.sort((a, b) => {
-                    const timeA = a.startTime?.toDate() || new Date(0);
-                    const timeB = b.startTime?.toDate() || new Date(0);
-                    return timeB - timeA;
-                });
-
-                log('🔄 Tri chronologique appliqué côté client', 'info');
-
-                document.getElementById('totalSessions').textContent = allSessions.length;
-                document.getElementById('activeSessions').textContent = activeCount;
-                document.getElementById('totalDistance').textContent = totalDist.toFixed(1);
-                document.getElementById('totalPositions').textContent = totalPos;
-
-                displaySessions();
-
-                log(`✅ ${allSessions.length} session(s) chargée(s)`, 'success');
-                log(`📊 Stats: ${activeCount} active(s), ${totalDist.toFixed(1)} km total, ${totalPos} positions`, 'info');
-                updateStatus(`✅ ${allSessions.length} session(s) trouvée(s)`);
-
-                return Promise.resolve(allSessions.length);
-            } catch (error) {
-                log('❌ Erreur chargement sessions: ' + error.message, 'error');
-                updateStatus('❌ Erreur chargement', true);
-                return Promise.reject(error);
-            }
-        }
-
-        function displaySessions() {
-            const container = document.getElementById('sessionsList');
-
-            if (allSessions.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-route"></i>
-                        <p>Aucune session de tracking</p>
-                        <p style="font-size: 0.8em; margin-top: 10px;">Les sessions apparaîtront ici</p>
-                    </div>
-                `;
-                log('ℹ️ Aucune session à afficher', 'info');
-                return;
-            }
-
-            container.innerHTML = '';
-
-            allSessions.forEach((session, idx) => {
-                const card = document.createElement('div');
-                card.className = 'session-card';
-                if (currentSessionId === session.id) {
-                    card.classList.add('active');
-                }
-
-                const driverName = allDriversGPS[session.driverId] || session.driverId;
-                const startTime = session.startTime?.toDate();
-                const endTime = session.endTime?.toDate();
-                
-                let duration = 'En cours';
-                if (startTime && endTime) {
-                    const diff = (endTime - startTime) / 60000;
-                    duration = `${Math.round(diff)} min`;
-                }
-
-                card.innerHTML = `
-                    <div class="session-driver">${driverName}</div>
-                    <div class="session-info">
-                        <div><i class="fas fa-clock"></i> ${startTime ? startTime.toLocaleString('fr-FR') : 'N/A'}</div>
-                        <div><i class="fas fa-hourglass"></i> ${duration}</div>
-                        <div><i class="fas fa-route"></i> ${(session.totalDistance || 0).toFixed(1)} km • ${session.totalPositions || 0} points GPS</div>
-                    </div>
-                `;
-
-                card.addEventListener('click', function() {
-                    log(`🖱️ CLIC sur session #${idx + 1} (${session.id})`, 'info');
-                    selectSession(session);
-                });
-
-                container.appendChild(card);
-            });
-
-            log(`📋 ${allSessions.length} carte(s) de session affichée(s)`, 'success');
-        }
-
-        async function selectSession(session) {
-            log('═══════════════════════════════════════', 'info');
-            log(`🎯 SELECTION SESSION: ${session.id}`, 'info');
-            log(`👤 Chauffeur: ${allDriversGPS[session.driverId]}`, 'info');
-            log(`📊 Stats session: ${session.totalPositions || 0} positions, ${(session.totalDistance || 0).toFixed(1)} km`, 'info');
-            
-            currentSessionId = session.id;
-            displaySessions();
-            showLoading('Chargement des positions GPS...');
-
-            try {
-                log('📍 Requête Firebase pour les positions GPS...', 'info');
-                
-                const snapshot = await db.collection('position_history')
-                    .where('sessionId', '==', session.id)
-                    .get();
-
-                log(`📦 ${snapshot.size} document(s) reçu(s) de Firestore`, 'info');
-
-                currentPositions = [];
-                const tempPositions = [];
-                let validCount = 0;
-                let invalidCount = 0;
-                
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.position?.latitude && data.position?.longitude) {
-                        tempPositions.push({
-                            lat: data.position.latitude,
-                            lng: data.position.longitude,
-                            timestamp: data.timestamp?.toDate() || new Date(0)
-                        });
-                        validCount++;
-                    } else {
-                        invalidCount++;
-                    }
-                });
-
-                log(`✅ ${validCount} position(s) valide(s)`, 'success');
-                if (invalidCount > 0) {
-                    log(`⚠️ ${invalidCount} position(s) ignorée(s) (données manquantes)`, 'warning');
-                }
-
-                tempPositions.sort((a, b) => a.timestamp - b.timestamp);
-                currentPositions = tempPositions.map(p => ({ lat: p.lat, lng: p.lng }));
-
-                log('🔄 Positions triées par ordre chronologique', 'info');
-                if (currentPositions.length > 0) {
-                    log(`📍 Première position: ${currentPositions[0]?.lat}, ${currentPositions[0]?.lng}`, 'info');
-                    log(`📍 Dernière position: ${currentPositions[currentPositions.length-1]?.lat}, ${currentPositions[currentPositions.length-1]?.lng}`, 'info');
-                }
-
-                if (currentPositions.length > 0) {
-                    log('🎨 Début du dessin du trajet...', 'info');
-                    drawTrajectory();
-                } else {
-                    log('❌ AUCUNE position GPS valide trouvée', 'error');
-                    hideLoading();
-                    showToast('⚠️ Aucune position GPS trouvée pour cette session', 'warning');
-                }
-
-            } catch (error) {
-                log('❌ ERREUR CRITIQUE: ' + error.message, 'error');
-                log('Stack: ' + error.stack, 'error');
-                hideLoading();
-                showToast('Erreur: ' + error.message, 'error');
-            } finally {
-                log('═══════════════════════════════════════', 'info');
-            }
-        }
-
-        function drawTrajectory() {
-            log('🧹 Nettoyage des éléments précédents sur la carte...', 'info');
-            
-            markers.forEach(m => m.setMap(null));
-            polylines.forEach(p => p.setMap(null));
-            markers = [];
-            polylines = [];
-
-            log(`🖌️ Dessin de la polyline avec ${currentPositions.length} points`, 'info');
-
-            const line = new google.maps.Polyline({
-                path: currentPositions,
-                geodesic: true,
-                strokeColor: '#00A854',
-                strokeOpacity: 1,
-                strokeWeight: 5,
-                map: map
-            });
-            polylines.push(line);
-            log('✅ Polyline créée', 'success');
-
-            log('📍 Ajout du marqueur DEPART...', 'info');
-            const start = new google.maps.Marker({
-                position: currentPositions[0],
-                map: map,
-                label: {
-                    text: 'D',
-                    color: 'white',
-                    fontWeight: 'bold'
-                },
-                icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 15,
-                    fillColor: '#4CAF50',
-                    fillOpacity: 1,
-                    strokeColor: 'white',
-                    strokeWeight: 3
-                },
-                title: 'Départ'
-            });
-            markers.push(start);
-            log('✅ Marqueur DEPART ajouté', 'success');
-
-            log('📍 Ajout du marqueur ARRIVEE...', 'info');
-            const end = new google.maps.Marker({
-                position: currentPositions[currentPositions.length - 1],
-                map: map,
-                label: {
-                    text: 'A',
-                    color: 'white',
-                    fontWeight: 'bold'
-                },
-                icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 15,
-                    fillColor: '#E30613',
-                    fillOpacity: 1,
-                    strokeColor: 'white',
-                    strokeWeight: 3
-                },
-                title: 'Arrivée'
-            });
-            markers.push(end);
-            log('✅ Marqueur ARRIVEE ajouté', 'success');
-
-            log('🎯 Centrage de la carte sur le trajet...', 'info');
-            const bounds = new google.maps.LatLngBounds();
-            currentPositions.forEach(pos => bounds.extend(pos));
-            map.fitBounds(bounds, { padding: 50 });
-            
-            showTrajectoryInfo();
-            hideLoading();
-            
-            log('✅✅✅ TRAJET COMPLETEMENT AFFICHE! ✅✅✅', 'success');
-            log(`📊 Résumé: ${currentPositions.length} points, 2 marqueurs, 1 ligne`, 'success');
-        }
-
-        function showTrajectoryInfo() {
-            const info = document.getElementById('trajectoryInfo');
-            info.classList.add('visible');
-
-            if (currentPositions.length === 0) return;
-
-            let totalDistance = 0;
-            for (let i = 1; i < currentPositions.length; i++) {
-                totalDistance += calculateDistance(
-                    currentPositions[i-1].lat,
-                    currentPositions[i-1].lng,
-                    currentPositions[i].lat,
-                    currentPositions[i].lng
-                );
-            }
-
-            const durationMinutes = Math.round((currentPositions.length * 10) / 60);
-            const avgSpeed = durationMinutes > 0 ? (totalDistance / (durationMinutes / 60)) : 0;
-
-            document.getElementById('trajDistance').textContent = totalDistance.toFixed(2) + ' km';
-            document.getElementById('trajDuration').textContent = durationMinutes + ' min';
-            document.getElementById('trajSpeed').textContent = Math.round(avgSpeed) + ' km/h';
-            document.getElementById('trajPoints').textContent = currentPositions.length;
-        }
-
-        function calculateDistance(lat1, lng1, lat2, lng2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLng = (lng2 - lng1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                     Math.sin(dLng/2) * Math.sin(dLng/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
-
-        function toggleMarkers() {
-            const show = document.getElementById('showMarkers').checked;
-            markers.forEach(m => m.setVisible(show));
-            log(`📍 Marqueurs: ${show ? 'VISIBLES' : 'CACHÉS'}`, 'info');
-        }
-
-        function toggleTrajectory() {
-            const show = document.getElementById('showTrajectory').checked;
-            polylines.forEach(p => p.setVisible(show));
-            log(`📈 Trajet: ${show ? 'VISIBLE' : 'CACHÉ'}`, 'info');
-        }
-
-        function centerOnTrajectory() {
-            if (currentPositions.length === 0) {
-                log('⚠️ Aucun trajet à centrer', 'warning');
-                return;
-            }
-
-            const bounds = new google.maps.LatLngBounds();
-            currentPositions.forEach(pos => bounds.extend(pos));
-            map.fitBounds(bounds, { padding: 50 });
-            log('✅ Carte centrée sur le trajet', 'success');
-        }
-
-        function clearMapDisplay() {
-            log('🧹 Effacement de la carte...', 'info');
-            
-            markers.forEach(m => m.setMap(null));
-            polylines.forEach(p => p.setMap(null));
-            markers = [];
-            polylines = [];
-            currentPositions = [];
-            currentSessionId = null;
-            
-            document.getElementById('trajectoryInfo').classList.remove('visible');
-            displaySessions();
-            
-            log('✅ Carte effacée', 'success');
-        }
-
-        document.getElementById('btnRefresh').addEventListener('click', function() {
-            log('🔄 Actualisation manuelle demandée', 'info');
-            const btn = this;
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Chargement...';
-            btn.disabled = true;
-            
-            loadSessions().finally(() => {
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
-            });
-        });
-        
-        document.getElementById('filterDriver').addEventListener('change', function() {
-            log('🔄 Filtre chauffeur modifié', 'info');
-            loadSessions();
-        });
-        
-        document.getElementById('filterStatus').addEventListener('change', function() {
-            log('🔄 Filtre statut modifié', 'info');
-            loadSessions();
-        });
-
-        auth.onAuthStateChanged(user => {
-            if (user && document.getElementById('adminDashboard').style.display !== 'none') {
-                loadCandidatures();
-            }
-        });
-
-        console.log('%c🚕 Al Bourakh Admin v4.1 - OPTIMISÉ', 'color: #00A854; font-size: 16px; font-weight: bold');
-        console.log('%c✨ Nouvelles fonctionnalités:', 'color: #FECB00; font-size: 14px; font-weight: bold');
-        console.log('  📊 Dashboard unifié avec 3 onglets');
-        console.log('  🚀 Préchargement intelligent de Google Maps');
-        console.log('  💾 Mise en cache des données GPS');
-        console.log('  ⚡ Chargement ultra-rapide de l\'onglet GPS');
-        console.log('  🎯 Indicateurs de progression détaillés');
-        console.log('%cSystème prêt!', 'color: #00A854; font-size: 12px');
+        function filterRecharges(filter, btn) { currentRechargeFilter = filter; if (btn) { btn.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); } displayRecharges(filter === 'all' ? allRecharges : allRecharges.filter(r => r.status === filter)); }
+        function filterDriverRecharges(filter, btn) { currentDriverRechargeFilter = filter; if (btn) { btn.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); } displayDriverRecharges(filter === 'all' ? allDriverRecharges : allDriverRecharges.filter(r => r.status === filter)); }
+        function filterPayments(filter, btn) { currentPaymentFilter = filter; if (btn) { btn.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); } displayPayments(filter === 'all' ? allPayments : allPayments.filter(p => p.status === filter)); }
+        function filterWithdrawals(filter, btn) { currentWithdrawalFilter = filter; if (btn) { btn.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); } displayWithdrawals(filter === 'all' ? allWithdrawals : allWithdrawals.filter(w => w.status === filter)); }
+        function displayRecharges(list) { const tbody = document.getElementById('rechargesTable'); if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Aucune recharge</td></tr>'; return; } tbody.innerHTML = list.map(r => `<tr><td><strong>${r.clientNom || 'Client'}</strong></td><td>${r.clientTelephone || 'N/A'}</td><td><span class="amount-highlight amount-credit">+${(r.amount || 0).toLocaleString()} FCFA</span></td><td>${r.source || 'Mobile Money'}</td><td>${formatDate(r.createdAt)}</td><td><span class="status-badge status-${r.status}">${r.status === 'validated' ? '✅ Validée' : '⏳ En attente'}</span></td><td><button class="btn btn-icon btn-view" onclick="viewRecharge('${r.id}')"><i class="fas fa-eye"></i></button>${r.status === 'pending' ? `<button class="btn btn-icon btn-validate" onclick="validateRecharge('${r.id}')"><i class="fas fa-check"></i></button>` : ''}</td></tr>`).join(''); }
+        function displayDriverRecharges(list) { const tbody = document.getElementById('driverRechargesTable'); if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Aucune recharge</td></tr>'; return; } tbody.innerHTML = list.map(r => `<tr><td><strong>${r.driverNom || 'Chauffeur'}</strong></td><td>${r.driverTelephone || 'N/A'}</td><td><span class="amount-highlight amount-credit">+${(r.amount || 0).toLocaleString()} FCFA</span></td><td>${r.source || 'Mobile Money'}</td><td>${formatDate(r.createdAt)}</td><td><span class="status-badge status-${r.status}">${r.status === 'validated' ? '✅ Validée' : '⏳ En attente'}</span></td><td><button class="btn btn-icon btn-view" onclick="viewDriverRecharge('${r.id}')"><i class="fas fa-eye"></i></button>${r.status === 'pending' ? `<button class="btn btn-icon btn-validate" onclick="validateDriverRecharge('${r.id}')"><i class="fas fa-check"></i></button>` : ''}</td></tr>`).join(''); }
+        function displayPayments(list) { const tbody = document.getElementById('paymentsTable'); if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Aucun paiement</td></tr>'; return; } tbody.innerHTML = list.map(p => `<tr><td><strong>${p.clientNom || 'Client'}</strong></td><td>${(p.depart || '').substring(0, 15)}... → ${(p.destination || '').substring(0, 15)}...</td><td>${p.chauffeurNom || 'Chauffeur'}</td><td><span class="amount-highlight amount-credit">+${(p.amount || 0).toLocaleString()} FCFA</span></td><td>${formatDate(p.createdAt)}</td><td><span class="status-badge status-${p.status}">${p.status === 'validated' ? '✅ Validé' : '⏳ En attente'}</span></td><td><button class="btn btn-icon btn-view" onclick="viewPayment('${p.id}')"><i class="fas fa-eye"></i></button>${p.status === 'pending' ? `<button class="btn btn-icon btn-validate" onclick="validatePayment('${p.id}')"><i class="fas fa-check"></i></button>` : ''}</td></tr>`).join(''); }
+        function displayWithdrawals(list) { const tbody = document.getElementById('withdrawalsTable'); if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Aucun retrait</td></tr>'; return; } tbody.innerHTML = list.map(w => `<tr><td><strong>${w.driverNom || 'Chauffeur'}</strong></td><td>${w.driverTelephone || 'N/A'}</td><td><span class="amount-highlight amount-debit">-${(w.amount || 0).toLocaleString()} FCFA</span></td><td>${w.destination || 'Mobile Money'}</td><td>${formatDate(w.createdAt)}</td><td><span class="status-badge status-${w.status === 'completed' ? 'completed' : 'pending'}">${w.status === 'completed' ? '✅ Effectué' : '⏳ En attente'}</span></td><td><button class="btn btn-icon btn-view" onclick="viewWithdrawal('${w.id}')"><i class="fas fa-eye"></i></button>${w.status === 'pending' ? `<button class="btn btn-icon btn-validate" onclick="validateWithdrawal('${w.id}')"><i class="fas fa-check"></i></button>` : ''}</td></tr>`).join(''); }
+        function viewRecharge(id) { const r = allRecharges.find(x => x.id === id); if (!r) return; document.getElementById('rechargeModalBody').innerHTML = `<div class="validation-instructions"><h4><i class="fas fa-exclamation-triangle"></i> Procédure</h4><ol><li>Vérifiez réception de <strong>${(r.amount || 0).toLocaleString()} FCFA</strong> sur <strong>${ALBOURAKH_ACCOUNT}</strong></li><li>Vérifiez source: <strong>${r.clientTelephone}</strong> via <strong>${r.source}</strong></li></ol></div><div class="info-section"><h4><i class="fas fa-user"></i> Client</h4><div class="info-grid"><div class="info-item"><label>Nom</label><span>${r.clientNom || 'N/A'}</span></div><div class="info-item"><label>Montant</label><span class="amount-highlight amount-credit">${(r.amount || 0).toLocaleString()} FCFA</span></div></div></div>${r.status === 'pending' ? `<button class="btn btn-success" onclick="confirmValidateRecharge('${r.id}')" style="width:100%;margin-top:20px;"><i class="fas fa-check-circle"></i> Valider</button>` : ''}`; document.getElementById('rechargeModal').classList.add('active'); }
+        function viewDriverRecharge(id) { const r = allDriverRecharges.find(x => x.id === id); if (!r) return; document.getElementById('driverRechargeModalBody').innerHTML = `<div class="validation-instructions"><h4><i class="fas fa-exclamation-triangle"></i> Procédure</h4><ol><li>Vérifiez réception de <strong>${(r.amount || 0).toLocaleString()} FCFA</strong> sur <strong>${ALBOURAKH_ACCOUNT}</strong></li></ol></div><div class="info-section"><h4><i class="fas fa-user-tie"></i> Chauffeur</h4><div class="info-grid"><div class="info-item"><label>Nom</label><span>${r.driverNom || 'N/A'}</span></div><div class="info-item"><label>Montant</label><span class="amount-highlight amount-credit">${(r.amount || 0).toLocaleString()} FCFA</span></div></div></div>${r.status === 'pending' ? `<button class="btn btn-success" onclick="confirmValidateDriverRecharge('${r.id}')" style="width:100%;margin-top:20px;"><i class="fas fa-check-circle"></i> Valider</button>` : ''}`; document.getElementById('driverRechargeModal').classList.add('active'); }
+        function viewPayment(id) { const p = allPayments.find(x => x.id === id); if (!p) return; const driverShare = Math.round((p.amount || 0) * DRIVER_RATE), commission = Math.round((p.amount || 0) * COMMISSION_RATE); document.getElementById('paymentModalBody').innerHTML = `<div class="validation-instructions"><h4><i class="fas fa-exclamation-triangle"></i> Répartition</h4><ol><li>Chauffeur (70%) : <strong>${driverShare.toLocaleString()} FCFA</strong></li><li>Commission (30%) : <strong>${commission.toLocaleString()} FCFA</strong></li></ol></div><div class="info-section"><h4><i class="fas fa-car"></i> Course</h4><div class="info-grid"><div class="info-item"><label>Client</label><span>${p.clientNom || 'N/A'}</span></div><div class="info-item"><label>Chauffeur</label><span>${p.chauffeurNom || 'N/A'}</span></div><div class="info-item"><label>Montant</label><span class="amount-highlight amount-credit">${(p.amount || 0).toLocaleString()} FCFA</span></div></div></div>${p.status === 'pending' ? `<button class="btn btn-success" onclick="confirmValidatePayment('${p.id}')" style="width:100%;margin-top:20px;"><i class="fas fa-check-circle"></i> Valider</button>` : ''}`; document.getElementById('paymentModal').classList.add('active'); }
+        function viewWithdrawal(id) { const w = allWithdrawals.find(x => x.id === id); if (!w) return; document.getElementById('withdrawalModalBody').innerHTML = `<div class="validation-instructions"><h4><i class="fas fa-exclamation-triangle"></i> Procédure</h4><ol><li>Transférer <strong>${(w.amount || 0).toLocaleString()} FCFA</strong> vers <strong>${w.driverTelephone}</strong></li></ol></div><div class="info-section"><h4><i class="fas fa-user-tie"></i> Chauffeur</h4><div class="info-grid"><div class="info-item"><label>Nom</label><span>${w.driverNom || 'N/A'}</span></div><div class="info-item"><label>Montant</label><span class="amount-highlight amount-debit">${(w.amount || 0).toLocaleString()} FCFA</span></div></div></div>${w.status === 'pending' ? `<button class="btn btn-success" onclick="confirmValidateWithdrawal('${w.id}')" style="width:100%;margin-top:20px;"><i class="fas fa-check-circle"></i> Confirmer Retrait</button>` : ''}`; document.getElementById('withdrawalModal').classList.add('active'); }
+        async function confirmValidateRecharge(id) { const r = allRecharges.find(x => x.id === id); if (!confirm(`Confirmer réception de ${r.amount.toLocaleString()} FCFA ?`)) return; showLoading(); try { await db.collection('recharges').doc(id).update({ status: 'validated', validatedAt: firebase.firestore.FieldValue.serverTimestamp() }); if (r.clientId) await db.collection('clients').doc(r.clientId).update({ soldePortefeuille: firebase.firestore.FieldValue.increment(r.amount) }); closeModal('rechargeModal'); hideLoading(); showToast('✅ Recharge validée!', 'success'); loadPortefeuilleData(); } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); } }
+        async function confirmValidateDriverRecharge(id) { const r = allDriverRecharges.find(x => x.id === id); if (!confirm(`Confirmer réception de ${r.amount.toLocaleString()} FCFA ?`)) return; showLoading(); try { await db.collection('driver_recharges').doc(id).update({ status: 'validated', validatedAt: firebase.firestore.FieldValue.serverTimestamp() }); if (r.driverId) await db.collection('drivers').doc(r.driverId).update({ soldeDisponible: firebase.firestore.FieldValue.increment(r.amount) }); closeModal('driverRechargeModal'); hideLoading(); showToast('✅ Recharge validée!', 'success'); loadPortefeuilleData(); } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); } }
+        async function confirmValidatePayment(id) { const p = allPayments.find(x => x.id === id); const driverShare = Math.round(p.amount * DRIVER_RATE); if (!confirm(`Confirmer paiement ? Crédit chauffeur: ${driverShare.toLocaleString()} FCFA`)) return; showLoading(); try { await db.collection('course_payments').doc(id).update({ status: 'validated', validatedAt: firebase.firestore.FieldValue.serverTimestamp() }); if (p.chauffeurId) await db.collection('drivers').doc(p.chauffeurId).update({ soldeDisponible: firebase.firestore.FieldValue.increment(driverShare) }); closeModal('paymentModal'); hideLoading(); showToast('✅ Paiement validé!', 'success'); loadPortefeuilleData(); } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); } }
+        async function confirmValidateWithdrawal(id) { const w = allWithdrawals.find(x => x.id === id); if (!confirm(`Confirmer transfert de ${w.amount.toLocaleString()} FCFA vers ${w.driverTelephone} ?`)) return; showLoading(); try { await db.collection('withdrawals').doc(id).update({ status: 'completed', completedAt: firebase.firestore.FieldValue.serverTimestamp() }); closeModal('withdrawalModal'); hideLoading(); showToast('✅ Retrait confirmé!', 'success'); loadPortefeuilleData(); } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); } }
+        function validateRecharge(id) { viewRecharge(id); }
+        function validateDriverRecharge(id) { viewDriverRecharge(id); }
+        function validatePayment(id) { viewPayment(id); }
+        function validateWithdrawal(id) { viewWithdrawal(id); }
+
+        // === GPS ===
+        function log(msg, type = 'info') { const t = new Date().toLocaleTimeString(); const colors = { error: '#f00', success: '#0f0', warning: '#ff0', info: '#0ff' }; const d = document.getElementById('debugConsole'); const l = document.createElement('div'); l.style.color = colors[type] || '#0ff'; l.textContent = `[${t}] ${msg}`; d.appendChild(l); d.scrollTop = d.scrollHeight; console.log(`[${t}] ${msg}`); }
+        function showGPSLoader() { document.getElementById('gpsLoadingOverlay').style.display = 'flex'; }
+        function hideGPSLoader() { document.getElementById('gpsLoadingOverlay').style.display = 'none'; }
+        function updateGPSProgress(msg) { document.getElementById('gpsLoadingProgress').textContent = msg; }
+        function updateStatus(msg, error = false) { const bar = document.getElementById('statusBar'); bar.innerHTML = msg; bar.className = 'status-bar ' + (error ? 'error' : 'connected'); }
+        document.getElementById('debugBtn').addEventListener('click', () => document.getElementById('debugConsole').classList.toggle('visible'));
+        function initGoogleMaps() { log('Initialisation Google Maps...'); updateGPSProgress('Chargement carte...'); const s = document.createElement('script'); s.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBI1svukv3Ts7fN97ke5OGfwo2V-vRUGHI&callback=initMap'; s.async = true; s.onerror = () => { log('Échec chargement Maps', 'error'); hideGPSLoader(); }; document.head.appendChild(s); }
+        window.initMapSilent = function() { if (mapInitialized) return; try { map = new google.maps.Map(document.getElementById('map'), { center: { lat: 14.6937, lng: -17.4441 }, zoom: 12, mapTypeControl: true, streetViewControl: false }); mapInitialized = true; log('Carte préchargée', 'success'); if (isAuth && Object.keys(allDriversGPS).length === 0) loadGPSDrivers(); } catch (e) { log('Erreur préchargement: ' + e.message, 'error'); } };
+        window.initMap = function() { if (mapInitialized) { hideGPSLoader(); loadSessions(); return; } log('Callback initMap'); updateGPSProgress('Création carte...'); try { map = new google.maps.Map(document.getElementById('map'), { center: { lat: 14.6937, lng: -17.4441 }, zoom: 12, mapTypeControl: true, streetViewControl: false }); mapInitialized = true; log('Carte OK', 'success'); updateStatus('✅ Carte chargée'); updateGPSProgress('Chargement chauffeurs...'); loadGPSDrivers().then(() => { updateGPSProgress('Chargement sessions...'); return loadSessions(); }).then(() => hideGPSLoader()).catch(e => { log('Erreur: ' + e.message, 'error'); hideGPSLoader(); }); } catch (e) { log('Erreur init: ' + e.message, 'error'); hideGPSLoader(); } };
+        async function loadGPSDrivers() { try { const snap = await db.collection('drivers').get(); const sel = document.getElementById('filterDriver'); sel.innerHTML = '<option value="">Tous</option>'; snap.forEach(doc => { const d = doc.data(); const name = `${d.prenom || ''} ${d.nom || ''}`.trim() || d.telephone; allDriversGPS[doc.id] = name; const opt = document.createElement('option'); opt.value = doc.id; opt.textContent = name; sel.appendChild(opt); }); log(`${snap.size} chauffeurs GPS`, 'success'); } catch (e) { log('Erreur chauffeurs GPS: ' + e.message, 'error'); } }
+        async function loadSessions() { if (!isAuth) return; log('Chargement sessions...'); try { let q = db.collection('tracking_sessions'); const dF = document.getElementById('filterDriver').value, sF = document.getElementById('filterStatus').value; if (dF) q = q.where('driverId', '==', dF); if (sF) q = q.where('status', '==', sF); const snap = await q.limit(100).get(); allSessions = []; let totalDist = 0, totalPos = 0, activeCount = 0; snap.forEach(doc => { const d = doc.data(); allSessions.push({ id: doc.id, ...d }); if (d.status === 'active') activeCount++; if (d.totalDistance) totalDist += d.totalDistance; if (d.totalPositions) totalPos += d.totalPositions; }); allSessions.sort((a, b) => (b.startTime?.toDate?.() || new Date(0)) - (a.startTime?.toDate?.() || new Date(0))); document.getElementById('totalSessions').textContent = allSessions.length; document.getElementById('activeSessions').textContent = activeCount; document.getElementById('totalDistance').textContent = totalDist.toFixed(1); document.getElementById('totalPositions').textContent = totalPos; displaySessions(); log(`${allSessions.length} sessions`, 'success'); updateStatus(`✅ ${allSessions.length} session(s)`); } catch (e) { log('Erreur sessions: ' + e.message, 'error'); updateStatus('❌ Erreur', true); } }
+        function displaySessions() { const c = document.getElementById('sessionsList'); if (!allSessions.length) { c.innerHTML = '<div class="empty-state"><i class="fas fa-route"></i><p>Aucune session</p></div>'; return; } c.innerHTML = ''; allSessions.forEach((s, i) => { const card = document.createElement('div'); card.className = 'session-card' + (currentSessionId === s.id ? ' active' : ''); const name = allDriversGPS[s.driverId] || s.driverId; const st = s.startTime?.toDate?.(); const et = s.endTime?.toDate?.(); let dur = 'En cours'; if (st && et) dur = Math.round((et - st) / 60000) + ' min'; card.innerHTML = `<div class="session-driver">${name}</div><div class="session-info"><div><i class="fas fa-clock"></i> ${st ? st.toLocaleString('fr-FR') : 'N/A'}</div><div><i class="fas fa-hourglass"></i> ${dur}</div><div><i class="fas fa-route"></i> ${(s.totalDistance || 0).toFixed(1)} km • ${s.totalPositions || 0} pts</div></div>`; card.addEventListener('click', () => selectSession(s)); c.appendChild(card); }); }
+        async function selectSession(session) { log(`Selection session: ${session.id}`); currentSessionId = session.id; displaySessions(); showLoading('Chargement positions...'); try { const snap = await db.collection('position_history').where('sessionId', '==', session.id).get(); const temp = []; snap.forEach(doc => { const d = doc.data(); if (d.position?.latitude && d.position?.longitude) temp.push({ lat: d.position.latitude, lng: d.position.longitude, ts: d.timestamp?.toDate?.() || new Date(0) }); }); temp.sort((a, b) => a.ts - b.ts); currentPositions = temp.map(p => ({ lat: p.lat, lng: p.lng })); if (currentPositions.length > 0) drawTrajectory(); else { hideLoading(); showToast('Aucune position GPS', 'warning'); } } catch (e) { log('Erreur positions: ' + e.message, 'error'); hideLoading(); showToast('Erreur: ' + e.message, 'error'); } }
+        function drawTrajectory() { markers.forEach(m => m.setMap(null)); polylines.forEach(p => p.setMap(null)); markers = []; polylines = []; const line = new google.maps.Polyline({ path: currentPositions, geodesic: true, strokeColor: '#00A854', strokeOpacity: 1, strokeWeight: 5, map: map }); polylines.push(line); const start = new google.maps.Marker({ position: currentPositions[0], map: map, label: { text: 'D', color: 'white', fontWeight: 'bold' }, icon: { path: google.maps.SymbolPath.CIRCLE, scale: 15, fillColor: '#4CAF50', fillOpacity: 1, strokeColor: 'white', strokeWeight: 3 }, title: 'Départ' }); markers.push(start); const end = new google.maps.Marker({ position: currentPositions[currentPositions.length - 1], map: map, label: { text: 'A', color: 'white', fontWeight: 'bold' }, icon: { path: google.maps.SymbolPath.CIRCLE, scale: 15, fillColor: '#E30613', fillOpacity: 1, strokeColor: 'white', strokeWeight: 3 }, title: 'Arrivée' }); markers.push(end); const bounds = new google.maps.LatLngBounds(); currentPositions.forEach(pos => bounds.extend(pos)); map.fitBounds(bounds, { padding: 50 }); showTrajectoryInfo(); hideLoading(); log('Trajet affiché!', 'success'); }
+        function showTrajectoryInfo() { const info = document.getElementById('trajectoryInfo'); info.classList.add('visible'); if (!currentPositions.length) return; let totalDist = 0; for (let i = 1; i < currentPositions.length; i++) totalDist += calcDist(currentPositions[i-1].lat, currentPositions[i-1].lng, currentPositions[i].lat, currentPositions[i].lng); const dur = Math.round((currentPositions.length * 10) / 60); const avg = dur > 0 ? (totalDist / (dur / 60)) : 0; document.getElementById('trajDistance').textContent = totalDist.toFixed(2) + ' km'; document.getElementById('trajDuration').textContent = dur + ' min'; document.getElementById('trajSpeed').textContent = Math.round(avg) + ' km/h'; document.getElementById('trajPoints').textContent = currentPositions.length; }
+        function calcDist(lat1, lng1, lat2, lng2) { const R = 6371, dLat = (lat2 - lat1) * Math.PI / 180, dLng = (lng2 - lng1) * Math.PI / 180; const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng/2) * Math.sin(dLng/2); return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); }
+        function toggleMarkers() { const show = document.getElementById('showMarkers').checked; markers.forEach(m => m.setVisible(show)); }
+        function toggleTrajectory() { const show = document.getElementById('showTrajectory').checked; polylines.forEach(p => p.setVisible(show)); }
+        function centerOnTrajectory() { if (!currentPositions.length) return; const bounds = new google.maps.LatLngBounds(); currentPositions.forEach(pos => bounds.extend(pos)); map.fitBounds(bounds, { padding: 50 }); }
+        function clearMapDisplay() { markers.forEach(m => m.setMap(null)); polylines.forEach(p => p.setMap(null)); markers = []; polylines = []; currentPositions = []; currentSessionId = null; document.getElementById('trajectoryInfo').classList.remove('visible'); displaySessions(); }
+        document.getElementById('btnRefresh').addEventListener('click', function() { this.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i>'; this.disabled = true; loadSessions().finally(() => { this.innerHTML = '<i class="fas fa-sync-alt"></i> Actualiser'; this.disabled = false; }); });
+        document.getElementById('filterDriver').addEventListener('change', loadSessions);
+        document.getElementById('filterStatus').addEventListener('change', loadSessions);
+        function openImageViewer(url) { document.getElementById('viewerImage').src = url; document.getElementById('imageViewer').classList.add('active'); }
+        function closeImageViewer() { document.getElementById('imageViewer').classList.remove('active'); }
+
+        console.log('%c🚕 Al Bourakh Admin v6.0 UNIFIÉ', 'color: #00A854; font-size: 16px; font-weight: bold');
     </script>
 </body>
 </html>
