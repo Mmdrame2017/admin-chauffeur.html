@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Al Bourakh - Administration Unifiée v6.1</title>
+    <title>Al Bourakh - Administration Unifiée v6.2</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -90,6 +90,18 @@
         .albourakh-instructions ul { margin-left: 20px; }
         .albourakh-instructions li { margin-bottom: 8px; line-height: 1.5; }
         
+        /* Auto-refresh indicator */
+        .auto-refresh-bar { background: linear-gradient(135deg, #059669, #10b981); color: white; padding: 12px 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .auto-refresh-info { display: flex; align-items: center; gap: 10px; }
+        .auto-refresh-info i { font-size: 1.2em; }
+        .countdown-badge { background: rgba(255,255,255,0.25); padding: 5px 12px; border-radius: 20px; font-weight: bold; min-width: 45px; text-align: center; }
+        .auto-refresh-controls { display: flex; gap: 8px; align-items: center; }
+        .toggle-auto-refresh { background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 600; transition: all 0.3s; }
+        .toggle-auto-refresh:hover { background: rgba(255,255,255,0.3); }
+        .toggle-auto-refresh.paused { background: #ef4444; border-color: #dc2626; }
+        .progress-bar-container { width: 150px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 3px; overflow: hidden; }
+        .progress-bar { height: 100%; background: white; border-radius: 3px; transition: width 1s linear; }
+        
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
         .modal.active { display: flex; }
         .modal-content { background: white; max-width: 900px; width: 100%; border-radius: 15px; max-height: 90vh; overflow-y: auto; }
@@ -110,13 +122,6 @@
         .validation-instructions ol { margin-left: 20px; color: #78350f; }
         .validation-instructions li { margin-bottom: 10px; line-height: 1.6; }
         .validation-instructions strong { color: #b45309; }
-        
-        .docs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
-        .doc-card { border: 2px solid #e0e0e0; border-radius: 10px; overflow: hidden; transition: all 0.3s; }
-        .doc-card:hover { border-color: #00A854; transform: translateY(-3px); }
-        .doc-card img { width: 100%; height: 150px; object-fit: cover; cursor: pointer; }
-        .doc-card .doc-label { padding: 10px; background: #f8f9fa; text-align: center; font-weight: 600; font-size: 0.85em; }
-        .doc-card a { display: block; padding: 10px; background: #00A854; color: white; text-align: center; text-decoration: none; font-size: 0.85em; }
         
         .alert-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: start; gap: 10px; }
         .alert-box.info { background: #d1ecf1; border-left-color: #17a2b8; }
@@ -212,6 +217,8 @@
             .gps-sidebar { width: 100%; height: 400px; }
             .map-wrapper { height: 500px; }
             .albourakh-account-number { font-size: 1.5em; }
+            .auto-refresh-bar { flex-direction: column; text-align: center; }
+            .progress-bar-container { width: 100%; }
         }
     </style>
 </head>
@@ -222,7 +229,7 @@
             <div class="login-header">
                 <div class="login-logo">🔐</div>
                 <h1 class="login-title">Administration</h1>
-                <p style="color: #666;">Al Bourakh - Gestion Unifiée v6.1</p>
+                <p style="color: #666;">Al Bourakh - Gestion Unifiée v6.2</p>
             </div>
             <div class="form-group">
                 <label>📧 Email Administrateur</label>
@@ -236,7 +243,7 @@
                 <i class="fas fa-sign-in-alt"></i> Se connecter
             </button>
             <p style="text-align: center; margin-top: 20px; color: #999; font-size: 0.9em;">
-                Version 6.1 - Débit/Crédit Auto © 2025
+                Version 6.2 - Auto-Refresh © 2025
             </p>
         </div>
     </div>
@@ -245,7 +252,7 @@
     <div id="adminDashboard" style="display: none;">
         <div class="container">
             <div class="header">
-                <h1><i class="fas fa-shield-alt"></i> Administration Unifiée v6.1</h1>
+                <h1><i class="fas fa-shield-alt"></i> Administration Unifiée v6.2</h1>
                 <p>Candidatures • Chauffeurs • Portefeuille • GPS Tracking</p>
                 <button class="logout-btn" onclick="logoutAdmin()">
                     <i class="fas fa-sign-out-alt"></i> Déconnexion
@@ -317,14 +324,34 @@
 
             <!-- TAB PORTEFEUILLE -->
             <div id="tab-portefeuille" class="tab-content">
+                <!-- Auto-refresh indicator bar -->
+                <div class="auto-refresh-bar" id="autoRefreshBar">
+                    <div class="auto-refresh-info">
+                        <i class="fas fa-sync-alt" id="refreshIcon"></i>
+                        <span>Rafraîchissement auto: <span class="countdown-badge" id="countdownBadge">60</span>s</span>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="progressBar" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    <div class="auto-refresh-controls">
+                        <button class="toggle-auto-refresh" id="toggleAutoRefresh" onclick="toggleAutoRefresh()">
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button class="btn btn-refresh" onclick="manualRefreshPortefeuille()" style="background: rgba(255,255,255,0.2); border: none;">
+                            <i class="fas fa-sync-alt"></i> Rafraîchir
+                        </button>
+                    </div>
+                </div>
+                
                 <div class="albourakh-main-account">
                     <h2><i class="fas fa-building"></i> Compte Principal Al Bourakh</h2>
                     <div class="albourakh-account-number">+221 78 785 01 01</div>
                     <div class="albourakh-instructions">
-                        <h3>📋 Instructions - v6.1 Débit/Crédit Automatique</h3>
+                        <h3>📋 Instructions - v6.2 Auto-Refresh</h3>
                         <ul>
                             <li><strong>Recharge Chauffeur :</strong> Vérifier réception → Valider → <span style="color:#10b981;">CRÉDIT AUTO du solde</span></li>
                             <li><strong>Retrait Chauffeur :</strong> Effectuer transfert → Valider → <span style="color:#ef4444;">DÉBIT AUTO du solde</span></li>
+                            <li><strong>🔄 Rafraîchissement automatique</strong> toutes les 60 secondes</li>
                         </ul>
                     </div>
                 </div>
@@ -338,7 +365,7 @@
                 <!-- Recharges Clients -->
                 <div class="section">
                     <div class="section-header"><h2 class="section-title"><i class="fas fa-plus-circle"></i> Recharges Clients</h2>
-                    <div class="filters"><button class="filter-btn active" onclick="filterRecharges('pending', this)">En attente</button><button class="filter-btn" onclick="filterRecharges('validated', this)">Validées</button><button class="filter-btn" onclick="filterRecharges('all', this)">Toutes</button><button class="btn btn-refresh" onclick="loadPortefeuilleData()"><i class="fas fa-sync"></i></button></div></div>
+                    <div class="filters"><button class="filter-btn active" onclick="filterRecharges('pending', this)">En attente</button><button class="filter-btn" onclick="filterRecharges('validated', this)">Validées</button><button class="filter-btn" onclick="filterRecharges('all', this)">Toutes</button></div></div>
                     <div class="table-container"><table><thead><tr><th>Client</th><th>Téléphone</th><th>Montant</th><th>Source</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="rechargesTable"><tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Chargement...</td></tr></tbody></table></div>
                 </div>
                 
@@ -438,10 +465,18 @@
         const ALBOURAKH_ACCOUNT = '+221 78 785 01 01';
         const COMMISSION_RATE = 0.30;
         const DRIVER_RATE = 0.70;
+        const AUTO_REFRESH_INTERVAL = 60; // Secondes
 
         let allCandidatures = [], allDrivers = [], allRecharges = [], allDriverRecharges = [], allPayments = [], allWithdrawals = [], allSessions = [], allDriversGPS = {};
         let currentCandFilter = 'all', currentRechargeFilter = 'pending', currentDriverRechargeFilter = 'pending', currentPaymentFilter = 'pending', currentWithdrawalFilter = 'pending';
         let map, markers = [], polylines = [], currentPositions = [], isAuth = false, currentSessionId = null, mapInitialized = false;
+        
+        // Auto-refresh variables
+        let autoRefreshInterval = null;
+        let countdownInterval = null;
+        let countdown = AUTO_REFRESH_INTERVAL;
+        let isAutoRefreshPaused = false;
+        let currentTab = 'candidatures';
 
         function showToast(msg, type = 'info') { const t = document.createElement('div'); t.className = `toast ${type}`; t.innerHTML = `<strong>${msg}</strong>`; document.body.appendChild(t); setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000); }
         function showLoading(txt = 'Chargement...') { document.querySelector('.loading-text').textContent = txt; document.getElementById('loading').classList.add('active'); }
@@ -450,15 +485,130 @@
         function formatDate(ts) { if (!ts) return 'N/A'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleString('fr-FR'); }
         function getStatusLabel(s) { const l = { 'en_attente': '⏳ En Attente', 'acceptee': '✅ Acceptée', 'refusee': '❌ Refusée', 'disponible': '🟢 Disponible', 'en_course': '🔵 En Course', 'hors_ligne': '⚫ Hors Ligne', 'pending': '⏳ En attente', 'validated': '✅ Validé', 'completed': '✅ Effectué', 'active': '🔵 Active' }; return l[s] || s; }
 
+        // ========== AUTO-REFRESH FUNCTIONS ==========
+        function startAutoRefresh() {
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            countdown = AUTO_REFRESH_INTERVAL;
+            updateCountdownDisplay();
+            
+            countdownInterval = setInterval(() => {
+                if (!isAutoRefreshPaused && currentTab === 'portefeuille') {
+                    countdown--;
+                    updateCountdownDisplay();
+                    if (countdown <= 0) {
+                        countdown = AUTO_REFRESH_INTERVAL;
+                        silentRefreshPortefeuille();
+                    }
+                }
+            }, 1000);
+        }
+        
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) { clearInterval(autoRefreshInterval); autoRefreshInterval = null; }
+            if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+        }
+        
+        function updateCountdownDisplay() {
+            const badge = document.getElementById('countdownBadge');
+            const progress = document.getElementById('progressBar');
+            const icon = document.getElementById('refreshIcon');
+            
+            if (badge) badge.textContent = countdown;
+            if (progress) progress.style.width = ((countdown / AUTO_REFRESH_INTERVAL) * 100) + '%';
+            
+            // Animation de l'icône quand proche du refresh
+            if (icon) {
+                if (countdown <= 5) {
+                    icon.classList.add('fa-spin');
+                } else {
+                    icon.classList.remove('fa-spin');
+                }
+            }
+        }
+        
+        function toggleAutoRefresh() {
+            isAutoRefreshPaused = !isAutoRefreshPaused;
+            const btn = document.getElementById('toggleAutoRefresh');
+            
+            if (isAutoRefreshPaused) {
+                btn.innerHTML = '<i class="fas fa-play"></i> Reprendre';
+                btn.classList.add('paused');
+                showToast('⏸️ Auto-refresh en pause', 'info');
+            } else {
+                btn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                btn.classList.remove('paused');
+                countdown = AUTO_REFRESH_INTERVAL;
+                updateCountdownDisplay();
+                showToast('▶️ Auto-refresh activé', 'success');
+            }
+        }
+        
+        async function silentRefreshPortefeuille() {
+            // Refresh silencieux sans loader
+            const icon = document.getElementById('refreshIcon');
+            if (icon) icon.classList.add('fa-spin');
+            
+            try {
+                const [rSnap, drSnap, pSnap, wSnap] = await Promise.all([
+                    db.collection('recharges').get(),
+                    db.collection('driver_recharges').get(),
+                    db.collection('course_payments').get(),
+                    db.collection('withdrawals').get()
+                ]);
+                
+                allRecharges = []; rSnap.forEach(d => allRecharges.push({ id: d.id, ...d.data() }));
+                allDriverRecharges = []; drSnap.forEach(d => allDriverRecharges.push({ id: d.id, ...d.data() }));
+                allPayments = []; pSnap.forEach(d => allPayments.push({ id: d.id, ...d.data() }));
+                allWithdrawals = []; wSnap.forEach(d => allWithdrawals.push({ id: d.id, ...d.data() }));
+                
+                const sortByDate = (a, b) => { const dA = a.createdAt?.toDate?.() || new Date(0); const dB = b.createdAt?.toDate?.() || new Date(0); return dB - dA; };
+                allRecharges.sort(sortByDate); allDriverRecharges.sort(sortByDate); allPayments.sort(sortByDate); allWithdrawals.sort(sortByDate);
+                
+                updatePortefeuilleStats();
+                filterRecharges(currentRechargeFilter); 
+                filterDriverRecharges(currentDriverRechargeFilter); 
+                filterPayments(currentPaymentFilter); 
+                filterWithdrawals(currentWithdrawalFilter);
+                
+                console.log(`🔄 Auto-refresh: ${new Date().toLocaleTimeString()}`);
+            } catch (e) {
+                console.error('Erreur auto-refresh:', e);
+            } finally {
+                if (icon) icon.classList.remove('fa-spin');
+            }
+        }
+        
+        function manualRefreshPortefeuille() {
+            countdown = AUTO_REFRESH_INTERVAL;
+            updateCountdownDisplay();
+            loadPortefeuilleData();
+            showToast('🔄 Rafraîchissement manuel', 'success');
+        }
+
         function switchTab(tab) {
+            currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             event.target.closest('.tab-btn').classList.add('active');
             document.getElementById(`tab-${tab}`).classList.add('active');
-            if (tab === 'candidatures') loadCandidatures();
-            else if (tab === 'chauffeurs') loadDrivers();
-            else if (tab === 'portefeuille') loadPortefeuilleData();
-            else if (tab === 'gps') { if (!mapInitialized) { showGPSLoader(); initGoogleMaps(); } else { loadSessions(); } }
+            
+            if (tab === 'candidatures') {
+                loadCandidatures();
+            } else if (tab === 'chauffeurs') {
+                loadDrivers();
+            } else if (tab === 'portefeuille') {
+                loadPortefeuilleData();
+                startAutoRefresh();
+            } else if (tab === 'gps') {
+                if (!mapInitialized) { showGPSLoader(); initGoogleMaps(); } else { loadSessions(); }
+            }
+            
+            // Stop auto-refresh when leaving portefeuille tab
+            if (tab !== 'portefeuille') {
+                // Keep the interval running but it won't execute refresh
+            }
         }
 
         async function loginAdmin() {
@@ -474,7 +624,15 @@
                 loadCandidatures();
             } catch (e) { hideLoading(); showToast('Email ou mot de passe incorrect', 'error'); }
         }
-        async function logoutAdmin() { if (confirm('Déconnexion ?')) { await auth.signOut(); isAuth = false; document.getElementById('loginScreen').style.display = 'block'; document.getElementById('adminDashboard').style.display = 'none'; } }
+        async function logoutAdmin() { 
+            if (confirm('Déconnexion ?')) { 
+                stopAutoRefresh();
+                await auth.signOut(); 
+                isAuth = false; 
+                document.getElementById('loginScreen').style.display = 'block'; 
+                document.getElementById('adminDashboard').style.display = 'none'; 
+            } 
+        }
         document.getElementById('adminPassword').addEventListener('keypress', e => { if (e.key === 'Enter') loginAdmin(); });
 
         // ========== CANDIDATURES ==========
@@ -542,7 +700,6 @@
                 allPayments = []; pSnap.forEach(d => allPayments.push({ id: d.id, ...d.data() }));
                 allWithdrawals = []; wSnap.forEach(d => allWithdrawals.push({ id: d.id, ...d.data() }));
                 
-                // Sort by date
                 const sortByDate = (a, b) => { const dA = a.createdAt?.toDate?.() || new Date(0); const dB = b.createdAt?.toDate?.() || new Date(0); return dB - dA; };
                 allRecharges.sort(sortByDate); allDriverRecharges.sort(sortByDate); allPayments.sort(sortByDate); allWithdrawals.sort(sortByDate);
                 
@@ -676,7 +833,7 @@
                     </div>
                 </div>
                 
-                ${!w.driverId ? `<div class="alert-box danger"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ ATTENTION</strong><p>driverId manquant - Impossible de débiter automatiquement. Ajoutez le driverId dans Firebase Console.</p></div></div>` : ''}
+                ${!w.driverId ? `<div class="alert-box danger"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ ATTENTION</strong><p>driverId manquant - Impossible de débiter automatiquement.</p></div></div>` : ''}
                 
                 ${w.status === 'pending' ? `<button class="btn btn-danger" onclick="confirmValidateWithdrawal('${w.id}')" style="width:100%;margin-top:20px;" ${!w.driverId ? 'disabled' : ''}><i class="fas fa-check-circle"></i> Confirmer le Transfert et Débiter le Solde</button>` : `<div class="alert-box info" style="margin-top:20px;"><i class="fas fa-check-circle"></i><div><strong>Déjà effectué</strong><p>Validé le ${w.completedAt ? formatDate(w.completedAt) : 'N/A'}</p></div></div>`}
             `; 
@@ -730,7 +887,7 @@
         function openImageViewer(url) { document.getElementById('viewerImage').src = url; document.getElementById('imageViewer').classList.add('active'); }
         function closeImageViewer() { document.getElementById('imageViewer').classList.remove('active'); }
 
-        console.log('%c🚕 Al Bourakh Admin v6.1 - Débit/Crédit Auto', 'color: #00A854; font-size: 16px; font-weight: bold');
+        console.log('%c🚕 Al Bourakh Admin v6.2 - Auto-Refresh', 'color: #00A854; font-size: 16px; font-weight: bold');
     </script>
 </body>
 </html>
