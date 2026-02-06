@@ -952,17 +952,25 @@
                     .limit(1000)
                     .get();
 
+                log(`📊 Documents retournés: ${snap.size}`, 'info');
+
                 const temp = [];
+                let rejectedCount = 0;
                 snap.forEach(doc => {
                     const d = doc.data();
+                    log(`📍 Doc: ${doc.id}, position: ${JSON.stringify(d.position)}`, 'info');
                     if (d.position?.latitude && d.position?.longitude) {
                         temp.push({
                             lat: d.position.latitude,
                             lng: d.position.longitude,
                             ts: d.timestamp?.toDate?.() || new Date(0)
                         });
+                    } else {
+                        rejectedCount++;
                     }
                 });
+
+                log(`✅ Positions valides: ${temp.length}, Rejetées: ${rejectedCount}`, 'success');
 
                 // ✅ Sort by timestamp client-side (ascending order)
                 temp.sort((a, b) => a.ts - b.ts);
