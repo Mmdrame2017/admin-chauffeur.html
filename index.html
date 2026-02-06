@@ -470,6 +470,9 @@
         let allCandidatures = [], allDrivers = [], allRecharges = [], allDriverRecharges = [], allPayments = [], allWithdrawals = [], allSessions = [], allDriversGPS = {};
         let currentCandFilter = 'all', currentRechargeFilter = 'pending', currentDriverRechargeFilter = 'pending', currentPaymentFilter = 'pending', currentWithdrawalFilter = 'pending';
         let map, markers = [], polylines = [], currentPositions = [], isAuth = false, currentSessionId = null, mapInitialized = false;
+
+        // GPS real-time listener cleanup functions
+        let sessionsListener = null;
         
         // Auto-refresh variables
         let autoRefreshInterval = null;
@@ -588,12 +591,17 @@
         }
 
         function switchTab(tab) {
+            // ✅ Cleanup GPS listeners when leaving GPS tab
+            if (currentTab === 'gps' && tab !== 'gps') {
+                cleanupGPSListeners();
+            }
+
             currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             event.target.closest('.tab-btn').classList.add('active');
             document.getElementById(`tab-${tab}`).classList.add('active');
-            
+
             if (tab === 'candidatures') {
                 loadCandidatures();
             } else if (tab === 'chauffeurs') {
@@ -604,7 +612,7 @@
             } else if (tab === 'gps') {
                 if (!mapInitialized) { showGPSLoader(); initGoogleMaps(); } else { loadSessions(); }
             }
-            
+
             // Stop auto-refresh when leaving portefeuille tab
             if (tab !== 'portefeuille') {
                 // Keep the interval running but it won't execute refresh
@@ -624,14 +632,15 @@
                 loadCandidatures();
             } catch (e) { hideLoading(); showToast('Email ou mot de passe incorrect', 'error'); }
         }
-        async function logoutAdmin() { 
-            if (confirm('Déconnexion ?')) { 
+        async function logoutAdmin() {
+            if (confirm('Déconnexion ?')) {
                 stopAutoRefresh();
-                await auth.signOut(); 
-                isAuth = false; 
-                document.getElementById('loginScreen').style.display = 'block'; 
-                document.getElementById('adminDashboard').style.display = 'none'; 
-            } 
+                cleanupGPSListeners(); // ✅ Cleanup GPS listeners
+                await auth.signOut();
+                isAuth = false;
+                document.getElementById('loginScreen').style.display = 'block';
+                document.getElementById('adminDashboard').style.display = 'none';
+            }
         }
         document.getElementById('adminPassword').addEventListener('keypress', e => { if (e.key === 'Enter') loginAdmin(); });
 
@@ -871,16 +880,164 @@
         function initGoogleMaps() { log('Init Google Maps...'); updateGPSProgress('Chargement carte...'); const s = document.createElement('script'); s.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBI1svukv3Ts7fN97ke5OGfwo2V-vRUGHI&callback=initMap'; s.async = true; s.onerror = () => { log('Échec Maps', 'error'); hideGPSLoader(); }; document.head.appendChild(s); }
         window.initMap = function() { if (mapInitialized) { hideGPSLoader(); loadSessions(); return; } try { map = new google.maps.Map(document.getElementById('map'), { center: { lat: 14.6937, lng: -17.4441 }, zoom: 12, mapTypeControl: true, streetViewControl: false }); mapInitialized = true; log('Carte OK', 'success'); updateStatus('✅ Carte chargée'); updateGPSProgress('Chargement chauffeurs...'); loadGPSDrivers().then(() => { updateGPSProgress('Chargement sessions...'); return loadSessions(); }).then(() => hideGPSLoader()).catch(e => { log('Erreur: ' + e.message, 'error'); hideGPSLoader(); }); } catch (e) { log('Erreur init: ' + e.message, 'error'); hideGPSLoader(); } };
         async function loadGPSDrivers() { try { const snap = await db.collection('drivers').get(); const sel = document.getElementById('filterDriver'); sel.innerHTML = '<option value="">Tous</option>'; snap.forEach(doc => { const d = doc.data(); const name = `${d.prenom || ''} ${d.nom || ''}`.trim() || d.telephone; allDriversGPS[doc.id] = name; const opt = document.createElement('option'); opt.value = doc.id; opt.textContent = name; sel.appendChild(opt); }); log(`${snap.size} chauffeurs GPS`, 'success'); } catch (e) { log('Erreur chauffeurs: ' + e.message, 'error'); } }
-        async function loadSessions() { if (!isAuth) return; log('Chargement sessions...'); try { let q = db.collection('tracking_sessions'); const dF = document.getElementById('filterDriver').value, sF = document.getElementById('filterStatus').value; if (dF) q = q.where('driverId', '==', dF); if (sF) q = q.where('status', '==', sF); const snap = await q.limit(100).get(); allSessions = []; let totalDist = 0, totalPos = 0, activeCount = 0; snap.forEach(doc => { const d = doc.data(); allSessions.push({ id: doc.id, ...d }); if (d.status === 'active') activeCount++; if (d.totalDistance) totalDist += d.totalDistance; if (d.totalPositions) totalPos += d.totalPositions; }); allSessions.sort((a, b) => (b.startTime?.toDate?.() || new Date(0)) - (a.startTime?.toDate?.() || new Date(0))); document.getElementById('totalSessions').textContent = allSessions.length; document.getElementById('activeSessions').textContent = activeCount; document.getElementById('totalDistance').textContent = totalDist.toFixed(1); document.getElementById('totalPositions').textContent = totalPos; displaySessions(); log(`${allSessions.length} sessions`, 'success'); updateStatus(`✅ ${allSessions.length} session(s)`); } catch (e) { log('Erreur sessions: ' + e.message, 'error'); updateStatus('❌ Erreur', true); } }
+        async function loadSessions() {
+            if (!isAuth) return;
+            log('Chargement sessions en temps réel...');
+
+            // Cleanup previous listener
+            if (sessionsListener) {
+                sessionsListener();
+                sessionsListener = null;
+                log('⚠️ Listener précédent nettoyé', 'warning');
+            }
+
+            try {
+                let q = db.collection('tracking_sessions');
+                const dF = document.getElementById('filterDriver').value, sF = document.getElementById('filterStatus').value;
+                if (dF) q = q.where('driverId', '==', dF);
+                if (sF) q = q.where('status', '==', sF);
+
+                // ✅ Real-time listener with onSnapshot
+                sessionsListener = q.limit(100).onSnapshot((snap) => {
+                    allSessions = [];
+                    let totalDist = 0, totalPos = 0, activeCount = 0;
+
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        allSessions.push({ id: doc.id, ...d });
+                        if (d.status === 'active') activeCount++;
+                        if (d.totalDistance) totalDist += d.totalDistance;
+                        if (d.totalPositions) totalPos += d.totalPositions;
+                    });
+
+                    allSessions.sort((a, b) => (b.startTime?.toDate?.() || new Date(0)) - (a.startTime?.toDate?.() || new Date(0)));
+                    document.getElementById('totalSessions').textContent = allSessions.length;
+                    document.getElementById('activeSessions').textContent = activeCount;
+                    document.getElementById('totalDistance').textContent = totalDist.toFixed(1);
+                    document.getElementById('totalPositions').textContent = totalPos;
+                    displaySessions();
+                    log(`🔄 ${allSessions.length} sessions (temps réel)`, 'success');
+                    updateStatus(`✅ ${allSessions.length} session(s) - Temps réel actif`);
+                }, (error) => {
+                    // ✅ Improved error handling
+                    log('Erreur sessions: ' + error.message, 'error');
+                    updateStatus('❌ Erreur connexion temps réel', true);
+
+                    // Retry after 5 seconds on connection errors
+                    if (error.code === 'unavailable' || error.code === 'permission-denied') {
+                        setTimeout(() => {
+                            if (currentTab === 'gps' && isAuth) {
+                                log('🔄 Tentative de reconnexion...', 'warning');
+                                loadSessions();
+                            }
+                        }, 5000);
+                    }
+                });
+            } catch (e) {
+                log('Erreur sessions: ' + e.message, 'error');
+                updateStatus('❌ Erreur', true);
+            }
+        }
         function displaySessions() { const c = document.getElementById('sessionsList'); if (!allSessions.length) { c.innerHTML = '<div class="empty-state"><i class="fas fa-route"></i><p>Aucune session</p></div>'; return; } c.innerHTML = ''; allSessions.forEach(s => { const card = document.createElement('div'); card.className = 'session-card' + (currentSessionId === s.id ? ' active' : ''); const name = allDriversGPS[s.driverId] || s.driverId; const st = s.startTime?.toDate?.(); const et = s.endTime?.toDate?.(); let dur = 'En cours'; if (st && et) dur = Math.round((et - st) / 60000) + ' min'; card.innerHTML = `<div class="session-driver">${name}</div><div class="session-info"><div><i class="fas fa-clock"></i> ${st ? st.toLocaleString('fr-FR') : 'N/A'}</div><div><i class="fas fa-hourglass"></i> ${dur}</div><div><i class="fas fa-route"></i> ${(s.totalDistance || 0).toFixed(1)} km • ${s.totalPositions || 0} pts</div></div>`; card.addEventListener('click', () => selectSession(s)); c.appendChild(card); }); }
-        async function selectSession(session) { log(`Selection: ${session.id}`); currentSessionId = session.id; displaySessions(); showLoading('Chargement positions...'); try { const snap = await db.collection('position_history').where('sessionId', '==', session.id).get(); const temp = []; snap.forEach(doc => { const d = doc.data(); if (d.position?.latitude && d.position?.longitude) temp.push({ lat: d.position.latitude, lng: d.position.longitude, ts: d.timestamp?.toDate?.() || new Date(0) }); }); temp.sort((a, b) => a.ts - b.ts); currentPositions = temp.map(p => ({ lat: p.lat, lng: p.lng })); if (currentPositions.length > 0) drawTrajectory(); else { hideLoading(); showToast('Aucune position', 'warning'); } } catch (e) { log('Erreur: ' + e.message, 'error'); hideLoading(); showToast('Erreur: ' + e.message, 'error'); } }
+        async function selectSession(session) {
+            log(`Selection: ${session.id}`);
+            currentSessionId = session.id;
+            displaySessions();
+            showLoading('Chargement positions...');
+
+            try {
+                // ✅ Added .limit(1000) to prevent excessive Firestore reads
+                const snap = await db.collection('position_history')
+                    .where('sessionId', '==', session.id)
+                    .orderBy('timestamp', 'asc')
+                    .limit(1000)
+                    .get();
+
+                const temp = [];
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if (d.position?.latitude && d.position?.longitude) {
+                        temp.push({
+                            lat: d.position.latitude,
+                            lng: d.position.longitude,
+                            ts: d.timestamp?.toDate?.() || new Date(0)
+                        });
+                    }
+                });
+
+                // Already sorted by orderBy('timestamp', 'asc') in query
+                currentPositions = temp.map(p => ({ lat: p.lat, lng: p.lng, ts: p.ts }));
+
+                if (currentPositions.length > 0) {
+                    drawTrajectory();
+                    if (snap.size >= 1000) {
+                        log(`⚠️ Limite de 1000 positions atteinte - affichage partiel`, 'warning');
+                        showToast('⚠️ Affichage limité à 1000 points', 'warning');
+                    }
+                } else {
+                    hideLoading();
+                    showToast('Aucune position', 'warning');
+                }
+            } catch (e) {
+                log('Erreur: ' + e.message, 'error');
+                hideLoading();
+                showToast('Erreur: ' + e.message, 'error');
+            }
+        }
         function drawTrajectory() { markers.forEach(m => m.setMap(null)); polylines.forEach(p => p.setMap(null)); markers = []; polylines = []; const line = new google.maps.Polyline({ path: currentPositions, geodesic: true, strokeColor: '#00A854', strokeOpacity: 1, strokeWeight: 5, map: map }); polylines.push(line); const start = new google.maps.Marker({ position: currentPositions[0], map: map, label: { text: 'D', color: 'white', fontWeight: 'bold' }, icon: { path: google.maps.SymbolPath.CIRCLE, scale: 15, fillColor: '#4CAF50', fillOpacity: 1, strokeColor: 'white', strokeWeight: 3 } }); markers.push(start); const end = new google.maps.Marker({ position: currentPositions[currentPositions.length - 1], map: map, label: { text: 'A', color: 'white', fontWeight: 'bold' }, icon: { path: google.maps.SymbolPath.CIRCLE, scale: 15, fillColor: '#E30613', fillOpacity: 1, strokeColor: 'white', strokeWeight: 3 } }); markers.push(end); const bounds = new google.maps.LatLngBounds(); currentPositions.forEach(pos => bounds.extend(pos)); map.fitBounds(bounds, { padding: 50 }); showTrajectoryInfo(); hideLoading(); log('Trajet affiché!', 'success'); }
-        function showTrajectoryInfo() { const info = document.getElementById('trajectoryInfo'); info.classList.add('visible'); if (!currentPositions.length) return; let totalDist = 0; for (let i = 1; i < currentPositions.length; i++) totalDist += calcDist(currentPositions[i-1].lat, currentPositions[i-1].lng, currentPositions[i].lat, currentPositions[i].lng); const dur = Math.round((currentPositions.length * 10) / 60); const avg = dur > 0 ? (totalDist / (dur / 60)) : 0; document.getElementById('trajDistance').textContent = totalDist.toFixed(2) + ' km'; document.getElementById('trajDuration').textContent = dur + ' min'; document.getElementById('trajSpeed').textContent = Math.round(avg) + ' km/h'; document.getElementById('trajPoints').textContent = currentPositions.length; }
+        function showTrajectoryInfo() {
+            const info = document.getElementById('trajectoryInfo');
+            info.classList.add('visible');
+            if (!currentPositions.length) return;
+
+            // Calculate total distance
+            let totalDist = 0;
+            for (let i = 1; i < currentPositions.length; i++) {
+                totalDist += calcDist(currentPositions[i-1].lat, currentPositions[i-1].lng, currentPositions[i].lat, currentPositions[i].lng);
+            }
+
+            // ✅ Fixed duration calculation using actual timestamps
+            let dur = 0;
+            if (currentPositions.length >= 2 && currentPositions[0].ts && currentPositions[currentPositions.length - 1].ts) {
+                const startTime = currentPositions[0].ts;
+                const endTime = currentPositions[currentPositions.length - 1].ts;
+                dur = Math.round((endTime - startTime) / 60000); // Convert milliseconds to minutes
+            } else {
+                // Fallback to estimated duration if timestamps not available
+                dur = Math.round((currentPositions.length * 10) / 60);
+                log('⚠️ Timestamps manquants - durée estimée', 'warning');
+            }
+
+            const avg = dur > 0 ? (totalDist / (dur / 60)) : 0;
+
+            document.getElementById('trajDistance').textContent = totalDist.toFixed(2) + ' km';
+            document.getElementById('trajDuration').textContent = dur + ' min';
+            document.getElementById('trajSpeed').textContent = Math.round(avg) + ' km/h';
+            document.getElementById('trajPoints').textContent = currentPositions.length;
+        }
         function calcDist(lat1, lng1, lat2, lng2) { const R = 6371, dLat = (lat2 - lat1) * Math.PI / 180, dLng = (lng2 - lng1) * Math.PI / 180; const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng/2) * Math.sin(dLng/2); return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); }
         function toggleMarkers() { const show = document.getElementById('showMarkers').checked; markers.forEach(m => m.setVisible(show)); }
         function toggleTrajectory() { const show = document.getElementById('showTrajectory').checked; polylines.forEach(p => p.setVisible(show)); }
         function centerOnTrajectory() { if (!currentPositions.length) return; const bounds = new google.maps.LatLngBounds(); currentPositions.forEach(pos => bounds.extend(pos)); map.fitBounds(bounds, { padding: 50 }); }
-        function clearMapDisplay() { markers.forEach(m => m.setMap(null)); polylines.forEach(p => p.setMap(null)); markers = []; polylines = []; currentPositions = []; currentSessionId = null; document.getElementById('trajectoryInfo').classList.remove('visible'); displaySessions(); }
+        function clearMapDisplay() {
+            markers.forEach(m => m.setMap(null));
+            polylines.forEach(p => p.setMap(null));
+            markers = [];
+            polylines = [];
+            currentPositions = [];
+            currentSessionId = null;
+            document.getElementById('trajectoryInfo').classList.remove('visible');
+            displaySessions();
+        }
+
+        // ✅ GPS Listener Cleanup
+        function cleanupGPSListeners() {
+            if (sessionsListener) {
+                log('🧹 Nettoyage du listener sessions', 'info');
+                sessionsListener();
+                sessionsListener = null;
+            }
+        }
         document.getElementById('btnRefresh').addEventListener('click', function() { this.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i>'; this.disabled = true; loadSessions().finally(() => { this.innerHTML = '<i class="fas fa-sync-alt"></i> Actualiser'; this.disabled = false; }); });
         document.getElementById('filterDriver').addEventListener('change', loadSessions);
         document.getElementById('filterStatus').addEventListener('change', loadSessions);
