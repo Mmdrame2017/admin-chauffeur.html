@@ -946,10 +946,9 @@
             showLoading('Chargement positions...');
 
             try {
-                // ✅ Added .limit(1000) to prevent excessive Firestore reads
+                // ✅ Removed .orderBy() to avoid requiring composite index - sort client-side instead
                 const snap = await db.collection('position_history')
                     .where('sessionId', '==', session.id)
-                    .orderBy('timestamp', 'asc')
                     .limit(1000)
                     .get();
 
@@ -965,7 +964,8 @@
                     }
                 });
 
-                // Already sorted by orderBy('timestamp', 'asc') in query
+                // ✅ Sort by timestamp client-side (ascending order)
+                temp.sort((a, b) => a.ts - b.ts);
                 currentPositions = temp.map(p => ({ lat: p.lat, lng: p.lng, ts: p.ts }));
 
                 if (currentPositions.length > 0) {
