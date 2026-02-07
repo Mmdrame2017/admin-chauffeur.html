@@ -1022,15 +1022,28 @@
                 let snap = null;
                 let source = '';
 
+                // Récupérer les timestamps de début/fin de session pour filtrer
+                const sessionStart = session.startTime?.toDate?.() || null;
+                const sessionEnd = session.endTime?.toDate?.() || null;
+                log(`📅 Session: ${sessionStart?.toLocaleString('fr-FR') || 'N/A'} → ${sessionEnd?.toLocaleString('fr-FR') || 'en cours'}`, 'info');
+
                 // 🔍 ESSAI 1: Sous-collection drivers/{driverId}/position_history (SOURCE PRINCIPALE)
                 log(`🔍 Essai 1: drivers/${session.driverId}/position_history`, 'info');
 
-                // D'abord essayer de récupérer toutes les positions du chauffeur
-                const snap1 = await db.collection('drivers')
+                // Charger les positions et filtrer par période de session
+                let query1 = db.collection('drivers')
                     .doc(session.driverId)
-                    .collection('position_history')
-                    .limit(1000)
-                    .get();
+                    .collection('position_history');
+
+                // Filtrer par timestamp si session a des bornes
+                if (sessionStart && session.startTime) {
+                    query1 = query1.where('timestamp', '>=', session.startTime);
+                }
+                if (sessionEnd && session.endTime) {
+                    query1 = query1.where('timestamp', '<=', session.endTime);
+                }
+
+                const snap1 = await query1.limit(1000).get();
                 log(`   → Résultat: ${snap1.size} documents`, snap1.size > 0 ? 'success' : 'warning');
 
                 if (snap1.size > 0) {
@@ -1126,7 +1139,6 @@
                 let rejectedCount = 0;
                 snap.forEach(doc => {
                     const d = doc.data();
-                    log(`📍 Doc: ${doc.id}, data: ${JSON.stringify(d)}`, 'info');
 
                     // ✅ CORRIGÉ: Gestion flexible des différentes structures de position
                     let lat = null, lng = null, ts = null;
@@ -1159,15 +1171,26 @@
                         temp.push({ lat, lng, ts });
                     } else {
                         rejectedCount++;
-                        log(`⚠️ Position rejetée: ${JSON.stringify(d)}`, 'warning');
                     }
                 });
 
-                log(`✅ Positions valides: ${temp.length}, Rejetées: ${rejectedCount}`, 'success');
+                log(`📊 Positions brutes: ${temp.length}, Rejetées: ${rejectedCount}`, 'info');
+
+                // ✅ FILTRAGE CLIENT-SIDE par période de session (fallback si requête Firestore n'a pas filtré)
+                let filteredPositions = temp;
+                if (sessionStart || sessionEnd) {
+                    const margin = 5 * 60 * 1000; // 5 minutes de marge
+                    filteredPositions = temp.filter(p => {
+                        if (sessionStart && p.ts < new Date(sessionStart.getTime() - margin)) return false;
+                        if (sessionEnd && p.ts > new Date(sessionEnd.getTime() + margin)) return false;
+                        return true;
+                    });
+                    log(`✅ Après filtrage période: ${filteredPositions.length} positions (${temp.length - filteredPositions.length} hors période)`, 'success');
+                }
 
                 // ✅ Sort by timestamp client-side (ascending order)
-                temp.sort((a, b) => a.ts - b.ts);
-                currentPositions = temp.map(p => ({ lat: p.lat, lng: p.lng, ts: p.ts }));
+                filteredPositions.sort((a, b) => a.ts - b.ts);
+                currentPositions = filteredPositions.map(p => ({ lat: p.lat, lng: p.lng, ts: p.ts }));
 
                 if (currentPositions.length > 0) {
                     drawTrajectory();
@@ -1402,7 +1425,14 @@
                 dateGroup.style.display = 'block';
                 legend.style.display = 'none';
                 stopRealtimeTracking();
-                loadSessions();
+                // Charger les sessions par période si les dates sont définies
+                const startDate = document.getElementById('filterDateStart').value;
+                const endDate = document.getElementById('filterDateEnd').value;
+                if (startDate && endDate) {
+                    loadSessionsByDateRange();
+                } else {
+                    loadSessions();
+                }
             } else if (mode === 'today') {
                 dateGroup.style.display = 'none';
                 legend.style.display = 'none';
