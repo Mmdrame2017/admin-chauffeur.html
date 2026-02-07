@@ -444,6 +444,15 @@
                             <div class="control-group"><label><input type="checkbox" id="showTrajectory" checked onchange="toggleTrajectory()"><span>📈 Trajet</span></label></div>
                             <button class="btn-map primary" onclick="centerOnTrajectory()"><i class="fas fa-crosshairs"></i> Centrer</button>
                             <button class="btn-map secondary" onclick="clearMapDisplay()"><i class="fas fa-eraser"></i> Effacer</button>
+                            <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e0e0e0;">
+                                <div style="font-size:0.85em;color:#666;margin-bottom:8px;">🧭 Rotation</div>
+                                <div style="display:flex;gap:5px;">
+                                    <button class="btn-map secondary" onclick="rotateMap(-45)" style="flex:1;padding:8px;" title="Rotation gauche"><i class="fas fa-undo"></i></button>
+                                    <button class="btn-map secondary" onclick="resetMapRotation()" style="flex:1;padding:8px;" title="Nord en haut"><i class="fas fa-compass"></i></button>
+                                    <button class="btn-map secondary" onclick="rotateMap(45)" style="flex:1;padding:8px;" title="Rotation droite"><i class="fas fa-redo"></i></button>
+                                </div>
+                                <div class="control-group" style="margin-top:8px;"><label><input type="checkbox" id="tiltMap" onchange="toggleTilt()"><span>🏔️ Vue 3D</span></label></div>
+                            </div>
                         </div>
                         <div class="trajectory-info" id="trajectoryInfo">
                             <h3>📊 Informations du trajet</h3>
@@ -1372,6 +1381,27 @@
             currentSessionId = null;
             document.getElementById('trajectoryInfo').classList.remove('visible');
             displaySessions();
+        }
+
+        // 🧭 Rotation de la carte
+        let currentHeading = 0;
+        function rotateMap(degrees) {
+            currentHeading = (currentHeading + degrees) % 360;
+            if (currentHeading < 0) currentHeading += 360;
+            map.setHeading(currentHeading);
+            log(`🧭 Rotation: ${currentHeading}°`, 'info');
+        }
+        function resetMapRotation() {
+            currentHeading = 0;
+            map.setHeading(0);
+            map.setTilt(0);
+            document.getElementById('tiltMap').checked = false;
+            log('🧭 Orientation réinitialisée (Nord)', 'info');
+        }
+        function toggleTilt() {
+            const tilt = document.getElementById('tiltMap').checked ? 45 : 0;
+            map.setTilt(tilt);
+            log(`🏔️ Vue 3D: ${tilt > 0 ? 'Activée' : 'Désactivée'}`, 'info');
         }
 
         // ✅ GPS Listener Cleanup
