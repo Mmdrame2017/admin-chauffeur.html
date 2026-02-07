@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Al Bourakh - Administration Unifiée v6.2</title>
+    <title>Al Bourakh - Administration Unifiée v6.4</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -229,7 +229,7 @@
             <div class="login-header">
                 <div class="login-logo">🔐</div>
                 <h1 class="login-title">Administration</h1>
-                <p style="color: #666;">Al Bourakh - Gestion Unifiée v6.2</p>
+                <p style="color: #666;">Al Bourakh - Gestion Unifiée v6.4</p>
             </div>
             <div class="form-group">
                 <label>📧 Email Administrateur</label>
@@ -243,7 +243,7 @@
                 <i class="fas fa-sign-in-alt"></i> Se connecter
             </button>
             <p style="text-align: center; margin-top: 20px; color: #999; font-size: 0.9em;">
-                Version 6.2 - Auto-Refresh © 2025
+                Version 6.4 - GPS Enhanced © 2025
             </p>
         </div>
     </div>
@@ -252,7 +252,7 @@
     <div id="adminDashboard" style="display: none;">
         <div class="container">
             <div class="header">
-                <h1><i class="fas fa-shield-alt"></i> Administration Unifiée v6.2</h1>
+                <h1><i class="fas fa-shield-alt"></i> Administration Unifiée v6.4</h1>
                 <p>Candidatures • Chauffeurs • Portefeuille • GPS Tracking</p>
                 <button class="logout-btn" onclick="logoutAdmin()">
                     <i class="fas fa-sign-out-alt"></i> Déconnexion
@@ -347,7 +347,7 @@
                     <h2><i class="fas fa-building"></i> Compte Principal Al Bourakh</h2>
                     <div class="albourakh-account-number">+221 78 785 01 01</div>
                     <div class="albourakh-instructions">
-                        <h3>📋 Instructions - v6.2 Auto-Refresh</h3>
+                        <h3>📋 Instructions - v6.3 Auto-Refresh</h3>
                         <ul>
                             <li><strong>Recharge Chauffeur :</strong> Vérifier réception → Valider → <span style="color:#10b981;">CRÉDIT AUTO du solde</span></li>
                             <li><strong>Retrait Chauffeur :</strong> Effectuer transfert → Valider → <span style="color:#ef4444;">DÉBIT AUTO du solde</span></li>
@@ -398,15 +398,37 @@
                         <div class="gps-sidebar-header"><h2>🛰️ GPS Tracking</h2><p style="font-size:0.9em;opacity:0.9;">Suivi en temps réel</p></div>
                         <div class="status-bar" id="statusBar"><i class="fas fa-circle-notch fa-spin"></i> Initialisation...</div>
                         <div class="gps-filters">
+                            <!-- Mode de visualisation -->
+                            <div class="filter-group-gps">
+                                <label>🎯 Mode</label>
+                                <select id="filterMode" onchange="changeGPSMode()">
+                                    <option value="realtime">🟢 Temps réel (en ligne)</option>
+                                    <option value="history">📜 Historique trajets</option>
+                                    <option value="today">📅 Aujourd'hui</option>
+                                </select>
+                            </div>
                             <div class="filter-group-gps"><label>Chauffeur</label><select id="filterDriver"><option value="">Tous</option></select></div>
-                            <div class="filter-group-gps"><label>Statut</label><select id="filterStatus"><option value="">Tous</option><option value="active">Actives</option><option value="completed">Terminées</option></select></div>
-                            <button class="btn btn-primary" id="btnRefresh" style="width:100%;"><i class="fas fa-sync-alt"></i> Actualiser</button>
+                            <div class="filter-group-gps"><label>Statut session</label><select id="filterStatus"><option value="">Tous</option><option value="active">Actives</option><option value="completed">Terminées</option></select></div>
+                            <!-- Filtre par date -->
+                            <div class="filter-group-gps" id="dateFilterGroup">
+                                <label>📅 Période</label>
+                                <input type="date" id="filterDateStart" style="width:100%;padding:6px;border:2px solid #e0e0e0;border-radius:6px;margin-bottom:5px;">
+                                <input type="date" id="filterDateEnd" style="width:100%;padding:6px;border:2px solid #e0e0e0;border-radius:6px;">
+                            </div>
+                            <button class="btn btn-primary" id="btnRefresh" style="width:100%;margin-top:10px;"><i class="fas fa-sync-alt"></i> Actualiser</button>
+                            <button class="btn btn-info" id="btnExport" onclick="exportTrajectory()" style="width:100%;margin-top:5px;"><i class="fas fa-download"></i> Exporter CSV</button>
                         </div>
                         <div class="stats-mini">
                             <div class="stat-mini"><div class="stat-mini-value" id="totalSessions">0</div><div class="stat-mini-label">Sessions</div></div>
-                            <div class="stat-mini"><div class="stat-mini-value" id="activeSessions">0</div><div class="stat-mini-label">Actives</div></div>
+                            <div class="stat-mini"><div class="stat-mini-value" id="activeSessions" style="color:#22c55e;">0</div><div class="stat-mini-label">🟢 En ligne</div></div>
                             <div class="stat-mini"><div class="stat-mini-value" id="totalDistance">0</div><div class="stat-mini-label">km Total</div></div>
                             <div class="stat-mini"><div class="stat-mini-value" id="totalPositions">0</div><div class="stat-mini-label">Positions</div></div>
+                        </div>
+                        <!-- Légende temps réel -->
+                        <div id="realtimeLegend" style="padding:10px;background:#f0fdf4;border-bottom:1px solid #e0e0e0;display:none;">
+                            <div style="font-size:0.8em;color:#166534;"><i class="fas fa-circle" style="color:#22c55e;"></i> En ligne maintenant</div>
+                            <div style="font-size:0.8em;color:#0369a1;margin-top:3px;"><i class="fas fa-circle" style="color:#3b82f6;"></i> En course</div>
+                            <div style="font-size:0.8em;color:#9ca3af;margin-top:3px;"><i class="fas fa-circle" style="color:#9ca3af;"></i> Hors ligne</div>
                         </div>
                         <div class="sessions-list" id="sessionsList"><div class="empty-state"><i class="fas fa-route"></i><p>Chargement...</p></div></div>
                     </div>
@@ -624,13 +646,36 @@
             const pwd = document.getElementById('adminPassword').value.trim();
             if (!email || !pwd) { showToast('Remplissez tous les champs', 'error'); return; }
             showLoading('Connexion...');
+            console.log('🔐 Tentative de connexion:', email);
             try {
-                await auth.signInWithEmailAndPassword(email, pwd);
-                isAuth = true; hideLoading(); showToast('✅ Connexion réussie!', 'success');
+                if (!auth) {
+                    throw new Error('Firebase Auth non initialisé');
+                }
+                const userCredential = await auth.signInWithEmailAndPassword(email, pwd);
+                console.log('✅ Connexion réussie:', userCredential.user.email);
+                isAuth = true;
+                hideLoading();
+                showToast('✅ Connexion réussie!', 'success');
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('adminDashboard').style.display = 'block';
                 loadCandidatures();
-            } catch (e) { hideLoading(); showToast('Email ou mot de passe incorrect', 'error'); }
+            } catch (e) {
+                console.error('❌ Erreur connexion:', e.code, e.message);
+                hideLoading();
+                // Messages d'erreur plus explicites
+                let errorMsg = 'Erreur de connexion';
+                switch(e.code) {
+                    case 'auth/invalid-email': errorMsg = 'Email invalide'; break;
+                    case 'auth/user-disabled': errorMsg = 'Compte désactivé'; break;
+                    case 'auth/user-not-found': errorMsg = 'Utilisateur non trouvé'; break;
+                    case 'auth/wrong-password': errorMsg = 'Mot de passe incorrect'; break;
+                    case 'auth/invalid-credential': errorMsg = 'Email ou mot de passe incorrect'; break;
+                    case 'auth/too-many-requests': errorMsg = 'Trop de tentatives. Réessayez plus tard'; break;
+                    case 'auth/network-request-failed': errorMsg = 'Erreur réseau. Vérifiez votre connexion'; break;
+                    default: errorMsg = e.message || 'Erreur inconnue';
+                }
+                showToast(errorMsg, 'error');
+            }
         }
         async function logoutAdmin() {
             if (confirm('Déconnexion ?')) {
@@ -687,12 +732,37 @@
         }
         function displayDrivers(list) { const tbody = document.getElementById('driversTableBody'); if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">Aucun chauffeur</td></tr>'; return; } tbody.innerHTML = list.map(d => `<tr><td><strong>${d.prenom || ''} ${d.nom || ''}</strong></td><td>${d.telephone || 'N/A'}</td><td>${d.vehicule?.marque || ''} ${d.vehicule?.modele || ''}</td><td><span style="color:#00A854;font-weight:bold;">${(d.soldeDisponible || 0).toLocaleString()} F</span></td><td><span class="status-badge status-${d.statut || 'hors_ligne'}">${getStatusLabel(d.statut || 'hors_ligne')}</span></td><td><div class="action-buttons"><button class="btn btn-icon btn-view" onclick="viewDriver('${d.id}')"><i class="fas fa-eye"></i></button><button class="btn btn-icon btn-edit" onclick="editDriver('${d.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-icon btn-delete" onclick="deleteDriver('${d.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join(''); }
         function searchDrivers() { const term = document.getElementById('searchDrivers').value.toLowerCase(); displayDrivers(allDrivers.filter(d => (d.prenom?.toLowerCase().includes(term)) || (d.nom?.toLowerCase().includes(term)) || (d.telephone?.includes(term)))); }
-        function viewDriver(id) { const d = allDrivers.find(x => x.id === id); if (!d) return; document.getElementById('modalTitle').textContent = `👤 ${d.prenom || ''} ${d.nom || ''}`; document.getElementById('modalBody').innerHTML = `<div class="info-section"><h4><i class="fas fa-user"></i> Informations</h4><div class="info-grid"><div class="info-item"><label>Nom</label><span>${d.prenom || ''} ${d.nom || ''}</span></div><div class="info-item"><label>Téléphone</label><span>${d.telephone || 'N/A'}</span></div><div class="info-item"><label>Solde</label><span style="color:#00A854;font-weight:bold;font-size:1.3em;">${(d.soldeDisponible || 0).toLocaleString()} FCFA</span></div><div class="info-item"><label>Courses</label><span>${d.coursesCompletees || 0}</span></div><div class="info-item"><label>ID</label><span style="font-size:0.7em;">${d.id}</span></div></div></div>`; document.getElementById('detailsModal').classList.add('active'); }
+        function viewDriver(id) { const d = allDrivers.find(x => x.id === id); if (!d) return; document.getElementById('modalTitle').textContent = `👤 ${d.prenom || ''} ${d.nom || ''}`; document.getElementById('modalBody').innerHTML = `<div class="info-section"><h4><i class="fas fa-user"></i> Informations</h4><div class="info-grid"><div class="info-item"><label>Nom</label><span>${d.prenom || ''} ${d.nom || ''}</span></div><div class="info-item"><label>Téléphone</label><span>${d.telephone || 'N/A'}</span></div><div class="info-item"><label>Solde</label><span style="color:#00A854;font-weight:bold;font-size:1.3em;">${(d.soldeDisponible || 0).toLocaleString()} FCFA</span></div><div class="info-item"><label>Courses</label><span>${d.coursesCompletees || 0}</span></div><div class="info-item"><label>ID</label><span style="font-size:0.7em;">${d.id}</span></div></div></div><button class="btn btn-info" onclick="showDriverGPS('${d.id}')" style="width:100%;margin-top:20px;"><i class="fas fa-map-marked-alt"></i> 📍 Afficher la trajectoire sur la carte</button>`; document.getElementById('detailsModal').classList.add('active'); }
         function editDriver(id) { const d = allDrivers.find(x => x.id === id); if (!d) return; document.getElementById('modalTitle').textContent = `✏️ Modifier`; document.getElementById('modalBody').innerHTML = `<div class="form-group"><label>Prénom</label><input type="text" id="editPrenom" value="${d.prenom || ''}"></div><div class="form-group"><label>Nom</label><input type="text" id="editNom" value="${d.nom || ''}"></div><div class="form-group"><label>Téléphone</label><input type="text" id="editTel" value="${d.telephone || ''}"></div><div class="form-group"><label>Solde Disponible (FCFA)</label><input type="number" id="editSolde" value="${d.soldeDisponible || 0}"></div><div class="form-group"><label>Statut</label><select id="editStatut"><option value="disponible" ${d.statut === 'disponible' ? 'selected' : ''}>Disponible</option><option value="en_course" ${d.statut === 'en_course' ? 'selected' : ''}>En Course</option><option value="hors_ligne" ${d.statut === 'hors_ligne' ? 'selected' : ''}>Hors Ligne</option></select></div><button class="btn btn-primary" onclick="saveDriver('${id}')" style="width:100%;"><i class="fas fa-save"></i> Enregistrer</button>`; document.getElementById('detailsModal').classList.add('active'); }
         async function saveDriver(id) { showLoading(); try { await db.collection('drivers').doc(id).update({ prenom: document.getElementById('editPrenom').value, nom: document.getElementById('editNom').value, telephone: document.getElementById('editTel').value, soldeDisponible: parseInt(document.getElementById('editSolde').value) || 0, statut: document.getElementById('editStatut').value }); hideLoading(); closeModal('detailsModal'); showToast('✅ Modifié', 'success'); loadDrivers(); } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); } }
         async function deleteDriver(id) { if (!confirm('Supprimer ?')) return; showLoading(); try { await db.collection('drivers').doc(id).delete(); hideLoading(); showToast('Supprimé', 'success'); loadDrivers(); } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); } }
         function newDriver() { document.getElementById('modalTitle').textContent = '➕ Nouveau Chauffeur'; document.getElementById('modalBody').innerHTML = `<div class="form-group"><label>Prénom *</label><input type="text" id="newPrenom"></div><div class="form-group"><label>Nom *</label><input type="text" id="newNom"></div><div class="form-group"><label>Téléphone *</label><input type="text" id="newTel"></div><div class="form-group"><label>Email</label><input type="email" id="newEmail"></div><button class="btn btn-primary" onclick="createDriver()" style="width:100%;"><i class="fas fa-plus"></i> Créer</button>`; document.getElementById('detailsModal').classList.add('active'); }
         async function createDriver() { const p = document.getElementById('newPrenom').value.trim(), n = document.getElementById('newNom').value.trim(), t = document.getElementById('newTel').value.trim(); if (!p || !n || !t) { showToast('Champs requis', 'error'); return; } showLoading(); try { await db.collection('drivers').add({ prenom: p, nom: n, telephone: t, email: document.getElementById('newEmail').value.trim(), statut: 'hors_ligne', actif: true, rating: 5.0, coursesCompletees: 0, soldeDisponible: 0, dateCreation: firebase.firestore.FieldValue.serverTimestamp() }); hideLoading(); closeModal('detailsModal'); showToast('✅ Créé', 'success'); loadDrivers(); } catch (e) { hideLoading(); showToast('Erreur: ' + e.message, 'error'); } }
+
+        // 📍 NEW FEATURE: Navigate to GPS tracking for specific driver
+        function showDriverGPS(driverId) {
+            closeModal('detailsModal');
+            currentTab = 'gps';
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const gpsBtn = document.querySelector('.tab-btn:nth-child(4)');
+            if (gpsBtn) gpsBtn.classList.add('active');
+            document.getElementById('tab-gps').classList.add('active');
+
+            if (!mapInitialized) {
+                showGPSLoader();
+                initGoogleMaps();
+                setTimeout(() => {
+                    document.getElementById('filterDriver').value = driverId;
+                    loadSessions();
+                    showToast('📍 GPS tracking du chauffeur', 'info');
+                }, 2000);
+            } else {
+                document.getElementById('filterDriver').value = driverId;
+                loadSessions();
+                showToast('📍 GPS tracking du chauffeur', 'info');
+            }
+        }
 
         // ========== PORTEFEUILLE ==========
         async function loadPortefeuilleData() {
@@ -878,7 +948,7 @@
         function updateStatus(msg, error = false) { const bar = document.getElementById('statusBar'); bar.innerHTML = msg; bar.className = 'status-bar ' + (error ? 'error' : 'connected'); }
         document.getElementById('debugBtn').addEventListener('click', () => document.getElementById('debugConsole').classList.toggle('visible'));
         function initGoogleMaps() { log('Init Google Maps...'); updateGPSProgress('Chargement carte...'); const s = document.createElement('script'); s.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBI1svukv3Ts7fN97ke5OGfwo2V-vRUGHI&callback=initMap'; s.async = true; s.onerror = () => { log('Échec Maps', 'error'); hideGPSLoader(); }; document.head.appendChild(s); }
-        window.initMap = function() { if (mapInitialized) { hideGPSLoader(); loadSessions(); return; } try { map = new google.maps.Map(document.getElementById('map'), { center: { lat: 14.6937, lng: -17.4441 }, zoom: 12, mapTypeControl: true, streetViewControl: false }); mapInitialized = true; log('Carte OK', 'success'); updateStatus('✅ Carte chargée'); updateGPSProgress('Chargement chauffeurs...'); loadGPSDrivers().then(() => { updateGPSProgress('Chargement sessions...'); return loadSessions(); }).then(() => hideGPSLoader()).catch(e => { log('Erreur: ' + e.message, 'error'); hideGPSLoader(); }); } catch (e) { log('Erreur init: ' + e.message, 'error'); hideGPSLoader(); } };
+        window.initMap = function() { if (mapInitialized) { hideGPSLoader(); changeGPSMode(); return; } try { map = new google.maps.Map(document.getElementById('map'), { center: { lat: 14.6937, lng: -17.4441 }, zoom: 12, mapTypeControl: true, streetViewControl: false }); mapInitialized = true; log('Carte OK', 'success'); updateStatus('✅ Carte chargée'); updateGPSProgress('Chargement chauffeurs...'); loadGPSDrivers().then(() => { updateGPSProgress('Initialisation filtres GPS...'); initGPSFilters(); changeGPSMode(); }).then(() => hideGPSLoader()).catch(e => { log('Erreur: ' + e.message, 'error'); hideGPSLoader(); }); } catch (e) { log('Erreur init: ' + e.message, 'error'); hideGPSLoader(); } };
         async function loadGPSDrivers() { try { const snap = await db.collection('drivers').get(); const sel = document.getElementById('filterDriver'); sel.innerHTML = '<option value="">Tous</option>'; snap.forEach(doc => { const d = doc.data(); const name = `${d.prenom || ''} ${d.nom || ''}`.trim() || d.telephone; allDriversGPS[doc.id] = name; const opt = document.createElement('option'); opt.value = doc.id; opt.textContent = name; sel.appendChild(opt); }); log(`${snap.size} chauffeurs GPS`, 'success'); } catch (e) { log('Erreur chauffeurs: ' + e.message, 'error'); } }
         async function loadSessions() {
             if (!isAuth) return;
@@ -906,7 +976,7 @@
                         const d = doc.data();
                         allSessions.push({ id: doc.id, ...d });
                         if (d.status === 'active') activeCount++;
-                        if (d.totalDistance) totalDist += d.totalDistance;
+                        if (d.finalDistance || d.totalDistance) totalDist += (d.finalDistance || d.totalDistance);
                         if (d.totalPositions) totalPos += d.totalPositions;
                     });
 
@@ -938,19 +1008,115 @@
                 updateStatus('❌ Erreur', true);
             }
         }
-        function displaySessions() { const c = document.getElementById('sessionsList'); if (!allSessions.length) { c.innerHTML = '<div class="empty-state"><i class="fas fa-route"></i><p>Aucune session</p></div>'; return; } c.innerHTML = ''; allSessions.forEach(s => { const card = document.createElement('div'); card.className = 'session-card' + (currentSessionId === s.id ? ' active' : ''); const name = allDriversGPS[s.driverId] || s.driverId; const st = s.startTime?.toDate?.(); const et = s.endTime?.toDate?.(); let dur = 'En cours'; if (st && et) dur = Math.round((et - st) / 60000) + ' min'; card.innerHTML = `<div class="session-driver">${name}</div><div class="session-info"><div><i class="fas fa-clock"></i> ${st ? st.toLocaleString('fr-FR') : 'N/A'}</div><div><i class="fas fa-hourglass"></i> ${dur}</div><div><i class="fas fa-route"></i> ${(s.totalDistance || 0).toFixed(1)} km • ${s.totalPositions || 0} pts</div></div>`; card.addEventListener('click', () => selectSession(s)); c.appendChild(card); }); }
+        function displaySessions() { const c = document.getElementById('sessionsList'); if (!allSessions.length) { c.innerHTML = '<div class="empty-state"><i class="fas fa-route"></i><p>Aucune session</p></div>'; return; } c.innerHTML = ''; allSessions.forEach(s => { const card = document.createElement('div'); card.className = 'session-card' + (currentSessionId === s.id ? ' active' : ''); const name = allDriversGPS[s.driverId] || s.driverId; const st = s.startTime?.toDate?.(); const et = s.endTime?.toDate?.(); let dur = 'En cours'; if (st && et) dur = Math.round((et - st) / 60000) + ' min'; card.innerHTML = `<div class="session-driver">${name}</div><div class="session-info"><div><i class="fas fa-clock"></i> ${st ? st.toLocaleString('fr-FR') : 'N/A'}</div><div><i class="fas fa-hourglass"></i> ${dur}</div><div><i class="fas fa-route"></i> ${(s.finalDistance || s.totalDistance || 0).toFixed(1)} km • ${s.totalPositions || 0} pts</div></div>`; card.addEventListener('click', () => selectSession(s)); c.appendChild(card); }); }
         async function selectSession(session) {
             log(`Selection: ${session.id}`);
+            log(`Driver ID: ${session.driverId}`, 'info');
             currentSessionId = session.id;
             displaySessions();
             showLoading('Chargement positions...');
 
             try {
-                // ✅ Removed .orderBy() to avoid requiring composite index - sort client-side instead
-                const snap = await db.collection('position_history')
-                    .where('sessionId', '==', session.id)
+                let snap = null;
+                let source = '';
+
+                // 🔍 ESSAI 1: Sous-collection drivers/{driverId}/position_history (SOURCE PRINCIPALE)
+                log(`🔍 Essai 1: drivers/${session.driverId}/position_history`, 'info');
+
+                // D'abord essayer de récupérer toutes les positions du chauffeur
+                const snap1 = await db.collection('drivers')
+                    .doc(session.driverId)
+                    .collection('position_history')
                     .limit(1000)
                     .get();
+                log(`   → Résultat: ${snap1.size} documents`, snap1.size > 0 ? 'success' : 'warning');
+
+                if (snap1.size > 0) {
+                    snap = snap1;
+                    source = 'drivers/position_history';
+                } else {
+                    // 🔍 ESSAI 2: Sous-collection tracking_sessions/{sessionId}/positions
+                    log(`🔍 Essai 2: tracking_sessions/${session.id}/positions`, 'info');
+                    const snap2 = await db.collection('tracking_sessions')
+                        .doc(session.id)
+                        .collection('positions')
+                        .limit(1000)
+                        .get();
+                    log(`   → Résultat: ${snap2.size} documents`, snap2.size > 0 ? 'success' : 'warning');
+
+                    if (snap2.size > 0) {
+                        snap = snap2;
+                        source = 'tracking_sessions/positions';
+                    } else {
+                        // 🔍 ESSAI 3: Collection position_history avec sessionId
+                        log(`🔍 Essai 3: position_history (sessionId=${session.id})`, 'info');
+                        const snap3 = await db.collection('position_history')
+                            .where('sessionId', '==', session.id)
+                            .limit(1000)
+                            .get();
+                        log(`   → Résultat: ${snap3.size} documents`, snap3.size > 0 ? 'success' : 'warning');
+
+                        if (snap3.size > 0) {
+                            snap = snap3;
+                            source = 'position_history';
+                        } else {
+                            // 🔍 ESSAI 4: Collection tracking_anomalies avec driverId + plage de dates
+                            log(`🔍 Essai 4: tracking_anomalies (driverId=${session.driverId})`, 'info');
+                            let query4 = db.collection('tracking_anomalies')
+                                .where('driverId', '==', session.driverId);
+
+                            if (session.startTime && session.endTime) {
+                                query4 = query4.where('timestamp', '>=', session.startTime)
+                                            .where('timestamp', '<=', session.endTime);
+                            }
+
+                            const snap4 = await query4.orderBy('timestamp', 'asc').limit(1000).get();
+                            log(`   → Résultat: ${snap4.size} documents`, snap4.size > 0 ? 'success' : 'warning');
+
+                            if (snap4.size > 0) {
+                                snap = snap4;
+                                source = 'tracking_anomalies';
+                            }
+                        }
+                    }
+                }
+
+                // 🔍 ESSAI 5: Position actuelle directement sur le document chauffeur
+                if (!snap || snap.size === 0) {
+                    log(`🔍 Essai 5: drivers/${session.driverId} → champ position`, 'info');
+                    const driverDoc = await db.collection('drivers').doc(session.driverId).get();
+
+                    if (driverDoc.exists) {
+                        const driverData = driverDoc.data();
+                        log(`   → Document chauffeur trouvé: ${JSON.stringify(driverData.position || 'pas de position')}`, 'info');
+
+                        if (driverData.position?.latitude && driverData.position?.longitude) {
+                            // Créer un faux snapshot avec la position actuelle
+                            snap = {
+                                size: 1,
+                                forEach: (callback) => {
+                                    callback({
+                                        id: 'current_position',
+                                        data: () => ({
+                                            position: driverData.position,
+                                            timestamp: driverData.position.timestamp || firebase.firestore.Timestamp.now()
+                                        })
+                                    });
+                                }
+                            };
+                            source = 'driver/position (actuelle)';
+                            log(`   → Position actuelle récupérée!`, 'success');
+                        }
+                    }
+                }
+
+                log(`📊 Source: ${source}, Documents: ${snap ? snap.size : 0}`, 'success');
+
+                if (!snap || snap.size === 0) {
+                    hideLoading();
+                    showToast('Aucune position trouvée pour cette session', 'warning');
+                    return;
+                }
 
                 log(`📊 Documents retournés: ${snap.size}`, 'info');
 
@@ -958,15 +1124,40 @@
                 let rejectedCount = 0;
                 snap.forEach(doc => {
                     const d = doc.data();
-                    log(`📍 Doc: ${doc.id}, position: ${JSON.stringify(d.position)}`, 'info');
+                    log(`📍 Doc: ${doc.id}, data: ${JSON.stringify(d)}`, 'info');
+
+                    // ✅ CORRIGÉ: Gestion flexible des différentes structures de position
+                    let lat = null, lng = null, ts = null;
+
+                    // Format 1: { position: { latitude, longitude } }
                     if (d.position?.latitude && d.position?.longitude) {
-                        temp.push({
-                            lat: d.position.latitude,
-                            lng: d.position.longitude,
-                            ts: d.timestamp?.toDate?.() || new Date(0)
-                        });
+                        lat = d.position.latitude;
+                        lng = d.position.longitude;
+                    }
+                    // Format 2: { latitude, longitude } directement
+                    else if (d.latitude && d.longitude) {
+                        lat = d.latitude;
+                        lng = d.longitude;
+                    }
+                    // Format 3: { coords: { latitude, longitude } }
+                    else if (d.coords?.latitude && d.coords?.longitude) {
+                        lat = d.coords.latitude;
+                        lng = d.coords.longitude;
+                    }
+                    // Format 4: { lat, lng }
+                    else if (d.lat && d.lng) {
+                        lat = d.lat;
+                        lng = d.lng;
+                    }
+
+                    // Timestamp flexible
+                    ts = d.timestamp?.toDate?.() || d.time?.toDate?.() || d.createdAt?.toDate?.() || new Date(0);
+
+                    if (lat && lng) {
+                        temp.push({ lat, lng, ts });
                     } else {
                         rejectedCount++;
+                        log(`⚠️ Position rejetée: ${JSON.stringify(d)}`, 'warning');
                     }
                 });
 
@@ -992,7 +1183,119 @@
                 showToast('Erreur: ' + e.message, 'error');
             }
         }
-        function drawTrajectory() { markers.forEach(m => m.setMap(null)); polylines.forEach(p => p.setMap(null)); markers = []; polylines = []; const line = new google.maps.Polyline({ path: currentPositions, geodesic: true, strokeColor: '#00A854', strokeOpacity: 1, strokeWeight: 5, map: map }); polylines.push(line); const start = new google.maps.Marker({ position: currentPositions[0], map: map, label: { text: 'D', color: 'white', fontWeight: 'bold' }, icon: { path: google.maps.SymbolPath.CIRCLE, scale: 15, fillColor: '#4CAF50', fillOpacity: 1, strokeColor: 'white', strokeWeight: 3 } }); markers.push(start); const end = new google.maps.Marker({ position: currentPositions[currentPositions.length - 1], map: map, label: { text: 'A', color: 'white', fontWeight: 'bold' }, icon: { path: google.maps.SymbolPath.CIRCLE, scale: 15, fillColor: '#E30613', fillOpacity: 1, strokeColor: 'white', strokeWeight: 3 } }); markers.push(end); const bounds = new google.maps.LatLngBounds(); currentPositions.forEach(pos => bounds.extend(pos)); map.fitBounds(bounds, { padding: 50 }); showTrajectoryInfo(); hideLoading(); log('Trajet affiché!', 'success'); }
+        let directionsRenderer = null;
+
+        function drawTrajectory() {
+            markers.forEach(m => m.setMap(null));
+            polylines.forEach(p => p.setMap(null));
+            if (directionsRenderer) directionsRenderer.setMap(null);
+            markers = [];
+            polylines = [];
+
+            // Essayer d'abord avec l'API Directions pour tracer les vraies routes
+            if (currentPositions.length >= 2) {
+                drawRoadTrajectory();
+            } else {
+                drawSimpleTrajectory();
+            }
+        }
+
+        // 🛣️ Tracer la trajectoire sur les vraies routes avec Directions API
+        function drawRoadTrajectory() {
+            const directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+                suppressMarkers: true, // On gère nos propres marqueurs
+                polylineOptions: {
+                    strokeColor: '#00A854',
+                    strokeWeight: 5,
+                    strokeOpacity: 0.9
+                }
+            });
+
+            // Échantillonner les waypoints (max 23 waypoints autorisés par Google)
+            const maxWaypoints = 23;
+            let waypoints = [];
+
+            if (currentPositions.length > 2) {
+                const step = Math.ceil((currentPositions.length - 2) / maxWaypoints);
+                for (let i = 1; i < currentPositions.length - 1; i += step) {
+                    if (waypoints.length < maxWaypoints) {
+                        waypoints.push({
+                            location: new google.maps.LatLng(currentPositions[i].lat, currentPositions[i].lng),
+                            stopover: false
+                        });
+                    }
+                }
+            }
+
+            const origin = new google.maps.LatLng(currentPositions[0].lat, currentPositions[0].lng);
+            const destination = new google.maps.LatLng(
+                currentPositions[currentPositions.length - 1].lat,
+                currentPositions[currentPositions.length - 1].lng
+            );
+
+            log(`🛣️ Calcul itinéraire: ${waypoints.length} waypoints`, 'info');
+
+            directionsService.route({
+                origin: origin,
+                destination: destination,
+                waypoints: waypoints,
+                travelMode: google.maps.TravelMode.DRIVING,
+                optimizeWaypoints: false
+            }, (result, status) => {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(result);
+                    log('✅ Itinéraire routier tracé!', 'success');
+                    addStartEndMarkers();
+                    showTrajectoryInfo();
+                    hideLoading();
+                } else {
+                    log(`⚠️ Directions API: ${status} - Fallback lignes simples`, 'warning');
+                    drawSimpleTrajectory();
+                }
+            });
+        }
+
+        // 📍 Fallback: tracer avec des lignes simples si l'API échoue
+        function drawSimpleTrajectory() {
+            const line = new google.maps.Polyline({
+                path: currentPositions,
+                geodesic: true,
+                strokeColor: '#00A854',
+                strokeOpacity: 1,
+                strokeWeight: 5,
+                map: map
+            });
+            polylines.push(line);
+            addStartEndMarkers();
+            showTrajectoryInfo();
+            hideLoading();
+            log('Trajet affiché (lignes simples)!', 'success');
+        }
+
+        // 🏁 Ajouter les marqueurs Départ et Arrivée
+        function addStartEndMarkers() {
+            const start = new google.maps.Marker({
+                position: currentPositions[0],
+                map: map,
+                label: { text: 'D', color: 'white', fontWeight: 'bold' },
+                icon: { path: google.maps.SymbolPath.CIRCLE, scale: 15, fillColor: '#4CAF50', fillOpacity: 1, strokeColor: 'white', strokeWeight: 3 }
+            });
+            markers.push(start);
+
+            const end = new google.maps.Marker({
+                position: currentPositions[currentPositions.length - 1],
+                map: map,
+                label: { text: 'A', color: 'white', fontWeight: 'bold' },
+                icon: { path: google.maps.SymbolPath.CIRCLE, scale: 15, fillColor: '#E30613', fillOpacity: 1, strokeColor: 'white', strokeWeight: 3 }
+            });
+            markers.push(end);
+
+            const bounds = new google.maps.LatLngBounds();
+            currentPositions.forEach(pos => bounds.extend(pos));
+            map.fitBounds(bounds, { padding: 50 });
+        }
         function showTrajectoryInfo() {
             const info = document.getElementById('trajectoryInfo');
             info.classList.add('visible');
@@ -1025,11 +1328,16 @@
         }
         function calcDist(lat1, lng1, lat2, lng2) { const R = 6371, dLat = (lat2 - lat1) * Math.PI / 180, dLng = (lng2 - lng1) * Math.PI / 180; const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng/2) * Math.sin(dLng/2); return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); }
         function toggleMarkers() { const show = document.getElementById('showMarkers').checked; markers.forEach(m => m.setVisible(show)); }
-        function toggleTrajectory() { const show = document.getElementById('showTrajectory').checked; polylines.forEach(p => p.setVisible(show)); }
+        function toggleTrajectory() {
+            const show = document.getElementById('showTrajectory').checked;
+            polylines.forEach(p => p.setVisible(show));
+            if (directionsRenderer) directionsRenderer.setOptions({ preserveViewport: true, polylineOptions: { visible: show } });
+        }
         function centerOnTrajectory() { if (!currentPositions.length) return; const bounds = new google.maps.LatLngBounds(); currentPositions.forEach(pos => bounds.extend(pos)); map.fitBounds(bounds, { padding: 50 }); }
         function clearMapDisplay() {
             markers.forEach(m => m.setMap(null));
             polylines.forEach(p => p.setMap(null));
+            if (directionsRenderer) directionsRenderer.setMap(null);
             markers = [];
             polylines = [];
             currentPositions = [];
@@ -1046,13 +1354,351 @@
                 sessionsListener = null;
             }
         }
-        document.getElementById('btnRefresh').addEventListener('click', function() { this.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i>'; this.disabled = true; loadSessions().finally(() => { this.innerHTML = '<i class="fas fa-sync-alt"></i> Actualiser'; this.disabled = false; }); });
+        document.getElementById('btnRefresh').addEventListener('click', function() {
+            this.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i>';
+            this.disabled = true;
+            const mode = currentGPSMode;
+            let loadPromise;
+            if (mode === 'realtime') {
+                stopRealtimeTracking();
+                loadPromise = new Promise(resolve => { startRealtimeTracking(); setTimeout(resolve, 500); });
+            } else if (mode === 'today') {
+                loadPromise = loadTodaySessions();
+            } else if (mode === 'history') {
+                loadPromise = loadSessionsByDateRange();
+            } else {
+                loadPromise = loadSessions();
+            }
+            Promise.resolve(loadPromise).finally(() => { this.innerHTML = '<i class="fas fa-sync-alt"></i> Actualiser'; this.disabled = false; });
+        });
         document.getElementById('filterDriver').addEventListener('change', loadSessions);
         document.getElementById('filterStatus').addEventListener('change', loadSessions);
         function openImageViewer(url) { document.getElementById('viewerImage').src = url; document.getElementById('imageViewer').classList.add('active'); }
         function closeImageViewer() { document.getElementById('imageViewer').classList.remove('active'); }
 
-        console.log('%c🚕 Al Bourakh Admin v6.2 - Auto-Refresh', 'color: #00A854; font-size: 16px; font-weight: bold');
+        // ========== GPS MODE & FILTERS v6.4 ==========
+        let currentGPSMode = 'realtime';
+        let realtimeDriverMarkers = {};
+        let realtimeDriversListener = null;
+
+        // Changer le mode GPS (temps réel, historique, aujourd'hui)
+        function changeGPSMode() {
+            const mode = document.getElementById('filterMode').value;
+            currentGPSMode = mode;
+            log(`🎯 Mode GPS: ${mode}`, 'info');
+
+            // Afficher/masquer les filtres selon le mode
+            const dateGroup = document.getElementById('dateFilterGroup');
+            const legend = document.getElementById('realtimeLegend');
+
+            if (mode === 'realtime') {
+                dateGroup.style.display = 'none';
+                legend.style.display = 'block';
+                startRealtimeTracking();
+            } else if (mode === 'history') {
+                dateGroup.style.display = 'block';
+                legend.style.display = 'none';
+                stopRealtimeTracking();
+                loadSessions();
+            } else if (mode === 'today') {
+                dateGroup.style.display = 'none';
+                legend.style.display = 'none';
+                stopRealtimeTracking();
+                loadTodaySessions();
+            }
+        }
+
+        // Charger les sessions d'aujourd'hui
+        async function loadTodaySessions() {
+            if (!isAuth) return;
+            log('📅 Chargement sessions du jour...', 'info');
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayTimestamp = firebase.firestore.Timestamp.fromDate(today);
+
+            try {
+                let q = db.collection('tracking_sessions')
+                    .where('startTime', '>=', todayTimestamp)
+                    .limit(100);
+
+                const dF = document.getElementById('filterDriver').value;
+                if (dF) q = q.where('driverId', '==', dF);
+
+                const snap = await q.get();
+                allSessions = [];
+                let totalDist = 0, totalPos = 0, activeCount = 0;
+
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    allSessions.push({ id: doc.id, ...d });
+                    if (d.status === 'active') activeCount++;
+                    if (d.finalDistance || d.totalDistance) totalDist += (d.finalDistance || d.totalDistance);
+                    if (d.totalPositions) totalPos += d.totalPositions;
+                });
+
+                allSessions.sort((a, b) => (b.startTime?.toDate?.() || new Date(0)) - (a.startTime?.toDate?.() || new Date(0)));
+                document.getElementById('totalSessions').textContent = allSessions.length;
+                document.getElementById('activeSessions').textContent = activeCount;
+                document.getElementById('totalDistance').textContent = totalDist.toFixed(1);
+                document.getElementById('totalPositions').textContent = totalPos;
+                displaySessions();
+                log(`📅 ${allSessions.length} sessions aujourd'hui`, 'success');
+                updateStatus(`✅ ${allSessions.length} session(s) aujourd'hui`);
+            } catch (e) {
+                log('Erreur sessions jour: ' + e.message, 'error');
+            }
+        }
+
+        // Charger les sessions par plage de dates
+        async function loadSessionsByDateRange() {
+            if (!isAuth) return;
+
+            const startDate = document.getElementById('filterDateStart').value;
+            const endDate = document.getElementById('filterDateEnd').value;
+
+            if (!startDate || !endDate) {
+                showToast('Sélectionnez une période', 'warning');
+                return;
+            }
+
+            log(`📅 Chargement sessions: ${startDate} → ${endDate}`, 'info');
+
+            const start = new Date(startDate);
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999);
+
+            try {
+                let q = db.collection('tracking_sessions')
+                    .where('startTime', '>=', firebase.firestore.Timestamp.fromDate(start))
+                    .where('startTime', '<=', firebase.firestore.Timestamp.fromDate(end))
+                    .limit(200);
+
+                const dF = document.getElementById('filterDriver').value;
+                if (dF) q = q.where('driverId', '==', dF);
+
+                const snap = await q.get();
+                allSessions = [];
+                let totalDist = 0, totalPos = 0, activeCount = 0;
+
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    allSessions.push({ id: doc.id, ...d });
+                    if (d.status === 'active') activeCount++;
+                    if (d.finalDistance || d.totalDistance) totalDist += (d.finalDistance || d.totalDistance);
+                    if (d.totalPositions) totalPos += d.totalPositions;
+                });
+
+                allSessions.sort((a, b) => (b.startTime?.toDate?.() || new Date(0)) - (a.startTime?.toDate?.() || new Date(0)));
+                document.getElementById('totalSessions').textContent = allSessions.length;
+                document.getElementById('activeSessions').textContent = activeCount;
+                document.getElementById('totalDistance').textContent = totalDist.toFixed(1);
+                document.getElementById('totalPositions').textContent = totalPos;
+                displaySessions();
+                log(`📅 ${allSessions.length} sessions (${startDate} → ${endDate})`, 'success');
+                updateStatus(`✅ ${allSessions.length} session(s) trouvées`);
+            } catch (e) {
+                log('Erreur sessions période: ' + e.message, 'error');
+            }
+        }
+
+        // ========== REAL-TIME DRIVER TRACKING ==========
+        function startRealtimeTracking() {
+            log('🟢 Démarrage suivi temps réel...', 'info');
+
+            // Nettoyer les anciens marqueurs
+            Object.values(realtimeDriverMarkers).forEach(m => m.setMap(null));
+            realtimeDriverMarkers = {};
+
+            // Écouter les chauffeurs en ligne
+            if (realtimeDriversListener) realtimeDriversListener();
+
+            realtimeDriversListener = db.collection('drivers')
+                .where('isOnline', '==', true)
+                .onSnapshot((snap) => {
+                    let onlineCount = 0;
+                    const seenDrivers = new Set();
+
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        const driverId = doc.id;
+                        seenDrivers.add(driverId);
+
+                        if (d.position?.latitude && d.position?.longitude) {
+                            onlineCount++;
+                            const pos = { lat: d.position.latitude, lng: d.position.longitude };
+                            const name = `${d.prenom || ''} ${d.nom || ''}`.trim() || d.telephone;
+                            const status = d.status || 'disponible';
+
+                            // Couleur selon le statut
+                            let color = '#22c55e'; // Vert - disponible
+                            if (status === 'en_course') color = '#3b82f6'; // Bleu - en course
+
+                            if (realtimeDriverMarkers[driverId]) {
+                                // Mise à jour position avec animation
+                                realtimeDriverMarkers[driverId].setPosition(pos);
+                                realtimeDriverMarkers[driverId].setIcon({
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: 12,
+                                    fillColor: color,
+                                    fillOpacity: 1,
+                                    strokeColor: 'white',
+                                    strokeWeight: 3
+                                });
+                            } else {
+                                // Nouveau marqueur
+                                const marker = new google.maps.Marker({
+                                    position: pos,
+                                    map: map,
+                                    icon: {
+                                        path: google.maps.SymbolPath.CIRCLE,
+                                        scale: 12,
+                                        fillColor: color,
+                                        fillOpacity: 1,
+                                        strokeColor: 'white',
+                                        strokeWeight: 3
+                                    },
+                                    title: name
+                                });
+
+                                // Info-bulle au clic
+                                const infoWindow = new google.maps.InfoWindow({
+                                    content: `<div style="padding:10px;font-family:Segoe UI,sans-serif;">
+                                        <strong style="color:#00A854;">${name}</strong><br>
+                                        <span style="color:#666;">📍 ${status === 'en_course' ? 'En course' : 'Disponible'}</span><br>
+                                        <small style="color:#999;">Dernière maj: ${d.position.timestamp?.toDate?.().toLocaleTimeString('fr-FR') || 'N/A'}</small>
+                                    </div>`
+                                });
+                                marker.addListener('click', () => infoWindow.open(map, marker));
+
+                                realtimeDriverMarkers[driverId] = marker;
+                            }
+                        }
+                    });
+
+                    // Supprimer les marqueurs des chauffeurs déconnectés
+                    Object.keys(realtimeDriverMarkers).forEach(id => {
+                        if (!seenDrivers.has(id)) {
+                            realtimeDriverMarkers[id].setMap(null);
+                            delete realtimeDriverMarkers[id];
+                        }
+                    });
+
+                    document.getElementById('activeSessions').textContent = onlineCount;
+                    log(`🟢 ${onlineCount} chauffeur(s) en ligne`, 'success');
+                    updateStatus(`✅ ${onlineCount} chauffeur(s) en ligne - Temps réel`);
+                }, (error) => {
+                    log('Erreur temps réel: ' + error.message, 'error');
+                });
+        }
+
+        function stopRealtimeTracking() {
+            log('⏹️ Arrêt suivi temps réel', 'info');
+            if (realtimeDriversListener) {
+                realtimeDriversListener();
+                realtimeDriversListener = null;
+            }
+            Object.values(realtimeDriverMarkers).forEach(m => m.setMap(null));
+            realtimeDriverMarkers = {};
+        }
+
+        // ========== EXPORT CSV ==========
+        function exportTrajectory() {
+            if (!currentPositions.length) {
+                showToast('Aucune trajectoire à exporter', 'warning');
+                return;
+            }
+
+            log('📥 Export CSV...', 'info');
+
+            // Entêtes CSV
+            let csv = 'Latitude,Longitude,Timestamp,Date,Heure\n';
+
+            currentPositions.forEach(pos => {
+                const date = pos.ts ? new Date(pos.ts) : new Date();
+                const dateStr = date.toLocaleDateString('fr-FR');
+                const timeStr = date.toLocaleTimeString('fr-FR');
+                csv += `${pos.lat},${pos.lng},${date.toISOString()},${dateStr},${timeStr}\n`;
+            });
+
+            // Télécharger le fichier
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `trajectoire_${currentSessionId || 'export'}_${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast(`✅ ${currentPositions.length} points exportés`, 'success');
+            log(`✅ Export CSV: ${currentPositions.length} points`, 'success');
+        }
+
+        // Event listeners pour filtres de date
+        document.getElementById('filterDateStart').addEventListener('change', function() {
+            if (currentGPSMode === 'history' && document.getElementById('filterDateEnd').value) {
+                loadSessionsByDateRange();
+            }
+        });
+        document.getElementById('filterDateEnd').addEventListener('change', function() {
+            if (currentGPSMode === 'history' && document.getElementById('filterDateStart').value) {
+                loadSessionsByDateRange();
+            }
+        });
+
+        // Initialiser le mode au chargement
+        function initGPSFilters() {
+            // Masquer le filtre date par défaut (mode temps réel)
+            document.getElementById('dateFilterGroup').style.display = 'none';
+            document.getElementById('realtimeLegend').style.display = 'block';
+
+            // Dates par défaut (dernière semaine)
+            const today = new Date();
+            const lastWeek = new Date(today);
+            lastWeek.setDate(lastWeek.getDate() - 7);
+            document.getElementById('filterDateEnd').value = today.toISOString().slice(0, 10);
+            document.getElementById('filterDateStart').value = lastWeek.toISOString().slice(0, 10);
+        }
+
+        console.log('%c🚕 Al Bourakh Admin v6.4 - GPS Enhanced', 'color: #00A854; font-size: 16px; font-weight: bold');
+
+        // ========== DIAGNOSTIC AU DÉMARRAGE ==========
+        window.addEventListener('load', function() {
+            console.log('🔍 === DIAGNOSTIC FIREBASE ===');
+            console.log('1. Firebase disponible:', typeof firebase !== 'undefined');
+            console.log('2. Firebase Auth disponible:', typeof firebase !== 'undefined' && typeof firebase.auth === 'function');
+            console.log('3. Firebase Firestore disponible:', typeof firebase !== 'undefined' && typeof firebase.firestore === 'function');
+            console.log('4. Objet auth:', auth);
+            console.log('5. Objet db:', db);
+            console.log('6. URL actuelle:', window.location.href);
+            console.log('7. Protocole:', window.location.protocol);
+
+            // Vérifier si on est en mode file://
+            if (window.location.protocol === 'file:') {
+                console.warn('⚠️ ATTENTION: Vous utilisez le protocole file://');
+                console.warn('Firebase Auth peut ne pas fonctionner correctement.');
+                console.warn('Utilisez un serveur local (Live Server, http-server, etc.)');
+                alert('⚠️ ATTENTION!\n\nVous ouvrez ce fichier directement (file://).\n\nFirebase Auth ne fonctionne PAS avec file://\n\nSolution: Utilisez "Live Server" dans VS Code ou un serveur local.');
+            }
+
+            // Écouter les changements d'état d'authentification
+            auth.onAuthStateChanged(function(user) {
+                console.log('🔐 Auth State Changed:', user ? user.email : 'Non connecté');
+                if (user) {
+                    console.log('✅ Utilisateur déjà connecté:', user.email);
+                    isAuth = true;
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('adminDashboard').style.display = 'block';
+                    loadCandidatures();
+                }
+            }, function(error) {
+                console.error('❌ Erreur Auth State:', error);
+            });
+        });
     </script>
 </body>
 </html>
+
