@@ -418,19 +418,21 @@
                             <button class="btn btn-primary" id="btnRefresh" style="width:100%;margin-top:10px;"><i class="fas fa-sync-alt"></i> Actualiser</button>
                             <button class="btn btn-info" id="btnExport" onclick="exportTrajectory()" style="width:100%;margin-top:5px;"><i class="fas fa-download"></i> Exporter CSV</button>
                         </div>
-                        <div class="stats-mini">
-                            <div class="stat-mini"><div class="stat-mini-value" id="totalSessions">0</div><div class="stat-mini-label">Sessions</div></div>
-                            <div class="stat-mini"><div class="stat-mini-value" id="activeSessions" style="color:#22c55e;">0</div><div class="stat-mini-label">🟢 En ligne</div></div>
-                            <div class="stat-mini"><div class="stat-mini-value" id="totalDistance">0</div><div class="stat-mini-label">km Total</div></div>
-                            <div class="stat-mini"><div class="stat-mini-value" id="totalPositions">0</div><div class="stat-mini-label">Positions</div></div>
-                        </div>
                         <!-- Légende temps réel -->
                         <div id="realtimeLegend" style="padding:10px;background:#f0fdf4;border-bottom:1px solid #e0e0e0;display:none;">
                             <div style="font-size:0.8em;color:#166534;"><i class="fas fa-circle" style="color:#22c55e;"></i> En ligne maintenant</div>
                             <div style="font-size:0.8em;color:#0369a1;margin-top:3px;"><i class="fas fa-circle" style="color:#3b82f6;"></i> En course</div>
                             <div style="font-size:0.8em;color:#9ca3af;margin-top:3px;"><i class="fas fa-circle" style="color:#9ca3af;"></i> Hors ligne</div>
                         </div>
+                        <!-- Liste des sessions (prend l'espace restant) -->
                         <div class="sessions-list" id="sessionsList"><div class="empty-state"><i class="fas fa-route"></i><p>Chargement...</p></div></div>
+                        <!-- Stats en bas -->
+                        <div class="stats-mini" style="flex-shrink:0;">
+                            <div class="stat-mini"><div class="stat-mini-value" id="totalSessions">0</div><div class="stat-mini-label">Sessions</div></div>
+                            <div class="stat-mini"><div class="stat-mini-value" id="activeSessions" style="color:#22c55e;">0</div><div class="stat-mini-label">🟢 En ligne</div></div>
+                            <div class="stat-mini"><div class="stat-mini-value" id="totalDistance">0</div><div class="stat-mini-label">km Total</div></div>
+                            <div class="stat-mini"><div class="stat-mini-value" id="totalPositions">0</div><div class="stat-mini-label">Positions</div></div>
+                        </div>
                     </div>
                     <div class="map-wrapper">
                         <div class="gps-loading-overlay" id="gpsLoadingOverlay" style="display:none;"><div class="gps-loading-spinner"></div><div class="gps-loading-text">Chargement GPS...</div><div class="gps-loading-progress" id="gpsLoadingProgress">Initialisation...</div></div>
