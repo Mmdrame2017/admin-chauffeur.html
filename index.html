@@ -1395,6 +1395,7 @@
                 dateGroup.style.display = 'none';
                 legend.style.display = 'block';
                 startRealtimeTracking();
+                loadActiveSessions(); // Charger aussi les sessions actives
             } else if (mode === 'history') {
                 dateGroup.style.display = 'block';
                 legend.style.display = 'none';
@@ -1408,6 +1409,41 @@
             }
         }
 
+        // Charger les sessions actives (temps réel)
+        async function loadActiveSessions() {
+            if (!isAuth) return;
+            log('🟢 Chargement sessions actives...', 'info');
+            const driverFilter = document.getElementById('filterDriver').value;
+
+            try {
+                const q = db.collection('tracking_sessions')
+                    .where('status', '==', 'active')
+                    .limit(50);
+
+                const snap = await q.get();
+                allSessions = [];
+                let totalDist = 0, totalPos = 0;
+
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if (driverFilter && d.driverId !== driverFilter) return;
+
+                    allSessions.push({ id: doc.id, ...d });
+                    if (d.finalDistance || d.totalDistance) totalDist += (d.finalDistance || d.totalDistance);
+                    if (d.totalPositions) totalPos += d.totalPositions;
+                });
+
+                allSessions.sort((a, b) => (b.startTime?.toDate?.() || new Date(0)) - (a.startTime?.toDate?.() || new Date(0)));
+                document.getElementById('totalSessions').textContent = allSessions.length;
+                document.getElementById('totalDistance').textContent = totalDist.toFixed(1);
+                document.getElementById('totalPositions').textContent = totalPos;
+                displaySessions();
+                log(`🟢 ${allSessions.length} sessions actives`, 'success');
+            } catch (e) {
+                log('Erreur sessions actives: ' + e.message, 'error');
+            }
+        }
+
         // Charger les sessions d'aujourd'hui
         async function loadTodaySessions() {
             if (!isAuth) return;
@@ -1416,14 +1452,14 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const todayTimestamp = firebase.firestore.Timestamp.fromDate(today);
+            const driverFilter = document.getElementById('filterDriver').value;
 
             try {
-                let q = db.collection('tracking_sessions')
+                // Requête simple sans index composite
+                const q = db.collection('tracking_sessions')
                     .where('startTime', '>=', todayTimestamp)
-                    .limit(100);
-
-                const dF = document.getElementById('filterDriver').value;
-                if (dF) q = q.where('driverId', '==', dF);
+                    .orderBy('startTime', 'desc')
+                    .limit(200);
 
                 const snap = await q.get();
                 allSessions = [];
@@ -1431,13 +1467,15 @@
 
                 snap.forEach(doc => {
                     const d = doc.data();
+                    // Filtrage chauffeur côté client (évite l'index)
+                    if (driverFilter && d.driverId !== driverFilter) return;
+
                     allSessions.push({ id: doc.id, ...d });
                     if (d.status === 'active') activeCount++;
                     if (d.finalDistance || d.totalDistance) totalDist += (d.finalDistance || d.totalDistance);
                     if (d.totalPositions) totalPos += d.totalPositions;
                 });
 
-                allSessions.sort((a, b) => (b.startTime?.toDate?.() || new Date(0)) - (a.startTime?.toDate?.() || new Date(0)));
                 document.getElementById('totalSessions').textContent = allSessions.length;
                 document.getElementById('activeSessions').textContent = activeCount;
                 document.getElementById('totalDistance').textContent = totalDist.toFixed(1);
@@ -1468,15 +1506,15 @@
             start.setHours(0, 0, 0, 0);
             const end = new Date(endDate);
             end.setHours(23, 59, 59, 999);
+            const driverFilter = document.getElementById('filterDriver').value;
 
             try {
-                let q = db.collection('tracking_sessions')
+                // Requête par dates uniquement (pas d'index composite nécessaire)
+                const q = db.collection('tracking_sessions')
                     .where('startTime', '>=', firebase.firestore.Timestamp.fromDate(start))
                     .where('startTime', '<=', firebase.firestore.Timestamp.fromDate(end))
-                    .limit(200);
-
-                const dF = document.getElementById('filterDriver').value;
-                if (dF) q = q.where('driverId', '==', dF);
+                    .orderBy('startTime', 'desc')
+                    .limit(500);
 
                 const snap = await q.get();
                 allSessions = [];
@@ -1484,13 +1522,15 @@
 
                 snap.forEach(doc => {
                     const d = doc.data();
+                    // Filtrage chauffeur côté client (évite l'index composite)
+                    if (driverFilter && d.driverId !== driverFilter) return;
+
                     allSessions.push({ id: doc.id, ...d });
                     if (d.status === 'active') activeCount++;
                     if (d.finalDistance || d.totalDistance) totalDist += (d.finalDistance || d.totalDistance);
                     if (d.totalPositions) totalPos += d.totalPositions;
                 });
 
-                allSessions.sort((a, b) => (b.startTime?.toDate?.() || new Date(0)) - (a.startTime?.toDate?.() || new Date(0)));
                 document.getElementById('totalSessions').textContent = allSessions.length;
                 document.getElementById('activeSessions').textContent = activeCount;
                 document.getElementById('totalDistance').textContent = totalDist.toFixed(1);
@@ -1500,6 +1540,7 @@
                 updateStatus(`✅ ${allSessions.length} session(s) trouvées`);
             } catch (e) {
                 log('Erreur sessions période: ' + e.message, 'error');
+                showToast('Erreur: ' + e.message, 'error');
             }
         }
 
