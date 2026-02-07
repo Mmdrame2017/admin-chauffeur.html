@@ -509,7 +509,10 @@
         function showLoading(txt = 'Chargement...') { document.querySelector('.loading-text').textContent = txt; document.getElementById('loading').classList.add('active'); }
         function hideLoading() { document.getElementById('loading').classList.remove('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-        function formatDate(ts) { if (!ts) return 'N/A'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleString('fr-FR'); }
+        // Fuseau horaire Dakar (GMT+0)
+        const TIMEZONE = 'Africa/Dakar';
+        function formatDate(ts) { if (!ts) return 'N/A'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleString('fr-FR', { timeZone: TIMEZONE }); }
+        function formatTime(ts) { if (!ts) return 'N/A'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleTimeString('fr-FR', { timeZone: TIMEZONE }); }
         function getStatusLabel(s) { const l = { 'en_attente': '⏳ En Attente', 'acceptee': '✅ Acceptée', 'refusee': '❌ Refusée', 'disponible': '🟢 Disponible', 'en_course': '🔵 En Course', 'hors_ligne': '⚫ Hors Ligne', 'pending': '⏳ En attente', 'validated': '✅ Validé', 'completed': '✅ Effectué', 'active': '🔵 Active' }; return l[s] || s; }
 
         // ========== AUTO-REFRESH FUNCTIONS ==========
@@ -1010,7 +1013,7 @@
                 updateStatus('❌ Erreur', true);
             }
         }
-        function displaySessions() { const c = document.getElementById('sessionsList'); if (!allSessions.length) { c.innerHTML = '<div class="empty-state"><i class="fas fa-route"></i><p>Aucune session</p></div>'; return; } c.innerHTML = ''; allSessions.forEach(s => { const card = document.createElement('div'); card.className = 'session-card' + (currentSessionId === s.id ? ' active' : ''); const name = allDriversGPS[s.driverId] || s.driverId; const st = s.startTime?.toDate?.(); const et = s.endTime?.toDate?.(); let dur = 'En cours'; if (st && et) dur = Math.round((et - st) / 60000) + ' min'; card.innerHTML = `<div class="session-driver">${name}</div><div class="session-info"><div><i class="fas fa-clock"></i> ${st ? st.toLocaleString('fr-FR') : 'N/A'}</div><div><i class="fas fa-hourglass"></i> ${dur}</div><div><i class="fas fa-route"></i> ${(s.finalDistance || s.totalDistance || 0).toFixed(1)} km • ${s.totalPositions || 0} pts</div></div>`; card.addEventListener('click', () => selectSession(s)); c.appendChild(card); }); }
+        function displaySessions() { const c = document.getElementById('sessionsList'); if (!allSessions.length) { c.innerHTML = '<div class="empty-state"><i class="fas fa-route"></i><p>Aucune session</p></div>'; return; } c.innerHTML = ''; allSessions.forEach(s => { const card = document.createElement('div'); card.className = 'session-card' + (currentSessionId === s.id ? ' active' : ''); const name = allDriversGPS[s.driverId] || s.driverId; const st = s.startTime?.toDate?.(); const et = s.endTime?.toDate?.(); let dur = 'En cours'; if (st && et) dur = Math.round((et - st) / 60000) + ' min'; card.innerHTML = `<div class="session-driver">${name}</div><div class="session-info"><div><i class="fas fa-clock"></i> ${st ? st.toLocaleString('fr-FR', { timeZone: TIMEZONE }) : 'N/A'}</div><div><i class="fas fa-hourglass"></i> ${dur}</div><div><i class="fas fa-route"></i> ${(s.finalDistance || s.totalDistance || 0).toFixed(1)} km • ${s.totalPositions || 0} pts</div></div>`; card.addEventListener('click', () => selectSession(s)); c.appendChild(card); }); }
         async function selectSession(session) {
             log(`Selection: ${session.id}`);
             log(`Driver ID: ${session.driverId}`, 'info');
