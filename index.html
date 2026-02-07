@@ -437,6 +437,7 @@
                     <div class="map-wrapper">
                         <div class="gps-loading-overlay" id="gpsLoadingOverlay" style="display:none;"><div class="gps-loading-spinner"></div><div class="gps-loading-text">Chargement GPS...</div><div class="gps-loading-progress" id="gpsLoadingProgress">Initialisation...</div></div>
                         <button class="debug-toggle" id="debugBtn"><i class="fas fa-terminal"></i> Debug</button>
+                        <button class="debug-toggle" onclick="diagnosticFirebase()" style="left:130px;background:#059669;"><i class="fas fa-database"></i> Diagnostic</button>
                         <div id="map"></div>
                         <div class="map-controls">
                             <h3>🎛️ Options</h3>
@@ -1415,6 +1416,72 @@
             map.setHeading(currentHeading);
             log(`🧭 Rotation: ${currentHeading}°`, 'info');
         }
+        // 🔍 Diagnostic Firebase - Explorer la structure des données
+        async function diagnosticFirebase() {
+            log('🔍 === DIAGNOSTIC FIREBASE ===', 'info');
+            showLoading('Analyse de la structure Firebase...');
+
+            try {
+                // 1. Compter les chauffeurs
+                const driversSnap = await db.collection('drivers').limit(5).get();
+                log(`📊 Chauffeurs trouvés: ${driversSnap.size}`, 'success');
+
+                // 2. Pour chaque chauffeur, explorer les sous-collections
+                for (const driverDoc of driversSnap.docs) {
+                    const driverId = driverDoc.id;
+                    const driverData = driverDoc.data();
+                    const name = `${driverData.prenom || ''} ${driverData.nom || ''}`.trim() || driverId;
+                    log(`\n👤 Chauffeur: ${name} (${driverId})`, 'info');
+
+                    // Position actuelle
+                    if (driverData.position) {
+                        const ts = driverData.position.timestamp?.toDate?.();
+                        log(`   📍 Position actuelle: ${ts ? ts.toLocaleString('fr-FR', { timeZone: TIMEZONE }) : 'N/A'}`, 'info');
+                    }
+
+                    // Sous-collection position_history
+                    const historySnap = await db.collection('drivers').doc(driverId).collection('position_history').limit(10).get();
+                    log(`   📜 position_history: ${historySnap.size} documents`, historySnap.size > 0 ? 'success' : 'warning');
+
+                    if (historySnap.size > 0) {
+                        const firstDoc = historySnap.docs[0].data();
+                        const lastDoc = historySnap.docs[historySnap.docs.length - 1].data();
+                        const firstTs = firstDoc.timestamp?.toDate?.();
+                        const lastTs = lastDoc.timestamp?.toDate?.();
+                        log(`      Premier: ${firstTs ? firstTs.toLocaleString('fr-FR', { timeZone: TIMEZONE }) : 'N/A'}`, 'info');
+                        log(`      Dernier: ${lastTs ? lastTs.toLocaleString('fr-FR', { timeZone: TIMEZONE }) : 'N/A'}`, 'info');
+                    }
+
+                    // Sous-collection daily_stats
+                    const statsSnap = await db.collection('drivers').doc(driverId).collection('daily_stats').limit(5).get();
+                    log(`   📈 daily_stats: ${statsSnap.size} documents`, statsSnap.size > 0 ? 'success' : 'warning');
+                }
+
+                // 3. Vérifier tracking_sessions
+                const sessionsSnap = await db.collection('tracking_sessions').limit(5).get();
+                log(`\n📦 tracking_sessions: ${sessionsSnap.size} documents`, 'info');
+
+                for (const sessionDoc of sessionsSnap.docs) {
+                    const sessionId = sessionDoc.id;
+                    const positionsSnap = await db.collection('tracking_sessions').doc(sessionId).collection('positions').limit(1).get();
+                    log(`   Session ${sessionId}: positions=${positionsSnap.size > 0 ? '✅' : '❌'}`, positionsSnap.size > 0 ? 'success' : 'warning');
+                }
+
+                // 4. Vérifier collection position_history racine
+                const rootHistorySnap = await db.collection('position_history').limit(5).get();
+                log(`\n📜 position_history (racine): ${rootHistorySnap.size} documents`, rootHistorySnap.size > 0 ? 'success' : 'warning');
+
+                log('\n✅ Diagnostic terminé', 'success');
+                hideLoading();
+                showToast('Diagnostic terminé - voir console Debug', 'success');
+
+            } catch (e) {
+                log(`❌ Erreur diagnostic: ${e.message}`, 'error');
+                hideLoading();
+                showToast('Erreur: ' + e.message, 'error');
+            }
+        }
+
         function resetMapRotation() {
             currentHeading = 0;
             map.setHeading(0);
