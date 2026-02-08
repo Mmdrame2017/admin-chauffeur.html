@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Al Bourakh - Administration Unifiée v6.3</title>
+    <title>Al Bourakh - Administration Unifiée v6.4</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -159,20 +159,20 @@
 
         .gps-container { display: flex; gap: 20px; height: 700px; }
         .gps-sidebar { width: 350px; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
-        .gps-sidebar-header { background: linear-gradient(135deg, #00A854, #FECB00); color: white; padding: 20px; }
-        .gps-sidebar-header h2 { font-size: 1.3em; margin-bottom: 5px; }
-        .status-bar { padding: 10px 15px; background: #f8f9fa; font-size: 0.85em; }
+        .gps-sidebar-header { background: linear-gradient(135deg, #00A854, #FECB00); color: white; padding: 12px 15px; flex-shrink: 0; }
+        .gps-sidebar-header h2 { font-size: 1.1em; margin-bottom: 3px; }
+        .status-bar { padding: 6px 12px; background: #f8f9fa; font-size: 0.8em; flex-shrink: 0; }
         .status-bar.connected { background: #d4edda; color: #155724; }
         .status-bar.error { background: #f8d7da; color: #721c24; }
-        .gps-filters { padding: 15px; border-bottom: 1px solid #e0e0e0; }
-        .filter-group-gps { margin-bottom: 15px; }
-        .filter-group-gps label { display: block; font-size: 0.85em; font-weight: 600; color: #666; margin-bottom: 5px; }
-        .filter-group-gps select { width: 100%; padding: 8px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 0.9em; }
-        .stats-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; border-bottom: 1px solid #e0e0e0; }
-        .stat-mini { background: #f8f9fa; padding: 10px; border-radius: 8px; text-align: center; }
-        .stat-mini-value { font-size: 1.5em; font-weight: bold; color: #00A854; }
-        .stat-mini-label { font-size: 0.75em; color: #666; margin-top: 5px; }
-        .sessions-list { flex: 1; overflow-y: auto; padding: 10px; }
+        .gps-filters { padding: 10px; border-bottom: 1px solid #e0e0e0; flex-shrink: 0; max-height: 280px; overflow-y: auto; }
+        .filter-group-gps { margin-bottom: 8px; }
+        .filter-group-gps label { display: block; font-size: 0.8em; font-weight: 600; color: #666; margin-bottom: 3px; }
+        .filter-group-gps select { width: 100%; padding: 6px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 0.85em; }
+        .stats-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 8px; border-top: 1px solid #e0e0e0; flex-shrink: 0; }
+        .stat-mini { background: #f8f9fa; padding: 6px; border-radius: 6px; text-align: center; }
+        .stat-mini-value { font-size: 1.2em; font-weight: bold; color: #00A854; }
+        .stat-mini-label { font-size: 0.7em; color: #666; margin-top: 2px; }
+        .sessions-list { flex: 1; overflow-y: auto; padding: 8px; min-height: 150px; }
         .session-card { background: white; border: 2px solid #e0e0e0; border-radius: 10px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.3s; }
         .session-card:hover { border-color: #00A854; box-shadow: 0 4px 12px rgba(0,168,84,0.2); transform: translateY(-2px); }
         .session-card.active { border-color: #00A854; background: #f0fff4; }
@@ -229,7 +229,7 @@
             <div class="login-header">
                 <div class="login-logo">🔐</div>
                 <h1 class="login-title">Administration</h1>
-                <p style="color: #666;">Al Bourakh - Gestion Unifiée v6.3</p>
+                <p style="color: #666;">Al Bourakh - Gestion Unifiée v6.4</p>
             </div>
             <div class="form-group">
                 <label>📧 Email Administrateur</label>
@@ -243,7 +243,7 @@
                 <i class="fas fa-sign-in-alt"></i> Se connecter
             </button>
             <p style="text-align: center; margin-top: 20px; color: #999; font-size: 0.9em;">
-                Version 6.3 - Auto-Refresh © 2025
+                Version 6.4 - GPS Enhanced © 2025
             </p>
         </div>
     </div>
@@ -252,7 +252,7 @@
     <div id="adminDashboard" style="display: none;">
         <div class="container">
             <div class="header">
-                <h1><i class="fas fa-shield-alt"></i> Administration Unifiée v6.3</h1>
+                <h1><i class="fas fa-shield-alt"></i> Administration Unifiée v6.4</h1>
                 <p>Candidatures • Chauffeurs • Portefeuille • GPS Tracking</p>
                 <button class="logout-btn" onclick="logoutAdmin()">
                     <i class="fas fa-sign-out-alt"></i> Déconnexion
@@ -398,21 +398,46 @@
                         <div class="gps-sidebar-header"><h2>🛰️ GPS Tracking</h2><p style="font-size:0.9em;opacity:0.9;">Suivi en temps réel</p></div>
                         <div class="status-bar" id="statusBar"><i class="fas fa-circle-notch fa-spin"></i> Initialisation...</div>
                         <div class="gps-filters">
+                            <!-- Mode de visualisation -->
+                            <div class="filter-group-gps">
+                                <label>🎯 Mode</label>
+                                <select id="filterMode" onchange="changeGPSMode()">
+                                    <option value="realtime">🟢 Temps réel (en ligne)</option>
+                                    <option value="history">📜 Historique trajets</option>
+                                    <option value="today">📅 Aujourd'hui</option>
+                                </select>
+                            </div>
                             <div class="filter-group-gps"><label>Chauffeur</label><select id="filterDriver"><option value="">Tous</option></select></div>
-                            <div class="filter-group-gps"><label>Statut</label><select id="filterStatus"><option value="">Tous</option><option value="active">Actives</option><option value="completed">Terminées</option></select></div>
-                            <button class="btn btn-primary" id="btnRefresh" style="width:100%;"><i class="fas fa-sync-alt"></i> Actualiser</button>
+                            <div class="filter-group-gps"><label>Statut session</label><select id="filterStatus"><option value="">Tous</option><option value="active">Actives</option><option value="completed">Terminées</option></select></div>
+                            <!-- Filtre par date -->
+                            <div class="filter-group-gps" id="dateFilterGroup">
+                                <label>📅 Période</label>
+                                <input type="date" id="filterDateStart" style="width:100%;padding:6px;border:2px solid #e0e0e0;border-radius:6px;margin-bottom:5px;">
+                                <input type="date" id="filterDateEnd" style="width:100%;padding:6px;border:2px solid #e0e0e0;border-radius:6px;">
+                            </div>
+                            <button class="btn btn-primary" id="btnRefresh" style="width:100%;margin-top:10px;"><i class="fas fa-sync-alt"></i> Actualiser</button>
+                            <button class="btn btn-info" id="btnExport" onclick="exportTrajectory()" style="width:100%;margin-top:5px;"><i class="fas fa-download"></i> Exporter CSV</button>
                         </div>
-                        <div class="stats-mini">
+                        <!-- Légende temps réel -->
+                        <div id="realtimeLegend" style="padding:10px;background:#f0fdf4;border-bottom:1px solid #e0e0e0;display:none;">
+                            <div style="font-size:0.8em;color:#166534;"><i class="fas fa-circle" style="color:#22c55e;"></i> En ligne maintenant</div>
+                            <div style="font-size:0.8em;color:#0369a1;margin-top:3px;"><i class="fas fa-circle" style="color:#3b82f6;"></i> En course</div>
+                            <div style="font-size:0.8em;color:#9ca3af;margin-top:3px;"><i class="fas fa-circle" style="color:#9ca3af;"></i> Hors ligne</div>
+                        </div>
+                        <!-- Liste des sessions (prend l'espace restant) -->
+                        <div class="sessions-list" id="sessionsList"><div class="empty-state"><i class="fas fa-route"></i><p>Chargement...</p></div></div>
+                        <!-- Stats en bas -->
+                        <div class="stats-mini" style="flex-shrink:0;">
                             <div class="stat-mini"><div class="stat-mini-value" id="totalSessions">0</div><div class="stat-mini-label">Sessions</div></div>
-                            <div class="stat-mini"><div class="stat-mini-value" id="activeSessions">0</div><div class="stat-mini-label">Actives</div></div>
+                            <div class="stat-mini"><div class="stat-mini-value" id="activeSessions" style="color:#22c55e;">0</div><div class="stat-mini-label">🟢 En ligne</div></div>
                             <div class="stat-mini"><div class="stat-mini-value" id="totalDistance">0</div><div class="stat-mini-label">km Total</div></div>
                             <div class="stat-mini"><div class="stat-mini-value" id="totalPositions">0</div><div class="stat-mini-label">Positions</div></div>
                         </div>
-                        <div class="sessions-list" id="sessionsList"><div class="empty-state"><i class="fas fa-route"></i><p>Chargement...</p></div></div>
                     </div>
                     <div class="map-wrapper">
                         <div class="gps-loading-overlay" id="gpsLoadingOverlay" style="display:none;"><div class="gps-loading-spinner"></div><div class="gps-loading-text">Chargement GPS...</div><div class="gps-loading-progress" id="gpsLoadingProgress">Initialisation...</div></div>
                         <button class="debug-toggle" id="debugBtn"><i class="fas fa-terminal"></i> Debug</button>
+                        <button class="debug-toggle" onclick="diagnosticFirebase()" style="left:130px;background:#059669;"><i class="fas fa-database"></i> Diagnostic</button>
                         <div id="map"></div>
                         <div class="map-controls">
                             <h3>🎛️ Options</h3>
@@ -420,6 +445,20 @@
                             <div class="control-group"><label><input type="checkbox" id="showTrajectory" checked onchange="toggleTrajectory()"><span>📈 Trajet</span></label></div>
                             <button class="btn-map primary" onclick="centerOnTrajectory()"><i class="fas fa-crosshairs"></i> Centrer</button>
                             <button class="btn-map secondary" onclick="clearMapDisplay()"><i class="fas fa-eraser"></i> Effacer</button>
+                            <div style="margin-top:10px;padding-top:10px;border-top:1px solid #e0e0e0;">
+                                <div style="font-size:0.85em;color:#666;margin-bottom:8px;">🗺️ Type de carte</div>
+                                <div style="display:flex;gap:5px;margin-bottom:10px;">
+                                    <button class="btn-map secondary" id="btnRoadmap" onclick="setMapType('roadmap')" style="flex:1;padding:6px;font-size:0.8em;">Plan</button>
+                                    <button class="btn-map primary" id="btnSatellite" onclick="setMapType('hybrid')" style="flex:1;padding:6px;font-size:0.8em;">🛰️ Satellite</button>
+                                </div>
+                                <div style="font-size:0.85em;color:#666;margin-bottom:8px;">🧭 Rotation <small style="color:#999;">(mode Satellite)</small></div>
+                                <div style="display:flex;gap:5px;">
+                                    <button class="btn-map secondary" onclick="rotateMap(-45)" style="flex:1;padding:8px;" title="Rotation gauche"><i class="fas fa-undo"></i></button>
+                                    <button class="btn-map secondary" onclick="resetMapRotation()" style="flex:1;padding:8px;" title="Nord en haut"><i class="fas fa-compass"></i></button>
+                                    <button class="btn-map secondary" onclick="rotateMap(45)" style="flex:1;padding:8px;" title="Rotation droite"><i class="fas fa-redo"></i></button>
+                                </div>
+                                <div class="control-group" style="margin-top:8px;"><label><input type="checkbox" id="tiltMap" onchange="toggleTilt()"><span>🏔️ Vue 3D</span></label></div>
+                            </div>
                         </div>
                         <div class="trajectory-info" id="trajectoryInfo">
                             <h3>📊 Informations du trajet</h3>
@@ -485,7 +524,10 @@
         function showLoading(txt = 'Chargement...') { document.querySelector('.loading-text').textContent = txt; document.getElementById('loading').classList.add('active'); }
         function hideLoading() { document.getElementById('loading').classList.remove('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-        function formatDate(ts) { if (!ts) return 'N/A'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleString('fr-FR'); }
+        // Fuseau horaire Dakar (GMT+0)
+        const TIMEZONE = 'Africa/Dakar';
+        function formatDate(ts) { if (!ts) return 'N/A'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleString('fr-FR', { timeZone: TIMEZONE }); }
+        function formatTime(ts) { if (!ts) return 'N/A'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleTimeString('fr-FR', { timeZone: TIMEZONE }); }
         function getStatusLabel(s) { const l = { 'en_attente': '⏳ En Attente', 'acceptee': '✅ Acceptée', 'refusee': '❌ Refusée', 'disponible': '🟢 Disponible', 'en_course': '🔵 En Course', 'hors_ligne': '⚫ Hors Ligne', 'pending': '⏳ En attente', 'validated': '✅ Validé', 'completed': '✅ Effectué', 'active': '🔵 Active' }; return l[s] || s; }
 
         // ========== AUTO-REFRESH FUNCTIONS ==========
@@ -926,7 +968,7 @@
         function updateStatus(msg, error = false) { const bar = document.getElementById('statusBar'); bar.innerHTML = msg; bar.className = 'status-bar ' + (error ? 'error' : 'connected'); }
         document.getElementById('debugBtn').addEventListener('click', () => document.getElementById('debugConsole').classList.toggle('visible'));
         function initGoogleMaps() { log('Init Google Maps...'); updateGPSProgress('Chargement carte...'); const s = document.createElement('script'); s.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBI1svukv3Ts7fN97ke5OGfwo2V-vRUGHI&callback=initMap'; s.async = true; s.onerror = () => { log('Échec Maps', 'error'); hideGPSLoader(); }; document.head.appendChild(s); }
-        window.initMap = function() { if (mapInitialized) { hideGPSLoader(); loadSessions(); return; } try { map = new google.maps.Map(document.getElementById('map'), { center: { lat: 14.6937, lng: -17.4441 }, zoom: 12, mapTypeControl: true, streetViewControl: false }); mapInitialized = true; log('Carte OK', 'success'); updateStatus('✅ Carte chargée'); updateGPSProgress('Chargement chauffeurs...'); loadGPSDrivers().then(() => { updateGPSProgress('Chargement sessions...'); return loadSessions(); }).then(() => hideGPSLoader()).catch(e => { log('Erreur: ' + e.message, 'error'); hideGPSLoader(); }); } catch (e) { log('Erreur init: ' + e.message, 'error'); hideGPSLoader(); } };
+        window.initMap = function() { if (mapInitialized) { hideGPSLoader(); changeGPSMode(); return; } try { map = new google.maps.Map(document.getElementById('map'), { center: { lat: 14.6937, lng: -17.4441 }, zoom: 12, mapTypeControl: true, streetViewControl: false }); mapInitialized = true; log('Carte OK', 'success'); updateStatus('✅ Carte chargée'); updateGPSProgress('Chargement chauffeurs...'); loadGPSDrivers().then(() => { updateGPSProgress('Initialisation filtres GPS...'); initGPSFilters(); changeGPSMode(); }).then(() => hideGPSLoader()).catch(e => { log('Erreur: ' + e.message, 'error'); hideGPSLoader(); }); } catch (e) { log('Erreur init: ' + e.message, 'error'); hideGPSLoader(); } };
         async function loadGPSDrivers() { try { const snap = await db.collection('drivers').get(); const sel = document.getElementById('filterDriver'); sel.innerHTML = '<option value="">Tous</option>'; snap.forEach(doc => { const d = doc.data(); const name = `${d.prenom || ''} ${d.nom || ''}`.trim() || d.telephone; allDriversGPS[doc.id] = name; const opt = document.createElement('option'); opt.value = doc.id; opt.textContent = name; sel.appendChild(opt); }); log(`${snap.size} chauffeurs GPS`, 'success'); } catch (e) { log('Erreur chauffeurs: ' + e.message, 'error'); } }
         async function loadSessions() {
             if (!isAuth) return;
@@ -986,7 +1028,7 @@
                 updateStatus('❌ Erreur', true);
             }
         }
-        function displaySessions() { const c = document.getElementById('sessionsList'); if (!allSessions.length) { c.innerHTML = '<div class="empty-state"><i class="fas fa-route"></i><p>Aucune session</p></div>'; return; } c.innerHTML = ''; allSessions.forEach(s => { const card = document.createElement('div'); card.className = 'session-card' + (currentSessionId === s.id ? ' active' : ''); const name = allDriversGPS[s.driverId] || s.driverId; const st = s.startTime?.toDate?.(); const et = s.endTime?.toDate?.(); let dur = 'En cours'; if (st && et) dur = Math.round((et - st) / 60000) + ' min'; card.innerHTML = `<div class="session-driver">${name}</div><div class="session-info"><div><i class="fas fa-clock"></i> ${st ? st.toLocaleString('fr-FR') : 'N/A'}</div><div><i class="fas fa-hourglass"></i> ${dur}</div><div><i class="fas fa-route"></i> ${(s.finalDistance || s.totalDistance || 0).toFixed(1)} km • ${s.totalPositions || 0} pts</div></div>`; card.addEventListener('click', () => selectSession(s)); c.appendChild(card); }); }
+        function displaySessions() { const c = document.getElementById('sessionsList'); if (!allSessions.length) { c.innerHTML = '<div class="empty-state"><i class="fas fa-route"></i><p>Aucune session</p></div>'; return; } c.innerHTML = ''; allSessions.forEach(s => { const card = document.createElement('div'); card.className = 'session-card' + (currentSessionId === s.id ? ' active' : ''); const name = allDriversGPS[s.driverId] || s.driverId; const st = s.startTime?.toDate?.(); const et = s.endTime?.toDate?.(); let dur = 'En cours'; if (st && et) dur = Math.round((et - st) / 60000) + ' min'; card.innerHTML = `<div class="session-driver">${name}</div><div class="session-info"><div><i class="fas fa-clock"></i> ${st ? st.toLocaleString('fr-FR', { timeZone: TIMEZONE }) : 'N/A'}</div><div><i class="fas fa-hourglass"></i> ${dur}</div><div><i class="fas fa-route"></i> ${(s.finalDistance || s.totalDistance || 0).toFixed(1)} km • ${s.totalPositions || 0} pts</div></div>`; card.addEventListener('click', () => selectSession(s)); c.appendChild(card); }); }
         async function selectSession(session) {
             log(`Selection: ${session.id}`);
             log(`Driver ID: ${session.driverId}`, 'info');
@@ -998,63 +1040,57 @@
                 let snap = null;
                 let source = '';
 
-                // 🔍 ESSAI 1: Sous-collection drivers/{driverId}/position_history (SOURCE PRINCIPALE)
-                log(`🔍 Essai 1: drivers/${session.driverId}/position_history`, 'info');
+                // Récupérer les timestamps de début/fin de session pour filtrer
+                const sessionStart = session.startTime?.toDate?.() || null;
+                const sessionEnd = session.endTime?.toDate?.() || null;
+                log(`📅 Session: ${sessionStart?.toLocaleString('fr-FR') || 'N/A'} → ${sessionEnd?.toLocaleString('fr-FR') || 'en cours'}`, 'info');
 
-                // D'abord essayer de récupérer toutes les positions du chauffeur
-                const snap1 = await db.collection('drivers')
-                    .doc(session.driverId)
-                    .collection('position_history')
-                    .limit(1000)
+                // 🔍 ESSAI 1: Sous-collection tracking_sessions/{sessionId}/positions (SOURCE PRINCIPALE)
+                log(`🔍 Essai 1: tracking_sessions/${session.id}/positions`, 'info');
+                const snap1 = await db.collection('tracking_sessions')
+                    .doc(session.id)
+                    .collection('positions')
+                    .orderBy('timestamp', 'asc')
+                    .limit(5000)
                     .get();
                 log(`   → Résultat: ${snap1.size} documents`, snap1.size > 0 ? 'success' : 'warning');
 
                 if (snap1.size > 0) {
                     snap = snap1;
-                    source = 'drivers/position_history';
+                    source = 'tracking_sessions/positions';
                 } else {
-                    // 🔍 ESSAI 2: Sous-collection tracking_sessions/{sessionId}/positions
-                    log(`🔍 Essai 2: tracking_sessions/${session.id}/positions`, 'info');
-                    const snap2 = await db.collection('tracking_sessions')
-                        .doc(session.id)
-                        .collection('positions')
-                        .limit(1000)
+                    // 🔍 ESSAI 2: Collection position_history avec sessionId
+                    log(`🔍 Essai 2: position_history (sessionId=${session.id})`, 'info');
+                    const snap2 = await db.collection('position_history')
+                        .where('sessionId', '==', session.id)
+                        .orderBy('timestamp', 'asc')
+                        .limit(5000)
                         .get();
                     log(`   → Résultat: ${snap2.size} documents`, snap2.size > 0 ? 'success' : 'warning');
 
                     if (snap2.size > 0) {
                         snap = snap2;
-                        source = 'tracking_sessions/positions';
+                        source = 'position_history';
                     } else {
-                        // 🔍 ESSAI 3: Collection position_history avec sessionId
-                        log(`🔍 Essai 3: position_history (sessionId=${session.id})`, 'info');
-                        const snap3 = await db.collection('position_history')
-                            .where('sessionId', '==', session.id)
-                            .limit(1000)
-                            .get();
+                        // 🔍 ESSAI 3: Sous-collection drivers/{driverId}/position_history (legacy)
+                        log(`🔍 Essai 3: drivers/${session.driverId}/position_history`, 'info');
+                        let query3 = db.collection('drivers')
+                            .doc(session.driverId)
+                            .collection('position_history');
+
+                        if (sessionStart && session.startTime) {
+                            query3 = query3.where('timestamp', '>=', session.startTime);
+                        }
+                        if (sessionEnd && session.endTime) {
+                            query3 = query3.where('timestamp', '<=', session.endTime);
+                        }
+
+                        const snap3 = await query3.limit(1000).get();
                         log(`   → Résultat: ${snap3.size} documents`, snap3.size > 0 ? 'success' : 'warning');
 
                         if (snap3.size > 0) {
                             snap = snap3;
-                            source = 'position_history';
-                        } else {
-                            // 🔍 ESSAI 4: Collection tracking_anomalies avec driverId + plage de dates
-                            log(`🔍 Essai 4: tracking_anomalies (driverId=${session.driverId})`, 'info');
-                            let query4 = db.collection('tracking_anomalies')
-                                .where('driverId', '==', session.driverId);
-
-                            if (session.startTime && session.endTime) {
-                                query4 = query4.where('timestamp', '>=', session.startTime)
-                                            .where('timestamp', '<=', session.endTime);
-                            }
-
-                            const snap4 = await query4.orderBy('timestamp', 'asc').limit(1000).get();
-                            log(`   → Résultat: ${snap4.size} documents`, snap4.size > 0 ? 'success' : 'warning');
-
-                            if (snap4.size > 0) {
-                                snap = snap4;
-                                source = 'tracking_anomalies';
-                            }
+                            source = 'drivers/position_history';
                         }
                     }
                 }
@@ -1102,7 +1138,6 @@
                 let rejectedCount = 0;
                 snap.forEach(doc => {
                     const d = doc.data();
-                    log(`📍 Doc: ${doc.id}, data: ${JSON.stringify(d)}`, 'info');
 
                     // ✅ CORRIGÉ: Gestion flexible des différentes structures de position
                     let lat = null, lng = null, ts = null;
@@ -1135,15 +1170,26 @@
                         temp.push({ lat, lng, ts });
                     } else {
                         rejectedCount++;
-                        log(`⚠️ Position rejetée: ${JSON.stringify(d)}`, 'warning');
                     }
                 });
 
-                log(`✅ Positions valides: ${temp.length}, Rejetées: ${rejectedCount}`, 'success');
+                log(`📊 Positions brutes: ${temp.length}, Rejetées: ${rejectedCount}`, 'info');
+
+                // ✅ FILTRAGE CLIENT-SIDE par période de session (fallback si requête Firestore n'a pas filtré)
+                let filteredPositions = temp;
+                if (sessionStart || sessionEnd) {
+                    const margin = 5 * 60 * 1000; // 5 minutes de marge
+                    filteredPositions = temp.filter(p => {
+                        if (sessionStart && p.ts < new Date(sessionStart.getTime() - margin)) return false;
+                        if (sessionEnd && p.ts > new Date(sessionEnd.getTime() + margin)) return false;
+                        return true;
+                    });
+                    log(`✅ Après filtrage période: ${filteredPositions.length} positions (${temp.length - filteredPositions.length} hors période)`, 'success');
+                }
 
                 // ✅ Sort by timestamp client-side (ascending order)
-                temp.sort((a, b) => a.ts - b.ts);
-                currentPositions = temp.map(p => ({ lat: p.lat, lng: p.lng, ts: p.ts }));
+                filteredPositions.sort((a, b) => a.ts - b.ts);
+                currentPositions = filteredPositions.map(p => ({ lat: p.lat, lng: p.lng, ts: p.ts }));
 
                 if (currentPositions.length > 0) {
                     drawTrajectory();
@@ -1324,6 +1370,117 @@
             displaySessions();
         }
 
+        // 🗺️ Type de carte et rotation
+        let currentHeading = 0;
+        let currentMapType = 'roadmap';
+
+        function setMapType(type) {
+            currentMapType = type;
+            map.setMapTypeId(type);
+            // Mettre à jour les boutons
+            document.getElementById('btnRoadmap').className = type === 'roadmap' ? 'btn-map primary' : 'btn-map secondary';
+            document.getElementById('btnSatellite').className = type === 'hybrid' ? 'btn-map primary' : 'btn-map secondary';
+            log(`🗺️ Type de carte: ${type === 'hybrid' ? 'Satellite' : 'Plan'}`, 'info');
+            // Info pour l'utilisateur
+            if (type === 'hybrid') {
+                showToast('Mode Satellite - Rotation et 3D disponibles', 'info');
+            }
+        }
+
+        function rotateMap(degrees) {
+            if (currentMapType === 'roadmap') {
+                showToast('⚠️ Passez en mode Satellite pour la rotation', 'warning');
+                return;
+            }
+            currentHeading = (currentHeading + degrees) % 360;
+            if (currentHeading < 0) currentHeading += 360;
+            map.setHeading(currentHeading);
+            log(`🧭 Rotation: ${currentHeading}°`, 'info');
+        }
+        // 🔍 Diagnostic Firebase - Explorer la structure des données
+        async function diagnosticFirebase() {
+            log('🔍 === DIAGNOSTIC FIREBASE ===', 'info');
+            showLoading('Analyse de la structure Firebase...');
+
+            try {
+                // 1. Compter les chauffeurs
+                const driversSnap = await db.collection('drivers').limit(5).get();
+                log(`📊 Chauffeurs trouvés: ${driversSnap.size}`, 'success');
+
+                // 2. Pour chaque chauffeur, explorer les sous-collections
+                for (const driverDoc of driversSnap.docs) {
+                    const driverId = driverDoc.id;
+                    const driverData = driverDoc.data();
+                    const name = `${driverData.prenom || ''} ${driverData.nom || ''}`.trim() || driverId;
+                    log(`\n👤 Chauffeur: ${name} (${driverId})`, 'info');
+
+                    // Position actuelle
+                    if (driverData.position) {
+                        const ts = driverData.position.timestamp?.toDate?.();
+                        log(`   📍 Position actuelle: ${ts ? ts.toLocaleString('fr-FR', { timeZone: TIMEZONE }) : 'N/A'}`, 'info');
+                    }
+
+                    // Sous-collection position_history
+                    const historySnap = await db.collection('drivers').doc(driverId).collection('position_history').limit(10).get();
+                    log(`   📜 position_history: ${historySnap.size} documents`, historySnap.size > 0 ? 'success' : 'warning');
+
+                    if (historySnap.size > 0) {
+                        const firstDoc = historySnap.docs[0].data();
+                        const lastDoc = historySnap.docs[historySnap.docs.length - 1].data();
+                        const firstTs = firstDoc.timestamp?.toDate?.();
+                        const lastTs = lastDoc.timestamp?.toDate?.();
+                        log(`      Premier: ${firstTs ? firstTs.toLocaleString('fr-FR', { timeZone: TIMEZONE }) : 'N/A'}`, 'info');
+                        log(`      Dernier: ${lastTs ? lastTs.toLocaleString('fr-FR', { timeZone: TIMEZONE }) : 'N/A'}`, 'info');
+                    }
+
+                    // Sous-collection daily_stats
+                    const statsSnap = await db.collection('drivers').doc(driverId).collection('daily_stats').limit(5).get();
+                    log(`   📈 daily_stats: ${statsSnap.size} documents`, statsSnap.size > 0 ? 'success' : 'warning');
+                }
+
+                // 3. Vérifier tracking_sessions
+                const sessionsSnap = await db.collection('tracking_sessions').limit(5).get();
+                log(`\n📦 tracking_sessions: ${sessionsSnap.size} documents`, 'info');
+
+                for (const sessionDoc of sessionsSnap.docs) {
+                    const sessionId = sessionDoc.id;
+                    const positionsSnap = await db.collection('tracking_sessions').doc(sessionId).collection('positions').limit(1).get();
+                    log(`   Session ${sessionId}: positions=${positionsSnap.size > 0 ? '✅' : '❌'}`, positionsSnap.size > 0 ? 'success' : 'warning');
+                }
+
+                // 4. Vérifier collection position_history racine
+                const rootHistorySnap = await db.collection('position_history').limit(5).get();
+                log(`\n📜 position_history (racine): ${rootHistorySnap.size} documents`, rootHistorySnap.size > 0 ? 'success' : 'warning');
+
+                log('\n✅ Diagnostic terminé', 'success');
+                hideLoading();
+                showToast('Diagnostic terminé - voir console Debug', 'success');
+
+            } catch (e) {
+                log(`❌ Erreur diagnostic: ${e.message}`, 'error');
+                hideLoading();
+                showToast('Erreur: ' + e.message, 'error');
+            }
+        }
+
+        function resetMapRotation() {
+            currentHeading = 0;
+            map.setHeading(0);
+            map.setTilt(0);
+            document.getElementById('tiltMap').checked = false;
+            log('🧭 Orientation réinitialisée (Nord)', 'info');
+        }
+        function toggleTilt() {
+            if (currentMapType === 'roadmap') {
+                showToast('⚠️ Passez en mode Satellite pour la vue 3D', 'warning');
+                document.getElementById('tiltMap').checked = false;
+                return;
+            }
+            const tilt = document.getElementById('tiltMap').checked ? 45 : 0;
+            map.setTilt(tilt);
+            log(`🏔️ Vue 3D: ${tilt > 0 ? 'Activée' : 'Désactivée'}`, 'info');
+        }
+
         // ✅ GPS Listener Cleanup
         function cleanupGPSListeners() {
             if (sessionsListener) {
@@ -1332,13 +1489,364 @@
                 sessionsListener = null;
             }
         }
-        document.getElementById('btnRefresh').addEventListener('click', function() { this.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i>'; this.disabled = true; loadSessions().finally(() => { this.innerHTML = '<i class="fas fa-sync-alt"></i> Actualiser'; this.disabled = false; }); });
+        document.getElementById('btnRefresh').addEventListener('click', function() {
+            this.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i>';
+            this.disabled = true;
+            const mode = currentGPSMode;
+            let loadPromise;
+            if (mode === 'realtime') {
+                stopRealtimeTracking();
+                loadPromise = new Promise(resolve => { startRealtimeTracking(); setTimeout(resolve, 500); });
+            } else if (mode === 'today') {
+                loadPromise = loadTodaySessions();
+            } else if (mode === 'history') {
+                loadPromise = loadSessionsByDateRange();
+            } else {
+                loadPromise = loadSessions();
+            }
+            Promise.resolve(loadPromise).finally(() => { this.innerHTML = '<i class="fas fa-sync-alt"></i> Actualiser'; this.disabled = false; });
+        });
         document.getElementById('filterDriver').addEventListener('change', loadSessions);
         document.getElementById('filterStatus').addEventListener('change', loadSessions);
         function openImageViewer(url) { document.getElementById('viewerImage').src = url; document.getElementById('imageViewer').classList.add('active'); }
         function closeImageViewer() { document.getElementById('imageViewer').classList.remove('active'); }
 
-        console.log('%c🚕 Al Bourakh Admin v6.3 - Auto-Refresh', 'color: #00A854; font-size: 16px; font-weight: bold');
+        // ========== GPS MODE & FILTERS v6.4 ==========
+        let currentGPSMode = 'realtime';
+        let realtimeDriverMarkers = {};
+        let realtimeDriversListener = null;
+
+        // Changer le mode GPS (temps réel, historique, aujourd'hui)
+        function changeGPSMode() {
+            const mode = document.getElementById('filterMode').value;
+            currentGPSMode = mode;
+            log(`🎯 Mode GPS: ${mode}`, 'info');
+
+            // Afficher/masquer les filtres selon le mode
+            const dateGroup = document.getElementById('dateFilterGroup');
+            const legend = document.getElementById('realtimeLegend');
+
+            if (mode === 'realtime') {
+                dateGroup.style.display = 'none';
+                legend.style.display = 'block';
+                startRealtimeTracking();
+                loadActiveSessions(); // Charger aussi les sessions actives
+            } else if (mode === 'history') {
+                dateGroup.style.display = 'block';
+                legend.style.display = 'none';
+                stopRealtimeTracking();
+                // Charger les sessions par période si les dates sont définies
+                const startDate = document.getElementById('filterDateStart').value;
+                const endDate = document.getElementById('filterDateEnd').value;
+                if (startDate && endDate) {
+                    loadSessionsByDateRange();
+                } else {
+                    loadSessions();
+                }
+            } else if (mode === 'today') {
+                dateGroup.style.display = 'none';
+                legend.style.display = 'none';
+                stopRealtimeTracking();
+                loadTodaySessions();
+            }
+        }
+
+        // Charger les sessions actives (temps réel)
+        async function loadActiveSessions() {
+            if (!isAuth) return;
+            log('🟢 Chargement sessions actives...', 'info');
+            const driverFilter = document.getElementById('filterDriver').value;
+
+            try {
+                const q = db.collection('tracking_sessions')
+                    .where('status', '==', 'active')
+                    .limit(50);
+
+                const snap = await q.get();
+                allSessions = [];
+                let totalDist = 0, totalPos = 0;
+
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if (driverFilter && d.driverId !== driverFilter) return;
+
+                    allSessions.push({ id: doc.id, ...d });
+                    if (d.finalDistance || d.totalDistance) totalDist += (d.finalDistance || d.totalDistance);
+                    if (d.totalPositions) totalPos += d.totalPositions;
+                });
+
+                allSessions.sort((a, b) => (b.startTime?.toDate?.() || new Date(0)) - (a.startTime?.toDate?.() || new Date(0)));
+                document.getElementById('totalSessions').textContent = allSessions.length;
+                document.getElementById('totalDistance').textContent = totalDist.toFixed(1);
+                document.getElementById('totalPositions').textContent = totalPos;
+                displaySessions();
+                log(`🟢 ${allSessions.length} sessions actives`, 'success');
+            } catch (e) {
+                log('Erreur sessions actives: ' + e.message, 'error');
+            }
+        }
+
+        // Charger les sessions d'aujourd'hui
+        async function loadTodaySessions() {
+            if (!isAuth) return;
+            log('📅 Chargement sessions du jour...', 'info');
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayTimestamp = firebase.firestore.Timestamp.fromDate(today);
+            const driverFilter = document.getElementById('filterDriver').value;
+
+            try {
+                // Requête simple sans index composite
+                const q = db.collection('tracking_sessions')
+                    .where('startTime', '>=', todayTimestamp)
+                    .orderBy('startTime', 'desc')
+                    .limit(200);
+
+                const snap = await q.get();
+                allSessions = [];
+                let totalDist = 0, totalPos = 0, activeCount = 0;
+
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    // Filtrage chauffeur côté client (évite l'index)
+                    if (driverFilter && d.driverId !== driverFilter) return;
+
+                    allSessions.push({ id: doc.id, ...d });
+                    if (d.status === 'active') activeCount++;
+                    if (d.finalDistance || d.totalDistance) totalDist += (d.finalDistance || d.totalDistance);
+                    if (d.totalPositions) totalPos += d.totalPositions;
+                });
+
+                document.getElementById('totalSessions').textContent = allSessions.length;
+                document.getElementById('activeSessions').textContent = activeCount;
+                document.getElementById('totalDistance').textContent = totalDist.toFixed(1);
+                document.getElementById('totalPositions').textContent = totalPos;
+                displaySessions();
+                log(`📅 ${allSessions.length} sessions aujourd'hui`, 'success');
+                updateStatus(`✅ ${allSessions.length} session(s) aujourd'hui`);
+            } catch (e) {
+                log('Erreur sessions jour: ' + e.message, 'error');
+            }
+        }
+
+        // Charger les sessions par plage de dates
+        async function loadSessionsByDateRange() {
+            if (!isAuth) return;
+
+            const startDate = document.getElementById('filterDateStart').value;
+            const endDate = document.getElementById('filterDateEnd').value;
+
+            if (!startDate || !endDate) {
+                showToast('Sélectionnez une période', 'warning');
+                return;
+            }
+
+            log(`📅 Chargement sessions: ${startDate} → ${endDate}`, 'info');
+
+            const start = new Date(startDate);
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999);
+            const driverFilter = document.getElementById('filterDriver').value;
+
+            try {
+                // Requête par dates uniquement (pas d'index composite nécessaire)
+                const q = db.collection('tracking_sessions')
+                    .where('startTime', '>=', firebase.firestore.Timestamp.fromDate(start))
+                    .where('startTime', '<=', firebase.firestore.Timestamp.fromDate(end))
+                    .orderBy('startTime', 'desc')
+                    .limit(500);
+
+                const snap = await q.get();
+                allSessions = [];
+                let totalDist = 0, totalPos = 0, activeCount = 0;
+
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    // Filtrage chauffeur côté client (évite l'index composite)
+                    if (driverFilter && d.driverId !== driverFilter) return;
+
+                    allSessions.push({ id: doc.id, ...d });
+                    if (d.status === 'active') activeCount++;
+                    if (d.finalDistance || d.totalDistance) totalDist += (d.finalDistance || d.totalDistance);
+                    if (d.totalPositions) totalPos += d.totalPositions;
+                });
+
+                document.getElementById('totalSessions').textContent = allSessions.length;
+                document.getElementById('activeSessions').textContent = activeCount;
+                document.getElementById('totalDistance').textContent = totalDist.toFixed(1);
+                document.getElementById('totalPositions').textContent = totalPos;
+                displaySessions();
+                log(`📅 ${allSessions.length} sessions (${startDate} → ${endDate})`, 'success');
+                updateStatus(`✅ ${allSessions.length} session(s) trouvées`);
+            } catch (e) {
+                log('Erreur sessions période: ' + e.message, 'error');
+                showToast('Erreur: ' + e.message, 'error');
+            }
+        }
+
+        // ========== REAL-TIME DRIVER TRACKING ==========
+        function startRealtimeTracking() {
+            log('🟢 Démarrage suivi temps réel...', 'info');
+
+            // Nettoyer les anciens marqueurs
+            Object.values(realtimeDriverMarkers).forEach(m => m.setMap(null));
+            realtimeDriverMarkers = {};
+
+            // Écouter les chauffeurs en ligne
+            if (realtimeDriversListener) realtimeDriversListener();
+
+            realtimeDriversListener = db.collection('drivers')
+                .where('isOnline', '==', true)
+                .onSnapshot((snap) => {
+                    let onlineCount = 0;
+                    const seenDrivers = new Set();
+
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        const driverId = doc.id;
+                        seenDrivers.add(driverId);
+
+                        if (d.position?.latitude && d.position?.longitude) {
+                            onlineCount++;
+                            const pos = { lat: d.position.latitude, lng: d.position.longitude };
+                            const name = `${d.prenom || ''} ${d.nom || ''}`.trim() || d.telephone;
+                            const status = d.status || 'disponible';
+
+                            // Couleur selon le statut
+                            let color = '#22c55e'; // Vert - disponible
+                            if (status === 'en_course') color = '#3b82f6'; // Bleu - en course
+
+                            if (realtimeDriverMarkers[driverId]) {
+                                // Mise à jour position avec animation
+                                realtimeDriverMarkers[driverId].setPosition(pos);
+                                realtimeDriverMarkers[driverId].setIcon({
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: 12,
+                                    fillColor: color,
+                                    fillOpacity: 1,
+                                    strokeColor: 'white',
+                                    strokeWeight: 3
+                                });
+                            } else {
+                                // Nouveau marqueur
+                                const marker = new google.maps.Marker({
+                                    position: pos,
+                                    map: map,
+                                    icon: {
+                                        path: google.maps.SymbolPath.CIRCLE,
+                                        scale: 12,
+                                        fillColor: color,
+                                        fillOpacity: 1,
+                                        strokeColor: 'white',
+                                        strokeWeight: 3
+                                    },
+                                    title: name
+                                });
+
+                                // Info-bulle au clic
+                                const infoWindow = new google.maps.InfoWindow({
+                                    content: `<div style="padding:10px;font-family:Segoe UI,sans-serif;">
+                                        <strong style="color:#00A854;">${name}</strong><br>
+                                        <span style="color:#666;">📍 ${status === 'en_course' ? 'En course' : 'Disponible'}</span><br>
+                                        <small style="color:#999;">Dernière maj: ${d.position.timestamp?.toDate?.().toLocaleTimeString('fr-FR') || 'N/A'}</small>
+                                    </div>`
+                                });
+                                marker.addListener('click', () => infoWindow.open(map, marker));
+
+                                realtimeDriverMarkers[driverId] = marker;
+                            }
+                        }
+                    });
+
+                    // Supprimer les marqueurs des chauffeurs déconnectés
+                    Object.keys(realtimeDriverMarkers).forEach(id => {
+                        if (!seenDrivers.has(id)) {
+                            realtimeDriverMarkers[id].setMap(null);
+                            delete realtimeDriverMarkers[id];
+                        }
+                    });
+
+                    document.getElementById('activeSessions').textContent = onlineCount;
+                    log(`🟢 ${onlineCount} chauffeur(s) en ligne`, 'success');
+                    updateStatus(`✅ ${onlineCount} chauffeur(s) en ligne - Temps réel`);
+                }, (error) => {
+                    log('Erreur temps réel: ' + error.message, 'error');
+                });
+        }
+
+        function stopRealtimeTracking() {
+            log('⏹️ Arrêt suivi temps réel', 'info');
+            if (realtimeDriversListener) {
+                realtimeDriversListener();
+                realtimeDriversListener = null;
+            }
+            Object.values(realtimeDriverMarkers).forEach(m => m.setMap(null));
+            realtimeDriverMarkers = {};
+        }
+
+        // ========== EXPORT CSV ==========
+        function exportTrajectory() {
+            if (!currentPositions.length) {
+                showToast('Aucune trajectoire à exporter', 'warning');
+                return;
+            }
+
+            log('📥 Export CSV...', 'info');
+
+            // Entêtes CSV
+            let csv = 'Latitude,Longitude,Timestamp,Date,Heure\n';
+
+            currentPositions.forEach(pos => {
+                const date = pos.ts ? new Date(pos.ts) : new Date();
+                const dateStr = date.toLocaleDateString('fr-FR');
+                const timeStr = date.toLocaleTimeString('fr-FR');
+                csv += `${pos.lat},${pos.lng},${date.toISOString()},${dateStr},${timeStr}\n`;
+            });
+
+            // Télécharger le fichier
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `trajectoire_${currentSessionId || 'export'}_${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast(`✅ ${currentPositions.length} points exportés`, 'success');
+            log(`✅ Export CSV: ${currentPositions.length} points`, 'success');
+        }
+
+        // Event listeners pour filtres de date
+        document.getElementById('filterDateStart').addEventListener('change', function() {
+            if (currentGPSMode === 'history' && document.getElementById('filterDateEnd').value) {
+                loadSessionsByDateRange();
+            }
+        });
+        document.getElementById('filterDateEnd').addEventListener('change', function() {
+            if (currentGPSMode === 'history' && document.getElementById('filterDateStart').value) {
+                loadSessionsByDateRange();
+            }
+        });
+
+        // Initialiser le mode au chargement
+        function initGPSFilters() {
+            // Masquer le filtre date par défaut (mode temps réel)
+            document.getElementById('dateFilterGroup').style.display = 'none';
+            document.getElementById('realtimeLegend').style.display = 'block';
+
+            // Dates par défaut (dernière semaine)
+            const today = new Date();
+            const lastWeek = new Date(today);
+            lastWeek.setDate(lastWeek.getDate() - 7);
+            document.getElementById('filterDateEnd').value = today.toISOString().slice(0, 10);
+            document.getElementById('filterDateStart').value = lastWeek.toISOString().slice(0, 10);
+        }
+
+        console.log('%c🚕 Al Bourakh Admin v6.4 - GPS Enhanced', 'color: #00A854; font-size: 16px; font-weight: bold');
 
         // ========== DIAGNOSTIC AU DÉMARRAGE ==========
         window.addEventListener('load', function() {
