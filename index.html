@@ -1045,71 +1045,52 @@
                 const sessionEnd = session.endTime?.toDate?.() || null;
                 log(`📅 Session: ${sessionStart?.toLocaleString('fr-FR') || 'N/A'} → ${sessionEnd?.toLocaleString('fr-FR') || 'en cours'}`, 'info');
 
-                // 🔍 ESSAI 1: Sous-collection drivers/{driverId}/position_history (SOURCE PRINCIPALE)
-                log(`🔍 Essai 1: drivers/${session.driverId}/position_history`, 'info');
-
-                // Charger les positions et filtrer par période de session
-                let query1 = db.collection('drivers')
-                    .doc(session.driverId)
-                    .collection('position_history');
-
-                // Filtrer par timestamp si session a des bornes
-                if (sessionStart && session.startTime) {
-                    query1 = query1.where('timestamp', '>=', session.startTime);
-                }
-                if (sessionEnd && session.endTime) {
-                    query1 = query1.where('timestamp', '<=', session.endTime);
-                }
-
-                const snap1 = await query1.limit(1000).get();
+                // 🔍 ESSAI 1: Sous-collection tracking_sessions/{sessionId}/positions (SOURCE PRINCIPALE)
+                log(`🔍 Essai 1: tracking_sessions/${session.id}/positions`, 'info');
+                const snap1 = await db.collection('tracking_sessions')
+                    .doc(session.id)
+                    .collection('positions')
+                    .orderBy('timestamp', 'asc')
+                    .limit(5000)
+                    .get();
                 log(`   → Résultat: ${snap1.size} documents`, snap1.size > 0 ? 'success' : 'warning');
 
                 if (snap1.size > 0) {
                     snap = snap1;
-                    source = 'drivers/position_history';
+                    source = 'tracking_sessions/positions';
                 } else {
-                    // 🔍 ESSAI 2: Sous-collection tracking_sessions/{sessionId}/positions
-                    log(`🔍 Essai 2: tracking_sessions/${session.id}/positions`, 'info');
-                    const snap2 = await db.collection('tracking_sessions')
-                        .doc(session.id)
-                        .collection('positions')
-                        .limit(1000)
+                    // 🔍 ESSAI 2: Collection position_history avec sessionId
+                    log(`🔍 Essai 2: position_history (sessionId=${session.id})`, 'info');
+                    const snap2 = await db.collection('position_history')
+                        .where('sessionId', '==', session.id)
+                        .orderBy('timestamp', 'asc')
+                        .limit(5000)
                         .get();
                     log(`   → Résultat: ${snap2.size} documents`, snap2.size > 0 ? 'success' : 'warning');
 
                     if (snap2.size > 0) {
                         snap = snap2;
-                        source = 'tracking_sessions/positions';
+                        source = 'position_history';
                     } else {
-                        // 🔍 ESSAI 3: Collection position_history avec sessionId
-                        log(`🔍 Essai 3: position_history (sessionId=${session.id})`, 'info');
-                        const snap3 = await db.collection('position_history')
-                            .where('sessionId', '==', session.id)
-                            .limit(1000)
-                            .get();
+                        // 🔍 ESSAI 3: Sous-collection drivers/{driverId}/position_history (legacy)
+                        log(`🔍 Essai 3: drivers/${session.driverId}/position_history`, 'info');
+                        let query3 = db.collection('drivers')
+                            .doc(session.driverId)
+                            .collection('position_history');
+
+                        if (sessionStart && session.startTime) {
+                            query3 = query3.where('timestamp', '>=', session.startTime);
+                        }
+                        if (sessionEnd && session.endTime) {
+                            query3 = query3.where('timestamp', '<=', session.endTime);
+                        }
+
+                        const snap3 = await query3.limit(1000).get();
                         log(`   → Résultat: ${snap3.size} documents`, snap3.size > 0 ? 'success' : 'warning');
 
                         if (snap3.size > 0) {
                             snap = snap3;
-                            source = 'position_history';
-                        } else {
-                            // 🔍 ESSAI 4: Collection tracking_anomalies avec driverId + plage de dates
-                            log(`🔍 Essai 4: tracking_anomalies (driverId=${session.driverId})`, 'info');
-                            let query4 = db.collection('tracking_anomalies')
-                                .where('driverId', '==', session.driverId);
-
-                            if (session.startTime && session.endTime) {
-                                query4 = query4.where('timestamp', '>=', session.startTime)
-                                            .where('timestamp', '<=', session.endTime);
-                            }
-
-                            const snap4 = await query4.orderBy('timestamp', 'asc').limit(1000).get();
-                            log(`   → Résultat: ${snap4.size} documents`, snap4.size > 0 ? 'success' : 'warning');
-
-                            if (snap4.size > 0) {
-                                snap = snap4;
-                                source = 'tracking_anomalies';
-                            }
+                            source = 'drivers/position_history';
                         }
                     }
                 }
