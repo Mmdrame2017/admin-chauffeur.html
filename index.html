@@ -1505,8 +1505,13 @@
             }
             Promise.resolve(loadPromise).finally(() => { this.innerHTML = '<i class="fas fa-sync-alt"></i> Actualiser'; this.disabled = false; });
         });
-        document.getElementById('filterDriver').addEventListener('change', loadSessions);
-        document.getElementById('filterStatus').addEventListener('change', loadSessions);
+        document.getElementById('filterDriver').addEventListener('change', function() {
+            // Recharger selon le mode GPS actuel
+            changeGPSMode();
+        });
+        document.getElementById('filterStatus').addEventListener('change', function() {
+            changeGPSMode();
+        });
         function openImageViewer(url) { document.getElementById('viewerImage').src = url; document.getElementById('imageViewer').classList.add('active'); }
         function closeImageViewer() { document.getElementById('imageViewer').classList.remove('active'); }
 
@@ -1729,6 +1734,7 @@
         // ========== REAL-TIME DRIVER TRACKING ==========
         function startRealtimeTracking() {
             log('🟢 Démarrage suivi temps réel...', 'info');
+            const driverFilter = document.getElementById('filterDriver').value;
 
             // Nettoyer les anciens marqueurs
             Object.values(realtimeDriverMarkers).forEach(m => m.setMap(null));
@@ -1747,6 +1753,12 @@
                         const d = doc.data();
                         const driverId = doc.id;
                         seenDrivers.add(driverId);
+
+                        // Filtrer par chauffeur si sélectionné
+                        if (driverFilter && driverId !== driverFilter) {
+                            onlineCount++;
+                            return;
+                        }
 
                         if (d.position?.latitude && d.position?.longitude) {
                             onlineCount++;
