@@ -1059,11 +1059,10 @@
                     snap = snap1;
                     source = 'tracking_sessions/positions';
                 } else {
-                    // 🔍 ESSAI 2: Collection position_history avec sessionId
+                    // 🔍 ESSAI 2: Collection position_history avec sessionId (sans orderBy pour éviter index composite)
                     log(`🔍 Essai 2: position_history (sessionId=${session.id})`, 'info');
                     const snap2 = await db.collection('position_history')
                         .where('sessionId', '==', session.id)
-                        .orderBy('timestamp', 'asc')
                         .limit(5000)
                         .get();
                     log(`   → Résultat: ${snap2.size} documents`, snap2.size > 0 ? 'success' : 'warning');
