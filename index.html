@@ -1521,6 +1521,9 @@
             currentGPSMode = mode;
             log(`🎯 Mode GPS: ${mode}`, 'info');
 
+            // Effacer la carte (trajectoire, marqueurs, overlay info)
+            clearMapDisplay();
+
             // Afficher/masquer les filtres selon le mode
             const dateGroup = document.getElementById('dateFilterGroup');
             const legend = document.getElementById('realtimeLegend');
