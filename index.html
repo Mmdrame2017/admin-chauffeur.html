@@ -1743,8 +1743,9 @@
             // Écouter les chauffeurs en ligne
             if (realtimeDriversListener) realtimeDriversListener();
 
+            // Utiliser statut (fiable) au lieu de isOnline (souvent désynchronisé)
             realtimeDriversListener = db.collection('drivers')
-                .where('isOnline', '==', true)
+                .where('statut', 'in', ['disponible', 'en_course'])
                 .onSnapshot((snap) => {
                     let onlineCount = 0;
                     const seenDrivers = new Set();
@@ -1764,7 +1765,7 @@
                             onlineCount++;
                             const pos = { lat: d.position.latitude, lng: d.position.longitude };
                             const name = `${d.prenom || ''} ${d.nom || ''}`.trim() || d.telephone;
-                            const status = d.status || 'disponible';
+                            const status = d.statut || 'disponible';
 
                             // Couleur selon le statut
                             let color = '#22c55e'; // Vert - disponible
@@ -1802,6 +1803,7 @@
                                     content: `<div style="padding:10px;font-family:Segoe UI,sans-serif;">
                                         <strong style="color:#00A854;">${name}</strong><br>
                                         <span style="color:#666;">📍 ${status === 'en_course' ? 'En course' : 'Disponible'}</span><br>
+                                        <small style="color:#999;">Vitesse: ${d.position.speed ? Math.round(d.position.speed * 3.6) + ' km/h' : '0 km/h'}</small><br>
                                         <small style="color:#999;">Dernière maj: ${d.position.timestamp?.toDate?.().toLocaleTimeString('fr-FR') || 'N/A'}</small>
                                     </div>`
                                 });
