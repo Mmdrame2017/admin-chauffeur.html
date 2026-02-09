@@ -1557,23 +1557,27 @@
             const driverFilter = document.getElementById('filterDriver').value;
 
             try {
-                // Ne charger que les sessions actives démarrées dans les dernières 24h
-                const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+                // Requête simple (1 seul where) pour éviter index composite
                 const q = db.collection('tracking_sessions')
                     .where('status', '==', 'active')
-                    .where('startTime', '>=', firebase.firestore.Timestamp.fromDate(since24h))
-                    .orderBy('startTime', 'desc')
-                    .limit(50);
+                    .limit(200);
 
                 const snap = await q.get();
                 allSessions = [];
                 let totalDist = 0, totalPos = 0;
-
-                // Fermer les vieilles sessions orphelines en arrière-plan
-                cleanupOrphanedSessions();
+                const since24h = Date.now() - 24 * 60 * 60 * 1000;
+                const orphanedDocs = [];
 
                 snap.forEach(doc => {
                     const d = doc.data();
+                    const startMs = d.startTime?.toDate?.()?.getTime() || 0;
+
+                    // Filtrage client-side : sessions récentes uniquement
+                    if (startMs < since24h) {
+                        orphanedDocs.push(doc.ref);
+                        return;
+                    }
+
                     if (driverFilter && d.driverId !== driverFilter) return;
 
                     allSessions.push({ id: doc.id, ...d });
@@ -1581,39 +1585,39 @@
                     if (d.totalPositions) totalPos += d.totalPositions;
                 });
 
+                allSessions.sort((a, b) => (b.startTime?.toDate?.() || new Date(0)) - (a.startTime?.toDate?.() || new Date(0)));
                 document.getElementById('totalSessions').textContent = allSessions.length;
                 document.getElementById('totalDistance').textContent = totalDist.toFixed(1);
                 document.getElementById('totalPositions').textContent = totalPos;
                 displaySessions();
-                log(`🟢 ${allSessions.length} sessions actives (dernières 24h)`, 'success');
+                log(`🟢 ${allSessions.length} sessions actives (dernières 24h), ${orphanedDocs.length} orphelines`, 'success');
+
+                // Fermer les sessions orphelines en arrière-plan
+                if (orphanedDocs.length > 0) cleanupOrphanedSessions(orphanedDocs);
             } catch (e) {
                 log('Erreur sessions actives: ' + e.message, 'error');
             }
         }
 
-        // Fermer automatiquement les sessions actives de plus de 24h (orphelines)
-        async function cleanupOrphanedSessions() {
+        // Fermer automatiquement les sessions orphelines (>24h)
+        async function cleanupOrphanedSessions(orphanedRefs) {
             try {
-                const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
-                const oldSnap = await db.collection('tracking_sessions')
-                    .where('status', '==', 'active')
-                    .where('startTime', '<', firebase.firestore.Timestamp.fromDate(since24h))
-                    .limit(50)
-                    .get();
+                log(`🧹 Fermeture de ${orphanedRefs.length} sessions orphelines (>24h)...`, 'warning');
+                const now = firebase.firestore.Timestamp.now();
 
-                if (oldSnap.size === 0) return;
-                log(`🧹 Fermeture de ${oldSnap.size} sessions orphelines (>24h)...`, 'warning');
-
-                const batch = db.batch();
-                oldSnap.forEach(doc => {
-                    batch.update(doc.ref, {
-                        status: 'stopped',
-                        endTime: firebase.firestore.Timestamp.fromDate(since24h),
-                        stoppedReason: 'auto_cleanup_24h'
+                // Firestore batch max 500 opérations
+                for (let i = 0; i < orphanedRefs.length; i += 500) {
+                    const batch = db.batch();
+                    orphanedRefs.slice(i, i + 500).forEach(ref => {
+                        batch.update(ref, {
+                            status: 'stopped',
+                            endTime: now,
+                            stoppedReason: 'auto_cleanup_24h'
+                        });
                     });
-                });
-                await batch.commit();
-                log(`🧹 ${oldSnap.size} sessions orphelines fermées`, 'success');
+                    await batch.commit();
+                }
+                log(`🧹 ${orphanedRefs.length} sessions orphelines fermées`, 'success');
             } catch (e) {
                 log('Erreur cleanup: ' + e.message, 'warning');
             }
